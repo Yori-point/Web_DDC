@@ -1,0 +1,51 @@
+.legend {
+	position: fixed;
+	z-index: var(--z-ui);
+	left: 30px;
+	bottom: 24px;
+	display: flex;
+	gap: 18px;
+	color: var(--color-muted);
+	font-size: 12px;
+	flex-wrap: wrap;
+	padding: 10px 14px;
+	border: 1px solid rgba(242, 231, 218, 0.16);
+	border-radius: var(--radius-pill);
+	background: rgba(242, 231, 218, 0.05);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
+}
+
+.dot {
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	margin-right: 8px;
+	vertical-align: middle;
+}
+
+.dot.palace {
+	background: #f3c7a6;
+	box-shadow: 0 0 14px rgba(243, 199, 166, 0.95);
+}
+
+.dot.landscape {
+	background: #d7b4c6;
+	box-shadow: 0 0 14px rgba(215, 180, 198, 0.9);
+}
+
+.dot.hook {
+	background: #f7eee6;
+	box-shadow: 0 0 14px rgba(247, 238, 230, 0.95);
+}
+
+@media (max-width: 720px) {
+	.legend {
+		left: 20px;
+		bottom: 16px;
+		right: 20px;
+		border-radius: 18px;
+	}
+}

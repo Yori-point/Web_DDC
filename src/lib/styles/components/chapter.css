@@ -1,0 +1,82 @@
+.chapter-container {
+	position: fixed;
+	inset: 0;
+	z-index: var(--z-chapter);
+	color: var(--color-cream);
+	pointer-events: auto;
+	background:
+		radial-gradient(circle at 50% 58%, rgba(169, 199, 230, 0.08), transparent 42%),
+		rgba(16, 24, 32, 0.18);
+	opacity: 1;
+	visibility: visible;
+	transition: opacity var(--transition-slow), visibility var(--transition-slow);
+}
+
+.chapter-container.hidden {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.chapter-back {
+	position: absolute;
+	left: var(--space-page-x);
+	top: 30px;
+	z-index: 20;
+	letter-spacing: 0.14em;
+	font-size: 12px;
+}
+
+.chapter-meta {
+	position: absolute;
+	top: 34px;
+	left: 50%;
+	transform: translateX(-50%);
+	text-align: center;
+	font-size: 12px;
+	letter-spacing: 0.22em;
+	color: rgba(242, 231, 218, 0.62);
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
+
+.chapter-copy {
+	position: absolute;
+	left: 50%;
+	top: 56px;
+	transform: translateX(-50%);
+	text-align: center;
+	width: min(720px, calc(100vw - 48px));
+}
+
+.chapter-copy h2 {
+	font-family: var(--font-title);
+	font-weight: 400;
+	font-size: clamp(36px, 5.8vw, 72px);
+	letter-spacing: -0.055em;
+	line-height: 0.95;
+	color: var(--color-cream);
+}
+
+.chapter-copy p {
+	margin: 14px auto 0;
+	max-width: 520px;
+	font-size: 14px;
+	line-height: 1.7;
+	color: rgba(242, 231, 218, 0.7);
+}
+
+.chapter-media-map {
+	position: absolute;
+	inset: 0;
+	z-index: var(--z-chapter-ui);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 1s ease 0.35s;
+}
+
+body.chapter-active .chapter-media-map {
+	opacity: 1;
+	pointer-events: auto;
+}

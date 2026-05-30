@@ -1,0 +1,18 @@
+:root {
+	--space-page-x: 32px;
+	--space-page-y: 28px;
+
+	--radius-pill: 999px;
+	--radius-panel: 22px;
+	--radius-card: 34px;
+	--radius-small: 14px;
+
+	--z-canvas: 0;
+	--z-ui: 5;
+	--z-hotspot: 9;
+	--z-panel: 10;
+	--z-chapter: 18;
+	--z-chapter-ui: 19;
+	--z-intro: 30;
+	--z-media-panel: 80;
+}

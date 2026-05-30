@@ -1,0 +1,149 @@
+.intro {
+	position: fixed;
+	inset: 0;
+	z-index: var(--z-intro);
+	background: var(--color-bg);
+	color: var(--color-cream);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	transition: opacity 1s ease, visibility 1s ease;
+}
+
+.intro.hidden {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.intro-content {
+	width: min(860px, calc(100vw - 48px));
+	text-align: center;
+	transform: translateY(6px);
+}
+
+.intro-rings {
+	position: relative;
+	width: 142px;
+	height: 70px;
+	margin: 0 auto 30px;
+	opacity: 0.32;
+	transition: opacity 1.1s ease, filter 1.1s ease;
+	filter: none;
+}
+
+body.model-loaded .intro-rings {
+	opacity: 1;
+}
+
+.intro-rings span {
+	position: absolute;
+	width: 42px;
+	height: 42px;
+	border: 2.2px solid rgba(242, 231, 218, 0.72);
+	border-radius: 50%;
+	box-shadow: none;
+}
+
+.intro-rings span:nth-child(1) {
+	left: 0;
+	top: 0;
+}
+
+.intro-rings span:nth-child(2) {
+	left: 44px;
+	top: 0;
+}
+
+.intro-rings span:nth-child(3) {
+	left: 88px;
+	top: 0;
+}
+
+.intro-rings span:nth-child(4) {
+	left: 22px;
+	top: 22px;
+}
+
+.intro-rings span:nth-child(5) {
+	left: 66px;
+	top: 22px;
+}
+
+.intro-title {
+	margin: 0 auto 24px;
+	max-width: 760px;
+	font-family: var(--font-title);
+	font-size: clamp(72px, 9vw, 132px);
+	line-height: 0.92;
+	font-weight: 400;
+	letter-spacing: -0.035em;
+	color: rgba(242, 231, 218, 0.96);
+	text-shadow: none;
+}
+
+.intro-text {
+	margin: 0 auto 34px;
+	max-width: 620px;
+	color: rgba(210, 222, 238, 0.78);
+	line-height: 1.65;
+	font-family: var(--font-primary);
+	font-size: clamp(15px, 1.15vw, 18px);
+	font-weight: 400;
+}
+
+.enter-btn {
+	width: auto;
+	height: auto;
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	color: rgba(242, 231, 218, 0.88);
+	padding: 0;
+	box-shadow: none;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.enter-btn:hover {
+	border: none;
+	background: transparent;
+	box-shadow: none;
+	transform: none;
+	color: var(--color-cream);
+}
+
+.enter-snowflake {
+	display: block;
+	font-size: 68px;
+	line-height: 1;
+	transform: translateY(-1px);
+	transition:
+		transform 0.28s ease,
+		color 0.28s ease,
+		opacity 0.28s ease;
+}
+
+.enter-btn:hover .enter-snowflake {
+	transform: translateY(-3px) scale(1.12) rotate(12deg);
+	color: var(--color-cream);
+	opacity: 1;
+}
+
+.enter-btn:active .enter-snowflake {
+	transform: translateY(0) scale(0.96) rotate(0deg);
+}
+
+.intro-footer {
+	position: absolute;
+	left: 36px;
+	bottom: 34px;
+	font-size: 11px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: rgba(212, 219, 227, 0.34);
+}

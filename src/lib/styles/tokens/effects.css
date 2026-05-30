@@ -1,0 +1,13 @@
+:root {
+	--shadow-soft: rgba(0, 0, 0, 0.25);
+	--shadow-panel: rgba(0, 0, 0, 0.34);
+	--shadow-strong: rgba(0, 0, 0, 0.42);
+
+	--blur-ui: blur(14px);
+	--blur-panel: blur(20px);
+	--blur-strong: blur(22px);
+
+	--transition-fast: 0.2s ease;
+	--transition-medium: 0.35s ease;
+	--transition-slow: 0.9s ease;
+}

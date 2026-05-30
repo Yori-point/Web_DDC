@@ -1,0 +1,7 @@
+:root {
+	--font-primary: "Satoshi", "Manrope", sans-serif;
+	--font-secondary: "Inter", sans-serif;
+	--font-title: Georgia, "Americana", serif;
+
+	font-feature-settings: "liga" 1, "calt" 1;
+}

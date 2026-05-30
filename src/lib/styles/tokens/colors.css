@@ -1,0 +1,30 @@
+:root {
+	--color-bg: #070e17;
+	--color-bg-2: #070e17;
+	--color-bg-3: #070e17;
+
+	--color-fg: #d7e4ee;
+	--color-title: #c8d8e6;
+	--color-muted: rgba(215, 228, 238, 0.76);
+
+	--color-cream: #f2e7da;
+	--color-snow: #f4f7fb;
+	--color-snow-soft: #e6f1fa;
+
+	--color-ice: #a9c7e6;
+	--color-ice-strong: #5b7fa6;
+	--color-ice-deep: #2d4b6b;
+
+	--color-memory: #fff3cc;
+	--color-memory-soft: rgba(255, 243, 204, 0.72);
+
+	--color-line: rgba(169, 199, 230, 0.22);
+	--color-panel-bg: rgba(8, 15, 22, 0.68);
+	--color-panel-border: rgba(169, 199, 230, 0.2);
+
+	--color-category-blue: #88c4e8;
+	--color-category-green: #88c8a8;
+	--color-category-white: #e0eaf4;
+	--color-category-yellow: #e8c860;
+	--color-category-pink: #e89ab0;
+}

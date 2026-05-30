@@ -1,0 +1,33 @@
+body.intro-active .ui,
+body.intro-active .legend,
+body.intro-active .panel {
+	opacity: 0;
+	pointer-events: none;
+}
+
+body:not(.intro-active) .ui,
+body:not(.intro-active) .legend {
+	opacity: 1;
+	transition: opacity 0.8s ease 0.4s;
+}
+
+body.is-transitioning .ui,
+body.is-transitioning .legend,
+body.is-transitioning .panel,
+body.chapter-active .ui,
+body.chapter-active .legend,
+body.chapter-active .panel {
+	opacity: 0;
+	pointer-events: none;
+}
+
+body.is-transitioning canvas,
+body.chapter-active canvas {
+	filter: blur(1px) brightness(0.9) contrast(1.02);
+	transition: filter 1.2s ease;
+}
+
+body.chapter-active canvas {
+	filter: blur(2px) brightness(0.82) contrast(1.02);
+	transition: filter 1.2s ease;
+}

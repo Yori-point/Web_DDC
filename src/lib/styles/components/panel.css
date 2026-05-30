@@ -1,0 +1,52 @@
+.panel {
+	position: fixed;
+	z-index: var(--z-panel);
+	right: 28px;
+	bottom: 30px;
+	width: min(360px, calc(100vw - 56px));
+	padding: 24px;
+	border-radius: var(--radius-panel);
+	background: rgba(7, 22, 52, 0.72);
+	border: 1px solid rgba(242, 231, 218, 0.16);
+	backdrop-filter: var(--blur-panel);
+	-webkit-backdrop-filter: var(--blur-panel);
+	box-shadow: 0 24px 90px var(--shadow-panel);
+	color: var(--color-fg);
+}
+
+.panel.hidden {
+	display: none;
+}
+
+#closePanel {
+	position: absolute;
+	right: 14px;
+	top: 14px;
+	width: 34px;
+	height: 34px;
+	padding: 0;
+	font-size: 20px;
+	line-height: 1;
+}
+
+.panel-label {
+	color: rgba(212, 219, 227, 0.78);
+	font-size: 12px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	opacity: 0.88;
+}
+
+.panel h2 {
+	margin: 10px 0 10px;
+	font-family: var(--font-title);
+	font-weight: 400;
+	font-size: 30px;
+	color: var(--color-cream);
+}
+
+.panel p {
+	margin: 0;
+	color: var(--color-muted);
+	line-height: 1.75;
+}

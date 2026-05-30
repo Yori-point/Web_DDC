@@ -1,0 +1,52 @@
+html,
+body,
+#app {
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background: var(--color-bg);
+	color: var(--color-fg);
+	font-family: var(--font-primary);
+}
+
+body {
+	background: var(--color-bg);
+}
+
+#app {
+	position: relative;
+	background: var(--color-bg);
+}
+
+canvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background: var(--color-bg);
+}
+
+button {
+	border: 1px solid var(--color-line);
+	background: rgba(8, 15, 22, 0.34);
+	color: var(--color-fg);
+	border-radius: var(--radius-pill);
+	padding: 10px 14px;
+	cursor: pointer;
+	backdrop-filter: var(--blur-ui);
+	-webkit-backdrop-filter: var(--blur-ui);
+	box-shadow: 0 10px 30px var(--shadow-strong);
+	transition: all var(--transition-fast);
+}
+
+button:hover {
+	border-color: rgba(169, 199, 230, 0.38);
+	background: rgba(169, 199, 230, 0.08);
+	box-shadow: 0 12px 36px var(--shadow-soft);
+	transform: translateY(-1px);
+}
+
+body,
+button {
+	color: var(--color-cream);
+}

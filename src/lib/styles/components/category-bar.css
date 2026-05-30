@@ -1,0 +1,132 @@
+.category-bar {
+	position: fixed;
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: 34px;
+
+	display: grid;
+	grid-template-columns: repeat(5, 150px);
+	gap: 22px;
+
+	width: auto;
+	pointer-events: auto;
+}
+
+.category-item {
+	all: unset;
+	cursor: pointer;
+	color: rgba(242, 231, 218, 0.74);
+	font-size: 12px;
+	letter-spacing: 0.12em;
+	text-transform: none;
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: auto auto auto;
+	column-gap: 8px;
+	row-gap: 7px;
+	align-items: center;
+}
+
+.category-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	grid-row: 1;
+}
+
+.category-name {
+	grid-row: 1;
+}
+
+.category-line {
+	grid-column: 1 / -1;
+	position: relative;
+	width: 100%;
+	height: 1px;
+	background: rgba(242, 231, 218, 0.18);
+	overflow: hidden;
+}
+
+.category-line::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: var(--progress, 0%);
+	background: var(--cat-color, var(--color-cream));
+	box-shadow: 0 0 12px var(--cat-color, var(--color-cream));
+	transition: width 0.45s ease;
+}
+
+.category-blue {
+	--cat-color: var(--color-category-blue);
+}
+
+.category-green {
+	--cat-color: var(--color-category-green);
+}
+
+.category-white {
+	--cat-color: var(--color-category-white);
+}
+
+.category-yellow {
+	--cat-color: var(--color-category-yellow);
+}
+
+.category-pink {
+	--cat-color: var(--color-category-pink);
+}
+
+.category-meta {
+	grid-column: 1 / -1;
+	font-size: 10px;
+	letter-spacing: 0.11em;
+	color: rgba(242, 231, 218, 0.38);
+}
+
+.category-blue .category-dot {
+	background: var(--color-category-blue);
+	box-shadow: 0 0 12px rgba(136, 196, 232, 0.85);
+}
+
+.category-green .category-dot {
+	background: var(--color-category-green);
+	box-shadow: 0 0 12px rgba(136, 200, 168, 0.85);
+}
+
+.category-white .category-dot {
+	background: var(--color-category-white);
+	box-shadow: 0 0 12px rgba(224, 234, 244, 0.85);
+}
+
+.category-yellow .category-dot {
+	background: var(--color-category-yellow);
+	box-shadow: 0 0 12px rgba(232, 200, 96, 0.85);
+}
+
+.category-pink .category-dot {
+	background: var(--color-category-pink);
+	box-shadow: 0 0 12px rgba(232, 154, 176, 0.85);
+}
+
+body.intro-active .category-bar,
+body.chapter-active .category-bar,
+body.is-transitioning .category-bar {
+	opacity: 0;
+	pointer-events: none;
+}
+
+@media (max-width: 760px) {
+	.category-bar {
+		bottom: 18px;
+		width: calc(100vw - 32px);
+		grid-template-columns: repeat(2, 1fr);
+		gap: 14px 20px;
+	}
+
+	.category-item {
+		font-size: 11px;
+	}
+}

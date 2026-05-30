@@ -1,0 +1,94 @@
+.ui {
+	position: fixed;
+	z-index: var(--z-ui);
+	pointer-events: none;
+	color: var(--color-fg);
+}
+
+.top-left {
+	left: var(--space-page-x);
+	top: var(--space-page-y);
+	width: min(440px, calc(100vw - 64px));
+}
+
+.kicker {
+	color: rgba(169, 199, 230, 0.78);
+	font-size: 12px;
+	letter-spacing: 0.18em;
+	margin-bottom: 12px;
+	text-transform: uppercase;
+	opacity: 0.9;
+}
+
+h1 {
+	margin: 0;
+	font-family: var(--font-title);
+	font-size: clamp(42px, 6.6vw, 92px);
+	font-weight: 400;
+	letter-spacing: -0.065em;
+	line-height: 0.86;
+	color: var(--color-title);
+	opacity: 0.88;
+	text-shadow:
+		0 0 14px rgba(169, 199, 230, 0.1),
+		0 0 38px rgba(45, 75, 107, 0.1);
+}
+
+.ui p {
+	margin: 18px 0 0;
+	color: var(--color-muted);
+	line-height: 1.75;
+	font-size: 14px;
+	max-width: 38ch;
+}
+
+.top-right {
+	right: 24px;
+	top: 24px;
+	display: flex;
+	gap: 10px;
+	pointer-events: auto;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+}
+
+/* Overview header: only keep small TRACCE */
+body:not(.intro-active) .top-left {
+	left: 32px;
+	top: 36px;
+	width: auto;
+}
+
+body:not(.intro-active) .top-left .kicker,
+body:not(.intro-active) .top-left p {
+	display: none !important;
+}
+
+body:not(.intro-active) .top-left h1 {
+	margin: 0;
+	font-family: var(--font-primary);
+	font-size: 14px;
+	line-height: 1;
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: rgba(242, 231, 218, 0.72);
+	opacity: 1;
+	text-shadow: none;
+}
+
+@media (max-width: 720px) {
+	.top-right {
+		top: auto;
+		bottom: 74px;
+		left: 20px;
+		right: auto;
+		justify-content: flex-start;
+	}
+
+	.top-left {
+		left: 20px;
+		top: 20px;
+		width: calc(100vw - 40px);
+	}
+}
