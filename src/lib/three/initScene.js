@@ -1,9 +1,65 @@
-  // @ts-nocheck
+// @ts-nocheck
 
-  import * as THREE from "three";
-  import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { CHAPTERS } from "$lib/data/chapters.js";
+import { legacyAreas, hookHeightByKey } from "$lib/data/legacyAreas.js";
+import { createInterviewsByCategory } from "$lib/data/interviews.js";
+
+import { bindInfoPanel } from "$lib/ui/panel.js";
+
+import {
+	updateChapterCopy,
+	showChapterContainer,
+	hideChapterContainer,
+	clearChapterState
+} from "$lib/ui/chapter.js";
+
+import {
+	updateCategoryProgressItem,
+	updateOverallProgressText
+} from "$lib/ui/progress.js";
+
+import {
+	openMediaPanel,
+	closeMediaPanel,
+	bindMediaPanelClose
+} from "$lib/ui/mediaPanel.js";
+
+import {
+	renderInterviewNodes as renderInterviewNodeList,
+	updateInterviewPan
+} from "$lib/ui/interviewNodes.js";
+
+import { bindCategoryBar } from "$lib/ui/categoryBar.js";
+
+import {
+	createHotspotButtons as createHotspotButtonList,
+	updateHotspotButtonPositions
+} from "$lib/ui/hotspots.js";
+
+import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+
+import {
+	createGlowSprite,
+	createHookTexture,
+	createSoftMistTexture,
+	createSnowFlakeTexture
+} from "$lib/three/textures.js";
+
+import {
+	updateCamera as updateCameraController,
+	updateOverviewCameraByPointer as updateOverviewCameraByPointerController,
+	getChapterCameraView as getChapterCameraViewController
+} from "$lib/three/cameraController.js";
+
+import {
+	createSceneSetup,
+	resizeScene
+} from "$lib/three/sceneSetup.js";
+
+import { setMapSceneOpacity as setMapSceneOpacityController } from "$lib/three/mapOpacity.js";
   
-  export function initScene() {
+export function initScene() {
 	console.log("Olympic Tracce scene started");
 
 	const BG_COLOR = 0x070e17;
@@ -16,35 +72,38 @@
 	return;
   }
 
-  const renderer = new THREE.WebGLRenderer({
-    canvas,
-    antialias: true,
-    alpha: false
+  const cleanupInfoPanel = bindInfoPanel();
+  const cleanupMediaPanel = bindMediaPanelClose();
+  const cleanupCategoryBar = bindCategoryBar({
+    legacyAreas,
+    hookHeightByKey,
+    onSelectCategory: (area) => {
+      startChapterTransition({
+        id: area.id,
+        key: area.key,
+        title: area.title,
+        text: area.text,
+        pos: new THREE.Vector3(area.x, area.y, area.z)
+      });
+    }
   });
 
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(BG_COLOR, 1);
-
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(BG_COLOR);
-  scene.fog = new THREE.FogExp2(BG_COLOR, 0.011);
-  const mapSceneGroup = new THREE.Group();
-  mapSceneGroup.name = 'map-scene-group';
-  mapSceneGroup.visible = false;
-  scene.add(mapSceneGroup);
-
-  const camera = new THREE.PerspectiveCamera(
-    48,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    2000
-  );
-
-  const clock = new THREE.Clock();
-  const raycaster = new THREE.Raycaster();
-  const pointerNdc = new THREE.Vector2();
-  raycaster.params.Points.threshold = 1.65;
+  const {
+    renderer,
+    scene,
+    mapSceneGroup,
+    camera,
+    clock,
+    raycaster,
+    pointerNdc,
+    ambientLight,
+    keyLight,
+    violetBackLight
+  } = createSceneSetup({
+    THREE,
+    canvas,
+    bgColor: BG_COLOR
+  });
 
   const appState = {
     view: 'overview',
@@ -77,55 +136,6 @@
       : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
 
-  const CHAPTERS = {
-    festa: {
-      id: '01',
-      key: 'festa',
-      title: 'Festa / Celebrazione',
-      subtitle: 'Il cuore che celebra. La cima più luminosa.',
-      total: 72
-    },
-    opportunita: {
-      id: '02',
-      key: 'opportunita',
-      title: 'Lavoro / Opportunità',
-      subtitle: 'Direzioni che aprono il futuro.',
-      total: 14
-    },
-    trasformazione: {
-      id: '03',
-      key: 'trasformazione',
-      title: 'Cambiamento / Trasformazione',
-      subtitle: 'Territori in divenire, forme che si ridisegnano.',
-      total: 14
-    },
-    criticita: {
-      id: '04',
-      key: 'criticita',
-      title: 'Problemi / Criticità',
-      subtitle: 'Le valli da ascoltare. Ombre che chiedono cura.',
-      total: 18
-    },
-    relazioni: {
-      id: '05',
-      key: 'relazioni',
-      title: 'Relazioni / Incontri',
-      subtitle: 'Incontri che generano nuove possibilità.',
-      total: 52
-    }
-  };
-
-  const ambientLight = new THREE.AmbientLight(0xA9C7E6, 0.92);
-  scene.add(ambientLight);
-
-  const keyLight = new THREE.DirectionalLight(0xE6F1FA, 1.55);
-  keyLight.position.set(18, 38, 26);
-  scene.add(keyLight);
-
-  const violetBackLight = new THREE.DirectionalLight(0x5B7FA6, 0.95);
-  violetBackLight.position.set(-28, 22, -24);
-  scene.add(violetBackLight);
-
   const WORLD = {
     width: 96,
     depth: 58,
@@ -147,77 +157,6 @@
   };
 
   let milanMapField = null;
-
-  const legacyAreas = [
-    {
-      id: '01',
-      key: 'festa',
-      title: 'Festa / Celebrazione',
-      text: 'Il cuore che celebra. La cima più luminosa.',
-      x: -15,
-      z: 2,
-      height: 5.2,
-      radius: 9.8,
-      spread: 1.0,
-      color: 0xE8C860
-    },
-    {
-      id: '02',
-      key: 'opportunita',
-      title: 'Lavoro / Opportunità',
-      text: 'Direzioni che aprono il futuro.',
-      x: -1,
-      z: -18,
-      height: 8.4,
-      radius: 10.2,
-      spread: 1.15,
-      color: 0x88C4E8
-    },
-    {
-      id: '03',
-      key: 'trasformazione',
-      title: 'Cambiamento / Trasformazione',
-      text: 'Territori in divenire, forme che si ridisegnano.',
-      x: 29,
-      z: -8,
-      height: 8.6,
-      radius: 10.6,
-      spread: 1.2,
-      color: 0xE0EAF4
-    },
-    {
-      id: '04',
-      key: 'criticita',
-      title: 'Problemi / Criticità',
-      text: 'Le valli da ascoltare. Ombre che chiedono cura.',
-      x: -6,
-      z: 21,
-      height: -4.6,
-      radius: 10.8,
-      spread: 1.25,
-      color: 0x88C8A8
-    },
-    {
-      id: '05',
-      key: 'relazioni',
-      title: 'Relazioni / Incontri',
-      text: 'Il nucleo che connette. Incontri che generano nuove possibilità.',
-      x: 30,
-      z: 22,
-      height: 5.8,
-      radius: 8.5,
-      spread: 1.0,
-      color: 0xE89AB0
-    }
-  ];
-
-  const hookHeightByKey = {
-    festa: 16.0,
-    opportunita: 14.0,
-    trasformazione: 8.5,
-    criticita: 27.0,
-    relazioni: 13.0
-  };
 
   function getLegacyArea(key) {
     return legacyAreas.find(area => area.key === key);
@@ -380,54 +319,21 @@
   };
 
   function updateCamera() {
-    orbit.pitch = Math.max(0.08, Math.min(1.05, orbit.pitch));
-    orbit.radius = Math.max(34, Math.min(145, orbit.radius));
-
-    // When the user rotates toward a top-down view, zoom out slightly
-    // so the front/bottom mountains are not clipped by the screen.
-    const topViewBoost = THREE.MathUtils.smoothstep(orbit.pitch, 0.52, 0.95) * 68;
-
-    // Small screens also need a bit more distance.
-    const aspect = window.innerWidth / window.innerHeight;
-    const responsiveBoost = aspect < 1.05 ? 22 : 0;
-
-    const effectiveRadius = orbit.radius + topViewBoost + responsiveBoost;
-
-    const x = Math.sin(orbit.yaw) * Math.cos(orbit.pitch) * effectiveRadius;
-    const y = orbit.target.y + Math.sin(orbit.pitch) * effectiveRadius;
-    const z = Math.cos(orbit.yaw) * Math.cos(orbit.pitch) * effectiveRadius;
-
-    camera.position.set(x, y, z);
-    camera.lookAt(orbit.target);
+    updateCameraController({
+      THREE,
+      camera,
+      orbit
+    });
   }
 
   function updateOverviewCameraByPointer() {
-    if (appState.view !== 'overview') return;
-
-    appState.overviewPointerX = THREE.MathUtils.lerp(
-      appState.overviewPointerX,
-      appState.overviewPointerTargetX,
-      0.026
-    );
-
-    appState.overviewPointerY = THREE.MathUtils.lerp(
-      appState.overviewPointerY,
-      appState.overviewPointerTargetY,
-      0.026
-    );
-
-    orbit.yaw =
-      OVERVIEW_CAMERA.yaw +
-      appState.overviewPointerX * OVERVIEW_CAMERA.maxYawOffset;
-
-    orbit.pitch =
-      OVERVIEW_CAMERA.pitch -
-      appState.overviewPointerY * OVERVIEW_CAMERA.maxPitchOffset;
-
-    orbit.radius = OVERVIEW_CAMERA.radius;
-    orbit.target.copy(OVERVIEW_CAMERA.target);
-
-    updateCamera();
+    updateOverviewCameraByPointerController({
+      THREE,
+      appState,
+      orbit,
+      overviewCamera: OVERVIEW_CAMERA,
+      updateCameraFn: updateCamera
+    });
   }
 
   function insideMapShape(x, z) {
@@ -638,75 +544,8 @@
     chapterAmp: null
   };
 
-  function createGlowSprite(color, opacity = 1) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 128;
-    canvas.height = 128;
-
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, 128, 128);
-
-    const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 58);
-
-    gradient.addColorStop(0.00, 'rgba(255,255,255,0.95)');
-    gradient.addColorStop(0.16, 'rgba(255,255,255,0.62)');
-    gradient.addColorStop(0.42, 'rgba(255,255,255,0.18)');
-    gradient.addColorStop(0.72, 'rgba(255,255,255,0.035)');
-    gradient.addColorStop(1.00, 'rgba(255,255,255,0)');
-
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(64, 64, 58, 0, Math.PI * 2);
-    ctx.fill();
-
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.needsUpdate = true;
-
-    const material = new THREE.SpriteMaterial({
-      map: texture,
-      color,
-      transparent: true,
-      opacity,
-      alphaTest: 0.025, // 关键：切掉正方形透明边
-      depthWrite: false,
-      depthTest: false,
-      blending: THREE.AdditiveBlending
-    });
-
-    return new THREE.Sprite(material);
-  }
-
-  function createHookTexture() {
-    const c = document.createElement('canvas');
-    c.width = c.height = 128;
-    const g = c.getContext('2d');
-
-    const gradient = g.createRadialGradient(64, 64, 3, 64, 64, 47);
-    gradient.addColorStop(0, 'rgba(255,255,255,1)');
-    gradient.addColorStop(0.34, 'rgba(230,241,250,0.66)');
-    gradient.addColorStop(1, 'rgba(230,241,250,0)');
-
-    g.fillStyle = gradient;
-    g.beginPath();
-    g.arc(64, 64, 48, 0, Math.PI * 2);
-    g.fill();
-
-    g.strokeStyle = 'rgba(255,255,255,0.88)';
-    g.lineWidth = 2.0;
-    g.beginPath();
-    g.arc(64, 64, 23, 0, Math.PI * 2);
-    g.stroke();
-
-    g.fillStyle = 'rgba(255,255,255,0.78)';
-    g.beginPath();
-    g.arc(64, 64, 7, 0, Math.PI * 2);
-    g.fill();
-
-    return new THREE.CanvasTexture(c);
-  }
-
   function createLegacyHooks() {
-    const texture = createHookTexture();
+    const texture = createHookTexture(THREE);
 
     legacyAreas.forEach(area => {
       const y = hookHeightByKey[area.key] || 9.5;
@@ -773,7 +612,7 @@
 
     // 雪的材质修改
     const snowMaterial = new THREE.PointsMaterial({
-      map: createSnowFlakeTexture(),
+      map: createSnowFlakeTexture(THREE),
       alphaTest: 0.008,
       color: 0xffffff,
       size: 0.32,
@@ -820,7 +659,7 @@
     geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
 
     const mat = new THREE.PointsMaterial({
-      map: createSnowFlakeTexture(),
+      map: createSnowFlakeTexture(THREE),
       alphaTest: 0.004,
       color: 0xffffff,
       size: 0.76,
@@ -931,39 +770,7 @@ function createBackgroundStars() {
   scene.add(points);
 }
 
-
-  function createSoftMistTexture() {
-    const c = document.createElement('canvas');
-    c.width = c.height = 64;
-    const ctx = c.getContext('2d');
-    const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grad.addColorStop(0,    'rgba(255,255,255,0.88)');
-    grad.addColorStop(0.28, 'rgba(255,255,255,0.40)');
-    grad.addColorStop(0.60, 'rgba(255,255,255,0.09)');
-    grad.addColorStop(1,    'rgba(255,255,255,0)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 64, 64);
-    return new THREE.CanvasTexture(c);
-  }
-
-  function createSnowFlakeTexture() {
-    const c = document.createElement('canvas');
-    c.width = c.height = 128;
-    const ctx = c.getContext('2d');
-
-    const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 58);
-    gradient.addColorStop(0.0, 'rgba(255,255,255,0.95)');
-    gradient.addColorStop(0.18, 'rgba(255,255,255,0.62)');
-    gradient.addColorStop(0.45, 'rgba(255,255,255,0.18)');
-    gradient.addColorStop(1.0, 'rgba(255,255,255,0)');
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 128, 128);
-
-    return new THREE.CanvasTexture(c);
-  }
-
-    function createIntroParticleRings() {
+function createIntroParticleRings() {
       const positions = [];
       const colors = [];
       const base = [];
@@ -1095,7 +902,7 @@ function createBackgroundStars() {
     geo.setAttribute('color',    new THREE.Float32BufferAttribute(colors, 3));
 
     const mat = new THREE.PointsMaterial({
-      map: createSoftMistTexture(),
+      map: createSoftMistTexture(THREE),
       alphaTest: 0.005,
       size: 0.46,
       sizeAttenuation: true,
@@ -1118,9 +925,9 @@ function createBackgroundStars() {
 
     scene.add(rings);
     animatedObjects.introRings = rings;
-  }
+}
 
-  function updateIntroRingTargetsFromCurrentHotspots() {
+function updateIntroRingTargetsFromCurrentHotspots() {
     const p02 = getLegacyPoint('opportunita');
     const p01 = getLegacyPoint('festa');
     const p03 = getLegacyPoint('trasformazione');
@@ -1134,9 +941,9 @@ function createBackgroundStars() {
       { cx:  -7.2, cy: 3.05, cz:  5.7, tx: p04.x, ty: p04.y, tz: p04.z },
       { cx:   7.2, cy: 3.05, cz:  5.7, tx: p05.x, ty: p05.y, tz: p05.z }
     ];
-  }
+}
 
-  function createRitualForegroundSnow() {
+function createRitualForegroundSnow() {
     // Fine particles between rings (z≈0) and camera (z=72).
     // Lower-half biased so they obscure the bottom of the ring composition.
     const fineCount = 1400;
@@ -1194,7 +1001,7 @@ function createBackgroundStars() {
     const largeGeo = new THREE.BufferGeometry();
     largeGeo.setAttribute('position', new THREE.Float32BufferAttribute(largePos, 3));
     const largeMat = new THREE.PointsMaterial({
-      map: createSoftMistTexture(),
+      map: createSoftMistTexture(THREE),
       alphaTest: 0.005,
       color: 0xDDE6EE,
       size: 0.55,
@@ -1215,28 +1022,25 @@ function createBackgroundStars() {
     animatedObjects.ritualSnowLargeBase  = new Float32Array(largeBase);
     animatedObjects.ritualSnowLargePhase = new Float32Array(largePhase);
     animatedObjects.ritualSnowLargeAmp   = new Float32Array(largeAmp);
-  }
+}
 
-  function createLegendHelperDots() {
-    legacyAreas.forEach(area => {
-      const glow = createGlowSprite(
-        area.color,
-        0.28
-      );
+function createLegendHelperDots() {
+	legacyAreas.forEach(area => {
+		const glow = createGlowSprite(THREE, area.color, 0.28);
 
-      const y = hookHeightByKey[area.key] || 9.5;
+		const y = hookHeightByKey[area.key] || 9.5;
 
-      glow.position.set(area.x, y, area.z);
+		glow.position.set(area.x, y, area.z);
 
-      // Smaller, cleaner glow. No huge square panel over the mountains.
-      glow.scale.set(4.8, 4.8, 1);
+		// Smaller, cleaner glow. No huge square panel over the mountains.
+		glow.scale.set(4.8, 4.8, 1);
 
-      glow.renderOrder = 35;
-      mapSceneGroup.add(glow);
-    });
-  }
+		glow.renderOrder = 35;
+		mapSceneGroup.add(glow);
+	});
+}
 
-  function createDenseMapPointsFromMesh(mesh, count = 32000) {
+function createDenseMapPointsFromMesh(mesh, count = 32000) {
     const geometry = mesh.geometry;
     const position = geometry.attributes.position;
     const index = geometry.index;
@@ -1356,7 +1160,7 @@ function createBackgroundStars() {
     );
 
     const particleMaterial = new THREE.PointsMaterial({
-      map: createSoftMistTexture(),
+      map: createSoftMistTexture(THREE),
       alphaTest: 0.025,
       size: 0.18,
       sizeAttenuation: true,
@@ -1380,9 +1184,9 @@ function createBackgroundStars() {
     mapSceneGroup.add(points);
 
     return points;
-  }
+}
 
-  function createTerrainBaseParticlesFromMesh(mesh, count = 90000) {
+function createTerrainBaseParticlesFromMesh(mesh, count = 90000) {
     const geometry = mesh.geometry;
     const position = geometry.attributes.position;
     const index = geometry.index;
@@ -1493,7 +1297,7 @@ function createBackgroundStars() {
     );
 
     const particleMaterial = new THREE.PointsMaterial({
-      map: createSoftMistTexture(),
+      map: createSoftMistTexture(THREE),
       alphaTest: 0.025,
       size: 0.34,
       sizeAttenuation: true,
@@ -1517,7 +1321,7 @@ function createBackgroundStars() {
     mapSceneGroup.add(points);
 
     return points;
-  }
+}
 
   function createDuomoParticlesFromMesh(mesh, count = 18000) {
     const geometry = mesh.geometry;
@@ -1622,7 +1426,7 @@ function createBackgroundStars() {
     );
 
     const particleMaterial = new THREE.PointsMaterial({
-      map: createSoftMistTexture(),
+      map: createSoftMistTexture(THREE),
       alphaTest: 0.04,
       size: 0.32,
       sizeAttenuation: true,
@@ -1760,7 +1564,7 @@ function createBackgroundStars() {
     );
 
     const particleMaterial = new THREE.PointsMaterial({
-      map: createSoftMistTexture(),
+      map: createSoftMistTexture(THREE),
       alphaTest: 0.055,
       size: 0.44,
       sizeAttenuation: true,
@@ -1964,26 +1768,10 @@ function createBackgroundStars() {
   createWorld();
 
   function setMapSceneOpacity(progress) {
-    const p = THREE.MathUtils.clamp(progress, 0, 1);
-
-    mapSceneGroup.traverse(obj => {
-      if (!obj.material) return;
-
-      const materials = Array.isArray(obj.material)
-        ? obj.material
-        : [obj.material];
-
-      materials.forEach(mat => {
-        if (mat.userData.baseOpacity === undefined) {
-          mat.userData.baseOpacity = mat.opacity !== undefined ? mat.opacity : 1;
-        }
-
-        mat.transparent = true;
-        mat.opacity = mat.userData.baseOpacity * p;
-
-        // 完全透明时不写入深度，避免看不见但挡住五环
-        mat.depthWrite = p > 0.15;
-      });
+    setMapSceneOpacityController({
+      THREE,
+      mapSceneGroup,
+      progress
     });
   }
 
@@ -2006,30 +1794,7 @@ function createBackgroundStars() {
   const mediaPanelTitle = document.getElementById('mediaPanelTitle');
   const mediaPanelText = document.getElementById('mediaPanelText');
 
-  function makeInterviewList(categoryKey, labelPrefix) {
-    const total = CHAPTERS[categoryKey]?.total ?? 10;
-    const types = ['text', 'audio', 'video'];
-
-    return Array.from({ length: total }, (_, i) => {
-      const type = types[i % types.length];
-
-      return {
-        id: i + 1,
-        type,
-        label: `${labelPrefix} ${i + 1}`,
-        title: `Intervista ${i + 1}`,
-        text: `Placeholder intervista ${i + 1} per ${CHAPTERS[categoryKey]?.title || categoryKey}.`
-      };
-    });
-  }
-
-  const INTERVIEWS_BY_CATEGORY = {
-    festa: makeInterviewList('festa', 'Celebrazione'),
-    opportunita: makeInterviewList('opportunita', 'Opportunità'),
-    trasformazione: makeInterviewList('trasformazione', 'Cambiamento'),
-    criticita: makeInterviewList('criticita', 'Problemi'),
-    relazioni: makeInterviewList('relazioni', 'Relazioni')
-  };
+  const INTERVIEWS_BY_CATEGORY = createInterviewsByCategory(CHAPTERS);
 
   const exploredByCategory = {
     festa: new Set(),
@@ -2040,27 +1805,11 @@ function createBackgroundStars() {
   };
 
   function getChapterCameraView(pos, key) {
-    // 让相机看向山顶上方一点，这样山会落在画面下半部，上面留白更多
-    const target = pos.clone();
-    target.y += 7.5; //上方留白
-
-    const yaw = OVERVIEW_CAMERA.yaw;
-    const pitch = 0.16;
-    const radius = 34; // zoom-in 更近 / 更远
-
-    const x = Math.sin(yaw) * Math.cos(pitch) * radius;
-    const y = Math.sin(pitch) * radius;
-    const z = Math.cos(yaw) * Math.cos(pitch) * radius;
-
-    const cameraPos = target.clone().add(new THREE.Vector3(x, y, z));
-
-    // 防止相机太低，穿到山里
-    cameraPos.y = Math.max(cameraPos.y, pos.y + 7);
-
-    return {
-      cameraPos,
-      target
-    };
+    return getChapterCameraViewController({
+      THREE,
+      pos,
+      overviewCamera: OVERVIEW_CAMERA
+    });
   }
 
   function startChapterTransition(data) {
@@ -2073,8 +1822,6 @@ function createBackgroundStars() {
     appState.targetChapter = chapter;
 
     if (panel) panel.classList.add('hidden');
-    if (mediaPanel) mediaPanel.classList.add('hidden');
-    if (mediaMap) mediaMap.classList.remove('has-open');
 
     document.body.classList.add('is-transitioning');
 
@@ -2106,17 +1853,13 @@ function createBackgroundStars() {
     mapSceneGroup.visible = true;
     setMapSceneOpacity(1);
 
-    if (chapterNumber) chapterNumber.textContent = chapter.id;
-    if (chapterTitle) chapterTitle.textContent = chapter.title;
-    if (chapterSubtitle) chapterSubtitle.textContent = chapter.subtitle;
-
-    if (chapterContainer) chapterContainer.classList.remove('hidden');
+    updateChapterCopy(chapter);
+    showChapterContainer();
 
     renderInterviewNodes(chapter.key);
     updateCategoryProgress();
 
     document.body.classList.remove('is-transitioning');
-    document.body.classList.add('chapter-active');
   }
 
   function returnToOverview() {
@@ -2136,12 +1879,8 @@ function createBackgroundStars() {
     if (animatedObjects.ritualSnowFine)  animatedObjects.ritualSnowFine.visible  = false;
     if (animatedObjects.ritualSnowLarge) animatedObjects.ritualSnowLarge.visible = false;
 
-    if (chapterContainer) chapterContainer.classList.add('hidden');
-    if (mediaPanel) mediaPanel.classList.add('hidden');
-    if (mediaMap) mediaMap.classList.remove('has-open');
-    document.querySelectorAll('.interview-node').forEach(node => {
-      node.classList.remove('is-active');
-    });
+    hideChapterContainer();
+    clearChapterState();
 
     document.body.classList.remove('chapter-active');
     document.body.classList.remove('is-transitioning');
@@ -2164,113 +1903,35 @@ function createBackgroundStars() {
     let overallExplored = 0;
     let overallTotal = 0;
 
-    document.querySelectorAll('.category-item').forEach(item => {
-      const key = item.dataset.key;
+    Object.keys(CHAPTERS).forEach(key => {
       const chapter = CHAPTERS[key];
-      const meta = item.querySelector('.category-meta');
 
-      if (!chapter || !meta) return;
+      if (!chapter) return;
 
       const explored = exploredByCategory[key]?.size || 0;
       const total = chapter.total ?? 10;
-      const percent = total > 0
-        ? Math.min(100, Math.round((explored / total) * 100))
-        : 0;
 
       overallExplored += explored;
       overallTotal += total;
 
-      meta.textContent = `Esplorazione ${explored} / ${total}`;
-      item.style.setProperty('--progress', `${percent}%`);
+      updateCategoryProgressItem(key, explored, total);
     });
+
+    updateOverallProgressText(overallExplored, overallTotal);
   }
 
   function renderInterviewNodes(categoryKey) {
-    const container = document.getElementById('interviewNodes');
-
-    if (!container || !mediaPanel || !mediaMap) return;
-
-    container.innerHTML = '';
-
     const interviews = INTERVIEWS_BY_CATEGORY[categoryKey] || [];
 
-    interviews.forEach((item, index) => {
-      const button = document.createElement('button');
-
-      button.className = `media-node interview-node interview-${item.type}`;
-      if (exploredByCategory[categoryKey]?.has(item.id)) {
-        button.classList.add('is-viewed');
-      }
-      button.dataset.category = categoryKey;
-      button.dataset.id = item.id;
-      button.setAttribute('aria-label', item.title);
-
-      // 10 buttons: two rows of five
-      const total = interviews.length;
-
-      // 采访数量越多，画布越宽；鼠标左右移动时可以看到更多按钮
-      const virtualWidth = total > 40 ? 190 : total > 20 ? 155 : 115;
-      container.style.setProperty('--interview-width', `${virtualWidth}vw`);
-
-      const cols = total > 40 ? 12 : total > 20 ? 8 : 5;
-      const rows = Math.ceil(total / cols);
-
-      const col = index % cols;
-      const row = Math.floor(index / cols);
-
-      // 基础网格，但加入轻微错位，避免太机械
-      const xBase = 7 + (col / Math.max(cols - 1, 1)) * 86;
-      const yBase = 34 + (row / Math.max(rows - 1, 1)) * 46;
-
-      const offsetX = Math.sin(index * 1.7) * 2.8;
-      const offsetY = Math.cos(index * 2.1) * 3.2;
-
-      button.style.left = `${xBase + offsetX}%`;
-      button.style.top = `${yBase + offsetY}%`;
-      button.style.animationDelay = `${index * -0.12}s`;
-
-      const iconByType = {
-        text: '”',
-        audio: '▶',
-        video: '▦'
-      };
-
-      const iconClassByType = {
-        text: 'particle-quote',
-        audio: 'particle-play',
-        video: 'particle-grid'
-      };
-
-      button.innerHTML = `
-        <span class="particle-icon ${iconClassByType[item.type] || 'particle-quote'}">
-          ${iconByType[item.type] || '”'}
-        </span>
-      `;
-
-      button.addEventListener('click', event => {
-        event.stopPropagation();
-
+    renderInterviewNodeList({
+      categoryKey,
+      interviews,
+      exploredSet: exploredByCategory[categoryKey],
+      onSelect: (item) => {
         exploredByCategory[categoryKey].add(item.id);
-        button.classList.add('is-viewed');
-
-        document.querySelectorAll('.interview-node').forEach(node => {
-          node.classList.remove('is-active');
-        });
-
-        button.classList.add('is-active');
-
-        mediaMap.classList.add('has-open');
-
-        if (mediaPanelLabel) mediaPanelLabel.textContent = item.label;
-        if (mediaPanelTitle) mediaPanelTitle.textContent = item.title;
-        if (mediaPanelText) mediaPanelText.textContent = item.text;
-
-        mediaPanel.classList.remove('hidden');
-
+        openMediaPanel(item);
         updateCategoryProgress();
-      });
-
-      container.appendChild(button);
+      }
     });
 
     updateCategoryProgress();
@@ -2296,8 +1957,6 @@ function createBackgroundStars() {
     // 左右最多移动约 28vw，不要太夸张
     interviewPanTarget = -normalized * window.innerWidth * 0.28;
   });
-
-  const categoryItems = document.querySelectorAll('.category-item');
 
   const hotspotLayer = document.getElementById('hotspotLayer');
   let hotspotButtons = [];
@@ -2327,150 +1986,57 @@ function createBackgroundStars() {
   }
 
   function createHotspotButtons() {
-    if (!hotspotLayer) return;
-
-    hotspotLayer.innerHTML = '';
-
-    hotspotButtons = legacyAreas.map(area => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = `hotspot-btn hotspot-${area.key}`;
-      button.dataset.key = area.key;
-
-      button.innerHTML = `
-        <span class="hotspot-dot"></span>
-        <span class="hotspot-label">
-          <strong>${area.title}</strong>
-          <small>${area.text}</small>
-        </span>
-      `;
-
-      button.addEventListener('mouseenter', () => {
-        appState.hoverHookObject = findHookByKey(area.key);
-      });
-
-      button.addEventListener('mouseleave', () => {
+    hotspotButtons = createHotspotButtonList({
+      legacyAreas,
+      hookHeightByKey,
+      hotspotLayer,
+      findHookByKey,
+      onHover: (key) => {
+        appState.hoverHookObject = findHookByKey(key);
+      },
+      onLeave: () => {
         appState.hoverHookObject = null;
-      });
-
-      button.addEventListener('pointerdown', event => {
-        event.stopPropagation();
-      });
-
-      button.addEventListener('pointerup', event => {
-        event.stopPropagation();
-      });
-
-      button.addEventListener('click', event => {
-        event.stopPropagation();
-
-        const hook = findHookByKey(area.key);
-        const y = hookHeightByKey[area.key] || 9.5;
+      },
+      onSelect: (area) => {
+        const fallbackPos = new THREE.Vector3(
+          area.fallback.x,
+          area.fallback.y,
+          area.fallback.z
+        );
 
         startChapterTransition({
           id: area.id,
           key: area.key,
           title: area.title,
           text: area.text,
-          pos: hook ? hook.userData.pos.clone() : new THREE.Vector3(area.x, y, area.z)
+          pos: area.pos || fallbackPos
         });
-      });
-
-      hotspotLayer.appendChild(button);
-
-      return {
-        button,
-        area
-      };
+      }
     });
   }
 
   function updateHotspotButtons() {
-    if (!hotspotLayer) return;
+    updateHotspotButtonPositions({
+      hotspotLayer,
+      hotspotButtons,
+      appState,
+      camera,
+      hookHeightByKey,
+      findHookByKey,
+      THREE
+    });
 
     const shouldShow =
-      appState.view === 'overview' &&
-      !document.body.classList.contains('intro-active');
-
-    hotspotLayer.classList.toggle('is-visible', shouldShow);
+      appState.view === "overview" &&
+      !document.body.classList.contains("intro-active");
 
     if (!shouldShow) {
       appState.hoverHookObject = null;
-      return;
     }
-
-    const worldPosition = new THREE.Vector3();
-
-    hotspotButtons.forEach(({ button, area }) => {
-      const hook = findHookByKey(area.key);
-
-      if (hook) {
-        hook.getWorldPosition(worldPosition);
-      } else {
-        worldPosition.set(area.x, hookHeightByKey[area.key] || 9.5, area.z);
-      }
-
-      worldPosition.project(camera);
-
-      const screenX = (worldPosition.x * 0.5 + 0.5) * window.innerWidth;
-      const screenY = (-worldPosition.y * 0.5 + 0.5) * window.innerHeight;
-
-      const isBehindCamera = worldPosition.z > 1;
-
-      button.style.left = `${screenX}px`;
-      button.style.top = `${screenY}px`;
-      button.classList.toggle('is-hidden', isBehindCamera);
-    });
   }
-
-  categoryItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const key = item.dataset.key;
-      const area = legacyAreas.find(a => a.key === key);
-
-      if (!area) return;
-
-      const y = hookHeightByKey[key] || 9.5;
-
-      startChapterTransition({
-        id: area.id,
-        key: area.key,
-        title: area.title,
-        text: area.text,
-        pos: new THREE.Vector3(area.x, y, area.z)
-      });
-    });
-  });
 
   // Initialize bottom category progress labels on overview.
   updateCategoryProgress();
-
-  if (closeMediaPanel && mediaPanel) {
-    closeMediaPanel.addEventListener('click', event => {
-      event.stopPropagation();
-
-      mediaPanel.classList.add('hidden');
-
-      if (mediaMap) mediaMap.classList.remove('has-open');
-      document.querySelectorAll('.interview-node').forEach(node => {
-        node.classList.remove('is-active');
-      });
-    });
-  }
-
-  if (closePanel && panel) {
-    closePanel.addEventListener('click', () => panel.classList.add('hidden'));
-  }
-
-  if (aboutBtn && panel && panelLabel && panelTitle && panelText) {
-    aboutBtn.addEventListener('click', () => {
-      panelLabel.textContent = 'ABOUT';
-      panelTitle.textContent = 'Rilievo emotivo';
-      panelText.textContent =
-        'Cinque cime di significato raccontano le tracce dell’eredità olimpica. Al centro, il nucleo urbano raccoglie traiettorie e anelli ispirati al Duomo.';
-      panel.classList.remove('hidden');
-    });
-  }
 
   window.addEventListener('pointermove', e => {
     const nx = e.clientX / window.innerWidth - 0.5;
@@ -2670,9 +2236,7 @@ function createBackgroundStars() {
   }
 
   window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    resizeScene({ renderer, camera });
   });
 
   updateCamera();
@@ -3074,12 +2638,7 @@ function createBackgroundStars() {
   function animate() {
     const t = clock.getElapsedTime();
 
-    const interviewContainer = document.getElementById('interviewNodes');
-
-    if (interviewContainer) {
-      interviewPanCurrent += (interviewPanTarget - interviewPanCurrent) * 0.06;
-      interviewContainer.style.setProperty('--pan-x', `${interviewPanCurrent}px`);
-    }
+    interviewPanCurrent = updateInterviewPan(interviewPanCurrent, interviewPanTarget);
 
     if (appState.view === 'overview' || appState.view === 'transition') {
       animateTerrain(t);
@@ -3147,6 +2706,10 @@ function createBackgroundStars() {
   	animate();
 
 	return () => {
+    cleanupInfoPanel?.();
+    cleanupMediaPanel?.();
+    cleanupCategoryBar?.();
+
 		renderer.dispose();
 	};
 }

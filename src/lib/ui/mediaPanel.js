@@ -1,0 +1,49 @@
+// @ts-nocheck
+
+export function openMediaPanel(item) {
+	const mediaPanel = document.getElementById("mediaPanel");
+	const mediaMap = document.querySelector(".chapter-media-map");
+
+	const mediaPanelLabel = document.getElementById("mediaPanelLabel");
+	const mediaPanelTitle = document.getElementById("mediaPanelTitle");
+	const mediaPanelText = document.getElementById("mediaPanelText");
+
+	if (!mediaPanel) return;
+
+	if (mediaMap) mediaMap.classList.add("has-open");
+
+	if (mediaPanelLabel) mediaPanelLabel.textContent = item.label;
+	if (mediaPanelTitle) mediaPanelTitle.textContent = item.title;
+	if (mediaPanelText) mediaPanelText.textContent = item.text;
+
+	mediaPanel.classList.remove("hidden");
+}
+
+export function closeMediaPanel() {
+	const mediaPanel = document.getElementById("mediaPanel");
+	const mediaMap = document.querySelector(".chapter-media-map");
+
+	if (mediaPanel) mediaPanel.classList.add("hidden");
+	if (mediaMap) mediaMap.classList.remove("has-open");
+
+	document.querySelectorAll(".interview-node").forEach((node) => {
+		node.classList.remove("is-active");
+	});
+}
+
+export function bindMediaPanelClose() {
+	const closeMediaPanelButton = document.getElementById("closeMediaPanel");
+
+	function handleClose(event) {
+		event?.preventDefault();
+		event?.stopPropagation();
+
+		closeMediaPanel();
+	}
+
+	closeMediaPanelButton?.addEventListener("click", handleClose);
+
+	return () => {
+		closeMediaPanelButton?.removeEventListener("click", handleClose);
+	};
+}
