@@ -58,6 +58,7 @@ import {
 } from "$lib/three/sceneSetup.js";
 
 import { setMapSceneOpacity as setMapSceneOpacityController } from "$lib/three/mapOpacity.js";
+import { loadUnifiedMapModel } from "$lib/three/mapModel.js";
   
 export function initScene() {
 	console.log("Olympic Tracce scene started");
@@ -1597,159 +1598,21 @@ function createTerrainBaseParticlesFromMesh(mesh, count = 90000) {
   }
 
   function createUnifiedMapModel() {
-    const loader = new GLTFLoader();
-
-    loader.load(
-      "/mountain_map.glb",
-      gltf => {
-        const model = gltf.scene;
-        model.name = 'unified-map-model';
-
-        model.position.set(0, 5.8, 0);
-        model.rotation.set(0, 0, 0);
-
-        // 地图大小
-        model.scale.set(2, 2, 2);
-        model.updateMatrixWorld(true);
-
-        // 先读取 Blender 里的 hotspot 位置
-        model.traverse(child => {
-          const meshName = child.name.toLowerCase();
-
-          if (meshName.startsWith('hotspot_')) {
-            updateLegacyAreaFromObject(child);
-            child.visible = false;
-          }
-        });
-
-        // 再根据更新后的 hotspot 生成网页上的五个点
-        createLegendHelperDots();
-        createLegacyHooks();
-        createHotspotButtons();
-
-        // 再处理山、地图线、底座、duomo
-        model.traverse(child => {
-          if (!child.isMesh) return;
-
-          const meshName = child.name.toLowerCase();
-
-          const isMountain = meshName.startsWith('mountain_');
-          const isMapLine = meshName.includes('map_line');
-          const isTerrainBase = meshName.includes('terrain_base');
-          const isDuomo = meshName.includes('duomo');
-
-          if (isMountain) {
-            const key = getKeyFromName(meshName);
-            const vertexCount = child.geometry?.attributes?.position?.count || 0;
-
-            const particleCount = Math.min(
-              52000,
-              Math.max(22000, Math.floor(vertexCount * 5.0))
-            );
-
-            createMountainParticlesFromMesh(child, particleCount, key);
-
-            child.visible = false;
-            child.material = new THREE.MeshBasicMaterial({
-              color: BG_COLOR,
-              transparent: true,
-              opacity: 0,
-              depthWrite: false
-            });
-
-            console.log('Converted named mountain:', child.name, key, particleCount);
-            return;
-          }
-
-          if (isMapLine) {
-            const vertexCount = child.geometry?.attributes?.position?.count || 0;
-
-            const mapPointCount = Math.min(
-              240000,
-              Math.max(90000, Math.floor(vertexCount * 34))
-            );
-
-            createDenseMapPointsFromMesh(child, mapPointCount);
-
-            child.visible = false;
-            child.material = new THREE.MeshBasicMaterial({
-              color: BG_COLOR,
-              transparent: true,
-              opacity: 0,
-              depthWrite: false
-            });
-
-            child.castShadow = false;
-            child.receiveShadow = false;
-
-            console.log('Converted Map_Line to dense points:', child.name, mapPointCount);
-            return;
-          }
-
-          if (isTerrainBase) {
-            const vertexCount = child.geometry?.attributes?.position?.count || 0;
-
-            const terrainPointCount = Math.min(
-              260000,
-              Math.max(130000, Math.floor(vertexCount * 30))
-            );
-
-            createTerrainBaseParticlesFromMesh(child, terrainPointCount);
-
-            // 隐藏原来的实体平面，只保留淡粒子底座
-            child.visible = false;
-            child.material = new THREE.MeshBasicMaterial({
-              color: BG_COLOR,
-              transparent: true,
-              opacity: 0,
-              depthWrite: false
-            });
-
-            child.castShadow = false;
-            child.receiveShadow = false;
-
-            console.log('Converted Terrain_Base to soft particles:', child.name, terrainPointCount);
-            return;
-          }
-
-          if (isDuomo) {
-            const vertexCount = child.geometry?.attributes?.position?.count || 0;
-
-            const duomoPointCount = Math.min(
-              42000,
-              Math.max(16000, Math.floor(vertexCount * 10))
-            );
-
-            createDuomoParticlesFromMesh(child, duomoPointCount);
-
-            child.visible = false;
-            child.material = new THREE.MeshBasicMaterial({
-              color: BG_COLOR,
-              transparent: true,
-              opacity: 0,
-              depthWrite: false
-            });
-
-            child.castShadow = false;
-            child.receiveShadow = false;
-
-            console.log('Converted Duomo to particles:', child.name, duomoPointCount);
-            return;
-          }
-
-          // 其他辅助 mesh 暂时隐藏，避免乱入
-          child.visible = false;
-        });
-
-        mapSceneGroup.add(model);
-        document.body.classList.add('model-loaded');
-        console.log('New mountain_map GLB loaded:', model);
-      },
-      undefined,
-      error => {
-        console.error('mountain_map GLB load error:', error);
-      }
-    );
+    loadUnifiedMapModel({
+      THREE,
+      GLTFLoader,
+      bgColor: BG_COLOR,
+      mapSceneGroup,
+      onUpdateLegacyAreaFromObject: updateLegacyAreaFromObject,
+      onCreateLegendHelperDots: createLegendHelperDots,
+      onCreateLegacyHooks: createLegacyHooks,
+      onCreateHotspotButtons: createHotspotButtons,
+      onCreateMountainParticlesFromMesh: createMountainParticlesFromMesh,
+      onCreateDenseMapPointsFromMesh: createDenseMapPointsFromMesh,
+      onCreateTerrainBaseParticlesFromMesh: createTerrainBaseParticlesFromMesh,
+      onCreateDuomoParticlesFromMesh: createDuomoParticlesFromMesh,
+      getKeyFromName
+    });
   }
 
   function createWorld() {
