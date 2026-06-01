@@ -59,6 +59,41 @@ import {
 
 import { setMapSceneOpacity as setMapSceneOpacityController } from "$lib/three/mapOpacity.js";
 import { loadUnifiedMapModel } from "$lib/three/mapModel.js";
+
+import {
+	createSnowParticles,
+	createForegroundSnowParticles,
+	animateSnowParticles,
+	animateForegroundSnowParticles
+} from "$lib/three/particles/snow.js";
+
+import {
+	createIntroParticleRings as createIntroParticleRingsModule,
+	updateIntroRingTargetsFromCurrentHotspots as updateIntroRingTargetsModule,
+	createRitualForegroundSnow as createRitualForegroundSnowModule,
+  animateIntroRings as animateIntroRingsModule,
+	animateRitualSnow as animateRitualSnowModule
+} from "$lib/three/particles/ritual.js";
+
+import {
+	createChapterCloudParticles,
+	animateChapterCloudParticles
+} from "$lib/three/particles/chapterCloud.js";
+
+import {
+	createLegendHelperDots as createLegendHelperDotsModule,
+	createLegacyHooks as createLegacyHooksModule,
+	animateHooks as animateHooksModule,
+	applyMarkerHoverVisual as applyMarkerHoverVisualModule
+} from "$lib/three/particles/hooks.js";
+
+import {
+	makePoints as makePointsModule,
+	createDenseMapPointsFromMesh as createDenseMapPointsFromMeshModule,
+	createTerrainBaseParticlesFromMesh as createTerrainBaseParticlesFromMeshModule,
+	createDuomoParticlesFromMesh as createDuomoParticlesFromMeshModule,
+	createMountainParticlesFromMesh as createMountainParticlesFromMeshModule
+} from "$lib/three/particles/mapParticles.js";
   
 export function initScene() {
 	console.log("Olympic Tracce scene started");
@@ -207,101 +242,19 @@ export function initScene() {
   }
 
   function applyMarkerHoverVisual() {
-    const hoveredHook = appState.hoverHookObject;
-    const hoveredKey = hoveredHook?.userData?.key || null;
-    const isHovering = appState.view === 'overview' && !!hoveredHook;
-
-    scene.background.set(BG_COLOR);
-    scene.fog.color.set(BG_COLOR); 
-
-    ambientLight.intensity = 0.92;
-    keyLight.intensity = 1.55;
-    violetBackLight.intensity = 0.95;
-
-    // Hover hook 时：只有对应山体轻微亮起，颜色跟山顶圆点一致
-    animatedObjects.mountainParticles.forEach(points => {
-      const mat = points.material;
-      const isTargetMountain =
-        isHovering &&
-        points.userData.key &&
-        points.userData.key === hoveredKey;
-
-      if (points.userData.baseColors && points.geometry.attributes.color) {
-        const colors = points.geometry.attributes.color.array;
-        const baseColors = points.userData.baseColors;
-
-        const targetColor = new THREE.Color(points.userData.color || 0xffffff);
-
-        for (let i = 0; i < colors.length; i += 3) {
-          const br = baseColors[i];
-          const bg = baseColors[i + 1];
-          const bb = baseColors[i + 2];
-
-          if (isTargetMountain) {
-            // 让山体真正染上对应类别色，而不是只变白
-            const mix = 0.58;
-            const glow = 1.18;
-
-            colors[i] = THREE.MathUtils.lerp(br * 0.88, targetColor.r * glow, mix);
-            colors[i + 1] = THREE.MathUtils.lerp(bg * 0.88, targetColor.g * glow, mix);
-            colors[i + 2] = THREE.MathUtils.lerp(bb * 0.88, targetColor.b * glow, mix);
-          } else {
-            colors[i] = br;
-            colors[i + 1] = bg;
-            colors[i + 2] = bb;
-          }
-        }
-
-        points.geometry.attributes.color.needsUpdate = true;
-      }
-
-      if (isTargetMountain) {
-        mat.opacity = 1.0;
-        mat.size = (points.userData.baseSize || 0.44) * 1.08;
-        points.renderOrder = 42;
-      } else {
-        mat.opacity = points.userData.baseOpacity || 0.96;
-        mat.size = points.userData.baseSize || 0.44;
-        points.renderOrder = 24;
-      }
-
-      mat.color.set(0xffffff);
-      mat.blending = THREE.NormalBlending;
-      mat.needsUpdate = true;
+    applyMarkerHoverVisualModule({
+      THREE,
+      BG_COLOR,
+      scene,
+      ambientLight,
+      keyLight,
+      violetBackLight,
+      animatedObjects,
+      appState
     });
-
-    // 地图线条保持原样
-    animatedObjects.pulseLines.forEach(line => {
-      if (!line.material.userData.baseOpacity) {
-        line.material.userData.baseOpacity = line.material.opacity;
-      }
-
-      line.material.opacity = line.material.userData.baseOpacity;
-    });
-
-    if (animatedObjects.snow) {
-      animatedObjects.snow.material.opacity = 0.5;
-    }
-
-    // 只保留以前五个点的轻微 hover feedback
-    animatedObjects.hooks.forEach(hook => {
-      const isTarget = isHovering && hook.userData.key === hoveredKey;
-
-      if (isTarget) {
-        hook.material.opacity = 1.0;
-        hook.scale.set(5.2, 5.2, 1);
-        hook.renderOrder = 70;
-      } else {
-        hook.material.opacity = 0.86;
-        hook.scale.set(4.7, 4.7, 1);
-        hook.renderOrder = 35;
-      }
-    });
-
-    document.body.style.cursor = isHovering ? 'pointer' : '';
   }
 
-    const orbit = {
+  const orbit = {
     yaw: -0.48,
     pitch: 0.30,
     radius: 80,
@@ -360,18 +313,18 @@ export function initScene() {
   }
 
   function gaussian(x, z, cx, cz, height, radius, sx = 1, sz = 1) {
-    const dx = (x - cx) / sx;
-    const dz = (z - cz) / sz;
-    const d2 = dx * dx + dz * dz;
-    return height * Math.exp(-d2 / (2 * radius * radius));
+      const dx = (x - cx) / sx;
+      const dz = (z - cz) / sz;
+      const d2 = dx * dx + dz * dz;
+      return height * Math.exp(-d2 / (2 * radius * radius));
   }
 
-    function smoothstep(edge0, edge1, x) {
+  function smoothstep(edge0, edge1, x) {
       const t = THREE.MathUtils.clamp((x - edge0) / (edge1 - edge0), 0, 1);
       return t * t * (3 - 2 * t);
-    }
+  }
 
-    function sampleMapMask(x, z) {
+  function sampleMapMask(x, z) {
       if (!milanMapField) return 0;
 
       const { width, height, data, worldWidth, worldHeight } = milanMapField;
@@ -403,7 +356,7 @@ export function initScene() {
      }
 
      return sum / count;
-   }
+  }
 
   function ridgeNoise(x, z) {
     return (
@@ -413,7 +366,7 @@ export function initScene() {
     );
   }
 
-    function terrainHeight(x, z) {
+  function terrainHeight(x, z) {
       const festa = legacyAreas.find(area => area.key === 'festa');
       const opportunita = legacyAreas.find(area => area.key === 'opportunita');
       const trasformazione = legacyAreas.find(area => area.key === 'trasformazione');
@@ -459,31 +412,18 @@ export function initScene() {
       y *= 0.72 + fade * 0.28;
 
       return y;
-    }
+  }
 
-    function makePoints(name, positions, colors, size, opacity) {
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-
-    if (colors) {
-      geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    }
-
-    const mat = new THREE.PointsMaterial({
+  function makePoints(name, positions, colors, size, opacity) {
+    return makePointsModule({
+      THREE,
+      scene,
+      name,
+      positions,
+      colors,
       size,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity,
-      vertexColors: Boolean(colors),
-      depthWrite: false,
-      depthTest: false,
-      blending: THREE.NormalBlending
+      opacity
     });
-
-    const pts = new THREE.Points(geo, mat);
-    pts.name = name;
-    scene.add(pts);
-    return pts;
   }
 
   function makeLineSegments(name, positions, color = 0xF3D7C4, opacity = 0.42) {
@@ -546,1055 +486,121 @@ export function initScene() {
   };
 
   function createLegacyHooks() {
-    const texture = createHookTexture(THREE);
-
-    legacyAreas.forEach(area => {
-      const y = hookHeightByKey[area.key] || 9.5;
-
-      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: texture,
-        color: area.color,
-        transparent: true,
-        opacity: 0.86,
-        alphaTest: 0.025,
-        depthWrite: false,
-        depthTest: false,
-        blending: THREE.NormalBlending
-      }));
-
-      sprite.position.set(area.x, y, area.z);
-      sprite.scale.set(2.4, 2.4, 1);
-      sprite.userData = {
-        id: area.id,
-        key: area.key,
-        title: area.title,
-        text: area.text,
-        pos: sprite.position.clone()
-      };
-
-      animatedObjects.hooks.push(sprite);
-      mapSceneGroup.add(sprite);
+    createLegacyHooksModule({
+      THREE,
+      legacyAreas,
+      hookHeightByKey,
+      mapSceneGroup,
+      animatedObjects,
+      createHookTexture
     });
   }
 
   function createSnow() {
-    const positions = [];
-    const base = [];
-    const phases = [];
-    const amps = [];
-
-    for (let i = 0; i < WORLD.snowCount; i++) {
-      const x = THREE.MathUtils.randFloatSpread(150);
-
-      // 分两层：一层近地漂浮，一层高空星尘
-      const lowLayer = Math.random() < 0.62;
-
-      const y = lowLayer
-        ? THREE.MathUtils.randFloat(1.8, 18)
-        : THREE.MathUtils.randFloat(18, 68);
-
-      const z = THREE.MathUtils.randFloatSpread(100);
-
-      positions.push(x, y, z);
-      base.push(x, y, z);
-      phases.push(Math.random() * Math.PI * 2);
-      amps.push(lowLayer ? 0.18 + Math.random() * 0.52 : 0.06 + Math.random() * 0.34);
-    }
-
-    animatedObjects.snowBase = new Float32Array(base);
-    animatedObjects.snowPhase = new Float32Array(phases);
-    animatedObjects.snowAmp = new Float32Array(amps);
-
-    const snowGeometry = new THREE.BufferGeometry();
-    snowGeometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(positions, 3)
-    );
-
-    // 雪的材质修改
-    const snowMaterial = new THREE.PointsMaterial({
-      map: createSnowFlakeTexture(THREE),
-      alphaTest: 0.008,
-      color: 0xffffff,
-      size: 0.32,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0.66,
-      depthWrite: false,
-      depthTest: false,
-      blending: THREE.NormalBlending
+    createSnowParticles({
+      THREE,
+      WORLD,
+      mapSceneGroup,
+      animatedObjects,
+      createSnowFlakeTexture
     });
-
-    const snowPoints = new THREE.Points(snowGeometry, snowMaterial);
-    snowPoints.name = 'dense-floating-snow';
-    snowPoints.renderOrder = 5;
-
-    mapSceneGroup.add(snowPoints);
-    animatedObjects.snow = snowPoints;
   }
 
   function createForegroundSnow() {
-    const positions = [];
-    const base = [];
-    const phases = [];
-    const amps = [];
-
-    const count = 260;
-
-    for (let i = 0; i < count; i++) {
-      const x = THREE.MathUtils.randFloatSpread(120);
-      const y = THREE.MathUtils.randFloat(4, 54);
-      const z = THREE.MathUtils.randFloat(-35, 52);
-
-      positions.push(x, y, z);
-      base.push(x, y, z);
-      phases.push(Math.random() * Math.PI * 2);
-      amps.push(0.18 + Math.random() * 0.55);
-    }
-
-    animatedObjects.foregroundSnowBase = new Float32Array(base);
-    animatedObjects.foregroundSnowPhase = new Float32Array(phases);
-    animatedObjects.foregroundSnowAmp = new Float32Array(amps);
-
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-
-    const mat = new THREE.PointsMaterial({
-      map: createSnowFlakeTexture(THREE),
-      alphaTest: 0.004,
-      color: 0xffffff,
-      size: 0.76,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0.42,
-      depthWrite: false,
-      depthTest: false,
-      blending: THREE.NormalBlending
+    createForegroundSnowParticles({
+      THREE,
+      mapSceneGroup,
+      animatedObjects,
+      createSnowFlakeTexture
     });
-
-    const points = new THREE.Points(geo, mat);
-    points.name = 'foreground-large-snow';
-    points.renderOrder = 7;
-
-    mapSceneGroup.add(points);
-    animatedObjects.foregroundSnow = points;
   }
 
   function createChapterCloud() {
-    const positions = [];
-    const colors = [];
-    const base = [];
-    const phases = [];
-    const amps = [];
-
-    for (let i = 0; i < 14000; i++) {
-     const radius = Math.pow(Math.random(), 0.62) * 92;
-     const angle = Math.random() * Math.PI * 2;
-
-     const x = Math.cos(angle) * radius;
-     const y = 
-       Math.random() < 0.72
-       ? THREE.MathUtils.randFloat(-10, 8)
-       : THREE.MathUtils.randFloat(8, 38);
-     const z = Math.sin(angle) * radius + THREE.MathUtils.randFloat(-60, 36);
-
-     positions.push(x, y, z);
-     base.push(x, y, z);
-
-     const c = COLORS.ice.clone().lerp(COLORS.white, 0.35 + Math.random() * 0.55);
-     const intensity = 0.34 + Math.random() * 0.54;
-
-     colors.push(c.r * intensity, c.g * intensity, c.b * intensity);
-
-     phases.push(Math.random() * Math.PI * 2);
-     amps.push(0.18 + Math.random() * 0.92);
-    }
-
-  animatedObjects.chapterBase = new Float32Array(base);
-  animatedObjects.chapterPhase = new Float32Array(phases);
-  animatedObjects.chapterAmp = new Float32Array(amps);
-
-  animatedObjects.chapterCloud = makePoints(
-    'chapter-cloud-particles',
-    positions,
-    colors,
-    0.11,
-    0.72
-  );
-
-  animatedObjects.chapterCloud.visible = false;
-  animatedObjects.chapterCloud.renderOrder = 80;
-}
-
-function createBackgroundStars() {
-  const positions = [];
-  const colors = [];
-
-  for (let i = 0; i < 3600; i++) {
-    const x = THREE.MathUtils.randFloatSpread(180);
-
-    const y =
-      Math.random() < 0.72
-        ? THREE.MathUtils.randFloat(4, 34)
-        : THREE.MathUtils.randFloat(34, 74);
-
-    const z = THREE.MathUtils.randFloat(-84, 68);
-
-    positions.push(x, y, z);
-
-    const m = 0.08 + Math.random() * 0.18;
-    colors.push(
-      0.78 * m,
-      0.88 * m,
-      1.0 * m
-    );
+    createChapterCloudParticles({
+      THREE,
+      animatedObjects,
+      COLORS,
+      makePoints
+    });
   }
 
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-  const mat = new THREE.PointsMaterial({
-    size: 0.095,
-    sizeAttenuation: true,
-    vertexColors: true,
-    transparent: true,
-    opacity: 0.38,
-    depthWrite: false,
-    depthTest: true,
-    blending: THREE.NormalBlending
-  });
-
-  const points = new THREE.Points(geo, mat);
-  points.name = 'distant-background-ice-dust';
-  points.renderOrder = 2;
-  scene.add(points);
-}
-
-function createIntroParticleRings() {
-      const positions = [];
-      const colors = [];
-      const base = [];
-      const phases = [];
-      const amps = [];
-
-      const countPerRing = 9000;
-      const ringRadius = 9.8;
-      const ringThickness = 3.2;
-
-      // Pale luminous winter palette — light, transparent, emerging from darkness.
-      // Low saturation but HIGH brightness. "Pale ice" not "dark mud".
-      const ringData = [
-        { x: -14.4, y: 6.0, z: -6.2, color: new THREE.Color(0x88C4E8) },  // pale icy cyan-blue
-        { x:    0,  y: 6.0, z: -6.2, color: new THREE.Color(0xE8C860) },  // soft pale gold
-        { x:  14.4, y: 6.0, z: -6.2, color: new THREE.Color(0xE0EAF4) },  // soft snow white
-        { x:  -7.2, y: 3.05, z:  5.7, color: new THREE.Color(0x88C8A8) },  // pale mint green
-        { x:   7.2, y: 3.05, z:  5.7, color: new THREE.Color(0xE89AB0) }   // soft dusty rose
-      ];
-
-      for (let ringIndex = 0; ringIndex < ringData.length; ringIndex++) {
-        const ring = ringData[ringIndex];
-
-        for (let i = 0; i < countPerRing; i++) {
-          const a = Math.random() * Math.PI * 2;
-
-          // Multi-frequency brightness variation — creates uneven but always visible arc.
-          const w1 = 0.5 + 0.5 * Math.sin(a * 1.8 + ringIndex * 2.3);
-          const w2 = 0.5 + 0.5 * Math.sin(a * 4.1 + ringIndex * 0.8 + 1.0);
-          const opFactor = w1 * 0.45 + w2 * 0.30 + Math.random() * 0.25;
-
-          // Radial spread: wider soft halos in dim zones, tight core in bright clusters
-          const radSpread = ringThickness * THREE.MathUtils.lerp(0.78, 0.34, opFactor);
-          // 轻微有机起伏：让轮廓像雪尘，不像数学椭圆
-          const organicWobble =
-            Math.sin(a * 2.2 + ringIndex * 1.7) * 0.28 +
-            Math.sin(a * 5.1 + ringIndex * 0.9) * 0.14;
-
-          // 给每个环一点“管状厚度”：不是一条平面线，而是有体积的雪雾环
-          const tubeAngle = Math.random() * Math.PI * 2;
-          const tubeRadius = ringThickness * (0.18 + Math.pow(Math.random(), 0.7) * 0.56);
-
-          const radialTube = Math.cos(tubeAngle) * tubeRadius;
-          const verticalTube = Math.sin(tubeAngle) * tubeRadius * 0.34;
-          const depthTube = Math.sin(tubeAngle) * tubeRadius * 0.12;
-
-          const r =
-            ringRadius +
-            organicWobble +
-            radialTube +
-            THREE.MathUtils.randFloatSpread(radSpread * 0.36);
-
-          const x =
-            ring.x +
-            Math.cos(a) * r +
-            THREE.MathUtils.randFloatSpread(0.34);
-
-          const y =
-            ring.y +
-            verticalTube +
-            Math.sin(a * 3.0 + ringIndex) * 0.16 +
-            THREE.MathUtils.randFloatSpread(0.26);
-
-          const z =
-            ring.z +
-            Math.sin(a) * r +
-            Math.cos(a) * depthTube +
-            THREE.MathUtils.randFloatSpread(0.34);
-
-          positions.push(x, y, z);
-          base.push(x, y, z);
-          phases.push(Math.random() * Math.PI * 2);
-          amps.push(0.04 + Math.random() * 0.14);
-
-          // Brightness floor at 0.42 — nothing goes dark or black.
-          // opFactor modulates from "soft" (0.42) to "brighter cluster" (0.82).
-          const brightness = 0.42 + opFactor * 0.40;
-          const c = ring.color.clone();
-          colors.push(c.r * brightness, c.g * brightness, c.b * brightness);
-        }
-      }
-
-      // Pale atmospheric dust — same light palette, barely visible
-      const dustCount = 420;
-      for (let i = 0; i < dustCount; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const radius = 10 + Math.random() * 22;
-        const dx = Math.cos(angle) * radius + THREE.MathUtils.randFloatSpread(4);
-        const dy = 4.8 + THREE.MathUtils.randFloat(-2.5, 3.5);
-        const dz = Math.sin(angle) * radius * 0.5 + THREE.MathUtils.randFloatSpread(6);
-        positions.push(dx, dy, dz);
-        base.push(dx, dy, dz);
-        phases.push(Math.random() * Math.PI * 2);
-        amps.push(0.05 + Math.random() * 0.18);
-        const m = 0.06 + Math.random() * 0.08;
-        colors.push(0.78 * m, 0.88 * m, 1.0 * m);
-      }
-
-    animatedObjects.introRingsCountPerRing = countPerRing;
-    const p02 = getLegacyPoint('opportunita');
-    const p01 = getLegacyPoint('festa');
-    const p03 = getLegacyPoint('trasformazione');
-    const p04 = getLegacyPoint('criticita');
-    const p05 = getLegacyPoint('relazioni');
-
-    animatedObjects.introRingsTargets = [
-      // blue ring → 02 opportunità
-      { cx: -14.4, cy: 6.0,  cz: -6.2, tx: p02.x, ty: p02.y, tz: p02.z },
-
-      // yellow ring → 01 festa
-      { cx:   0.0, cy: 6.0,  cz: -6.2, tx: p01.x, ty: p01.y, tz: p01.z },
-
-      // white ring → 03 trasformazione
-      { cx:  14.4, cy: 6.0,  cz: -6.2, tx: p03.x, ty: p03.y, tz: p03.z },
-
-      // green ring → 04 criticità
-      { cx:  -7.2, cy: 3.05, cz:  5.7, tx: p04.x, ty: p04.y, tz: p04.z },
-
-      // pink ring → 05 relazioni
-      { cx:   7.2, cy: 3.05, cz:  5.7, tx: p05.x, ty: p05.y, tz: p05.z }
-    ];
-
-    animatedObjects.introRingsBase  = new Float32Array(base);
-    animatedObjects.introRingsPhase = new Float32Array(phases);
-    animatedObjects.introRingsAmp   = new Float32Array(amps);
-
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geo.setAttribute('color',    new THREE.Float32BufferAttribute(colors, 3));
-
-    const mat = new THREE.PointsMaterial({
-      map: createSoftMistTexture(THREE),
-      alphaTest: 0.005,
-      size: 0.46,
-      sizeAttenuation: true,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0,
-      depthWrite: false,
-      depthTest: false,
-      blending: THREE.NormalBlending
+  function createIntroParticleRings() {
+    createIntroParticleRingsModule({
+      THREE,
+      scene,
+      animatedObjects,
+      createSoftMistTexture,
+      getLegacyPoint
     });
+  }
 
-    const rings = new THREE.Points(geo, mat);
-    rings.name = 'intro-particle-rings';
-    rings.visible = false;
-    rings.renderOrder = 150;
-    rings.position.set(0.8, 0.15, 0);
-    rings.scale.set(1.18, 1.10, 1.12);
-    rings.rotation.y = 0;
-    rings.rotation.z = 0;
-
-    scene.add(rings);
-    animatedObjects.introRings = rings;
-}
-
-function updateIntroRingTargetsFromCurrentHotspots() {
-    const p02 = getLegacyPoint('opportunita');
-    const p01 = getLegacyPoint('festa');
-    const p03 = getLegacyPoint('trasformazione');
-    const p04 = getLegacyPoint('criticita');
-    const p05 = getLegacyPoint('relazioni');
-
-    animatedObjects.introRingsTargets = [
-      { cx: -14.4, cy: 6.0,  cz: -6.2, tx: p02.x, ty: p02.y, tz: p02.z },
-      { cx:   0.0, cy: 6.0,  cz: -6.2, tx: p01.x, ty: p01.y, tz: p01.z },
-      { cx:  14.4, cy: 6.0,  cz: -6.2, tx: p03.x, ty: p03.y, tz: p03.z },
-      { cx:  -7.2, cy: 3.05, cz:  5.7, tx: p04.x, ty: p04.y, tz: p04.z },
-      { cx:   7.2, cy: 3.05, cz:  5.7, tx: p05.x, ty: p05.y, tz: p05.z }
-    ];
-}
-
-function createRitualForegroundSnow() {
-    // Fine particles between rings (z≈0) and camera (z=72).
-    // Lower-half biased so they obscure the bottom of the ring composition.
-    const fineCount = 1400;
-    const finePos = [], fineBase = [], finePhase = [], fineAmp = [];
-
-    for (let i = 0; i < fineCount; i++) {
-      const x = THREE.MathUtils.randFloatSpread(75);
-      const y = Math.random() < 0.65
-        ? THREE.MathUtils.randFloat(-18, 3)   // lower half emphasis
-        : THREE.MathUtils.randFloat(3, 16);
-      const z = 18 + Math.random() * 44;      // between rings and camera
-      finePos.push(x, y, z);
-      fineBase.push(x, y, z);
-      finePhase.push(Math.random() * Math.PI * 2);
-      fineAmp.push(0.12 + Math.random() * 0.38);
-    }
-
-    const fineGeo = new THREE.BufferGeometry();
-    fineGeo.setAttribute('position', new THREE.Float32BufferAttribute(finePos, 3));
-    const fineMat = new THREE.PointsMaterial({
-      color: 0xCCDAE6,
-      size: 0.11,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0,
-      depthWrite: false,
-      depthTest: false,
-      blending: THREE.NormalBlending
+  function updateIntroRingTargetsFromCurrentHotspots() {
+    updateIntroRingTargetsModule({
+      animatedObjects,
+      getLegacyPoint
     });
-    const fineSnow = new THREE.Points(fineGeo, fineMat);
-    fineSnow.name = 'ritual-snow-fine';
-    fineSnow.visible = false;
-    fineSnow.renderOrder = 160;
-    scene.add(fineSnow);
+  }
 
-    animatedObjects.ritualSnowFine      = fineSnow;
-    animatedObjects.ritualSnowFineBase  = new Float32Array(fineBase);
-    animatedObjects.ritualSnowFinePhase = new Float32Array(finePhase);
-    animatedObjects.ritualSnowFineAmp   = new Float32Array(fineAmp);
-
-    // Large slow flakes very close to camera — big apparent size, strong depth cue
-    const largeCount = 38;
-    const largePos = [], largeBase = [], largePhase = [], largeAmp = [];
-
-    for (let i = 0; i < largeCount; i++) {
-      const x = THREE.MathUtils.randFloatSpread(50);
-      const y = THREE.MathUtils.randFloat(-12, 8);
-      const z = 52 + Math.random() * 16;   // very close to camera
-      largePos.push(x, y, z);
-      largeBase.push(x, y, z);
-      largePhase.push(Math.random() * Math.PI * 2);
-      largeAmp.push(0.25 + Math.random() * 0.45);
-    }
-
-    const largeGeo = new THREE.BufferGeometry();
-    largeGeo.setAttribute('position', new THREE.Float32BufferAttribute(largePos, 3));
-    const largeMat = new THREE.PointsMaterial({
-      map: createSoftMistTexture(THREE),
-      alphaTest: 0.005,
-      color: 0xDDE6EE,
-      size: 0.55,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0,
-      depthWrite: false,
-      depthTest: false,
-      blending: THREE.NormalBlending
+  function createRitualForegroundSnow() {
+    createRitualForegroundSnowModule({
+      THREE,
+      scene,
+      animatedObjects,
+      createSoftMistTexture
     });
-    const largeSnow = new THREE.Points(largeGeo, largeMat);
-    largeSnow.name = 'ritual-snow-large';
-    largeSnow.visible = false;
-    largeSnow.renderOrder = 162;
-    scene.add(largeSnow);
-
-    animatedObjects.ritualSnowLarge      = largeSnow;
-    animatedObjects.ritualSnowLargeBase  = new Float32Array(largeBase);
-    animatedObjects.ritualSnowLargePhase = new Float32Array(largePhase);
-    animatedObjects.ritualSnowLargeAmp   = new Float32Array(largeAmp);
-}
-
-function createLegendHelperDots() {
-	legacyAreas.forEach(area => {
-		const glow = createGlowSprite(THREE, area.color, 0.28);
-
-		const y = hookHeightByKey[area.key] || 9.5;
-
-		glow.position.set(area.x, y, area.z);
-
-		// Smaller, cleaner glow. No huge square panel over the mountains.
-		glow.scale.set(4.8, 4.8, 1);
-
-		glow.renderOrder = 35;
-		mapSceneGroup.add(glow);
-	});
-}
-
-function createDenseMapPointsFromMesh(mesh, count = 32000) {
-    const geometry = mesh.geometry;
-    const position = geometry.attributes.position;
-    const index = geometry.index;
-
-    if (!position) return null;
-
-    mesh.updateMatrixWorld(true);
-
-    const triangles = [];
-    let totalArea = 0;
-
-    const a = new THREE.Vector3();
-    const b = new THREE.Vector3();
-    const c = new THREE.Vector3();
-    const ab = new THREE.Vector3();
-    const ac = new THREE.Vector3();
-
-    const triCount = index ? index.count / 3 : Math.floor(position.count / 3);
-
-    for (let i = 0; i < triCount; i++) {
-      const ia = index ? index.getX(i * 3) : i * 3;
-      const ib = index ? index.getX(i * 3 + 1) : i * 3 + 1;
-      const ic = index ? index.getX(i * 3 + 2) : i * 3 + 2;
-
-      a.fromBufferAttribute(position, ia).applyMatrix4(mesh.matrixWorld);
-      b.fromBufferAttribute(position, ib).applyMatrix4(mesh.matrixWorld);
-      c.fromBufferAttribute(position, ic).applyMatrix4(mesh.matrixWorld);
-
-      ab.subVectors(b, a);
-      ac.subVectors(c, a);
-
-      const area = ab.cross(ac).length() * 0.5;
-
-      if (area > 0.000001) {
-        totalArea += area;
-        triangles.push({
-          a: a.clone(),
-          b: b.clone(),
-          c: c.clone(),
-          area,
-          cumulative: totalArea
-        });
-      }
-    }
-
-    const positions = [];
-    const colors = [];
-
-    if (triangles.length) {
-      for (let i = 0; i < count; i++) {
-        const r = Math.random() * totalArea;
-
-        let low = 0;
-        let high = triangles.length - 1;
-
-        while (low < high) {
-          const mid = Math.floor((low + high) / 2);
-          if (triangles[mid].cumulative < r) low = mid + 1;
-          else high = mid;
-        }
-
-        const tri = triangles[low];
-
-        let u = Math.random();
-        let v = Math.random();
-
-        if (u + v > 1) {
-          u = 1 - u;
-          v = 1 - v;
-        }
-
-        const p = tri.a.clone()
-          .add(tri.b.clone().sub(tri.a).multiplyScalar(u))
-          .add(tri.c.clone().sub(tri.a).multiplyScalar(v));
-
-        p.x += THREE.MathUtils.randFloatSpread(0.012);
-        p.y += -0.025 + THREE.MathUtils.randFloatSpread(0.004);
-        p.z += THREE.MathUtils.randFloatSpread(0.012);
-
-        positions.push(p.x, p.y, p.z);
-
-        // Milan map line: brighter white particle traces
-        const brightness = 0.62 + Math.random() * 0.28;
-
-        colors.push(
-          0.72 * brightness,
-          0.84 * brightness,
-          0.96 * brightness
-);
-      }
-    } else {
-      // fallback: if the mesh has no usable triangles, use raw vertices
-      for (let i = 0; i < position.count; i++) {
-        const p = new THREE.Vector3()
-          .fromBufferAttribute(position, i)
-          .applyMatrix4(mesh.matrixWorld);
-
-        positions.push(p.x, p.y, p.z);
-
-        const brightness = 0.58 + Math.random() * 0.32;
-        colors.push(
-          0.78 * brightness,
-          0.90 * brightness,
-          1.0 * brightness
-        );
-      }
-    }
-
-    const particleGeometry = new THREE.BufferGeometry();
-    particleGeometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(positions, 3)
-    );
-    particleGeometry.setAttribute(
-      'color',
-      new THREE.Float32BufferAttribute(colors, 3)
-    );
-
-    const particleMaterial = new THREE.PointsMaterial({
-      map: createSoftMistTexture(THREE),
-      alphaTest: 0.025,
-      size: 0.18,
-      sizeAttenuation: true,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.82,
-      depthWrite: false,
-      depthTest: false,
-      blending: THREE.NormalBlending
-    }); 
-
-    const points = new THREE.Points(particleGeometry, particleMaterial);
-    points.name = `dense-map-points-${mesh.name || 'city'}`;
-    points.renderOrder = 30;
-
-    points.userData = {
-      baseOpacity: 0.82,
-      baseSize: 0.18
-    };
-
-    mapSceneGroup.add(points);
-
-    return points;
-}
-
-function createTerrainBaseParticlesFromMesh(mesh, count = 90000) {
-    const geometry = mesh.geometry;
-    const position = geometry.attributes.position;
-    const index = geometry.index;
-
-    if (!position) return null;
-
-    mesh.updateMatrixWorld(true);
-
-    const triangles = [];
-    let totalArea = 0;
-
-    const a = new THREE.Vector3();
-    const b = new THREE.Vector3();
-    const c = new THREE.Vector3();
-    const ab = new THREE.Vector3();
-    const ac = new THREE.Vector3();
-
-    const triCount = index ? index.count / 3 : Math.floor(position.count / 3);
-
-    for (let i = 0; i < triCount; i++) {
-      const ia = index ? index.getX(i * 3) : i * 3;
-      const ib = index ? index.getX(i * 3 + 1) : i * 3 + 1;
-      const ic = index ? index.getX(i * 3 + 2) : i * 3 + 2;
-
-      a.fromBufferAttribute(position, ia).applyMatrix4(mesh.matrixWorld);
-      b.fromBufferAttribute(position, ib).applyMatrix4(mesh.matrixWorld);
-      c.fromBufferAttribute(position, ic).applyMatrix4(mesh.matrixWorld);
-
-      ab.subVectors(b, a);
-      ac.subVectors(c, a);
-
-      const area = ab.cross(ac).length() * 0.5;
-
-      if (area > 0.000001) {
-        totalArea += area;
-        triangles.push({
-          a: a.clone(),
-          b: b.clone(),
-          c: c.clone(),
-          area,
-          cumulative: totalArea
-        });
-      }
-    }
-
-    if (!triangles.length) return null;
-
-    const positions = [];
-    const colors = [];
-
-    for (let i = 0; i < count; i++) {
-      const r = Math.random() * totalArea;
-
-      let low = 0;
-      let high = triangles.length - 1;
-
-      while (low < high) {
-        const mid = Math.floor((low + high) / 2);
-        if (triangles[mid].cumulative < r) low = mid + 1;
-        else high = mid;
-      }
-
-      const tri = triangles[low];
-
-      let u = Math.random();
-      let v = Math.random();
-
-      if (u + v > 1) {
-        u = 1 - u;
-        v = 1 - v;
-      }
-
-      const p = tri.a.clone()
-        .add(tri.b.clone().sub(tri.a).multiplyScalar(u))
-        .add(tri.c.clone().sub(tri.a).multiplyScalar(v));
-
-      // 很轻微的雪尘松散感，不要像实体板
-      p.x += THREE.MathUtils.randFloatSpread(0.08);
-      p.y += THREE.MathUtils.randFloatSpread(0.045);
-      p.z += THREE.MathUtils.randFloatSpread(0.08);
-
-      positions.push(p.x, p.y, p.z);
-
-      // Terrain base: not pure white. Use icy blue-grey with organic variation.
-      const wave =
-        0.5 +
-        0.5 * Math.sin(p.x * 0.18 + p.z * 0.11) *
-        Math.cos(p.z * 0.13 - p.x * 0.07);
-
-      const brightness = 0.36 + wave * 0.22 + Math.random() * 0.16;
-
-      // Slight cold-green / blue-grey tint, closer to the reference site's unified terrain feeling.
-      colors.push(
-        0.58 * brightness,
-        0.74 * brightness,
-        0.82 * brightness
-      );
-    }
-
-    const particleGeometry = new THREE.BufferGeometry();
-    particleGeometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(positions, 3)
-    );
-    particleGeometry.setAttribute(
-      'color',
-      new THREE.Float32BufferAttribute(colors, 3)
-    );
-
-    const particleMaterial = new THREE.PointsMaterial({
-      map: createSoftMistTexture(THREE),
-      alphaTest: 0.025,
-      size: 0.34,
-      sizeAttenuation: true,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.68,
-      depthWrite: false,
-      depthTest: true,
-      blending: THREE.NormalBlending
+  }
+
+  function createLegendHelperDots() {
+    createLegendHelperDotsModule({
+      THREE,
+      legacyAreas,
+      hookHeightByKey,
+      mapSceneGroup,
+      createGlowSprite
     });
+  }
 
-    const points = new THREE.Points(particleGeometry, particleMaterial);
-    points.name = `terrain-base-particles-${mesh.name || 'terrain'}`;
-    points.renderOrder = 12;
+  function createDenseMapPointsFromMesh(mesh, count = 32000) {
+    return createDenseMapPointsFromMeshModule({
+      THREE,
+      mesh,
+      count,
+      mapSceneGroup,
+      createSoftMistTexture
+    });
+  }
 
-    points.userData = {
-      baseOpacity: 0.74,
-      baseSize: 0.30
-    };
-
-    mapSceneGroup.add(points);
-
-    return points;
-}
+  function createTerrainBaseParticlesFromMesh(mesh, count = 90000) {
+    return createTerrainBaseParticlesFromMeshModule({
+      THREE,
+      mesh,
+      count,
+      mapSceneGroup,
+      createSoftMistTexture
+    });
+  }
 
   function createDuomoParticlesFromMesh(mesh, count = 18000) {
-    const geometry = mesh.geometry;
-    const position = geometry.attributes.position;
-    const index = geometry.index;
-
-    if (!position) return null;
-
-    mesh.updateMatrixWorld(true);
-
-    const triangles = [];
-    let totalArea = 0;
-
-    const a = new THREE.Vector3();
-    const b = new THREE.Vector3();
-    const c = new THREE.Vector3();
-    const ab = new THREE.Vector3();
-    const ac = new THREE.Vector3();
-
-    const triCount = index ? index.count / 3 : Math.floor(position.count / 3);
-
-    for (let i = 0; i < triCount; i++) {
-      const ia = index ? index.getX(i * 3) : i * 3;
-      const ib = index ? index.getX(i * 3 + 1) : i * 3 + 1;
-      const ic = index ? index.getX(i * 3 + 2) : i * 3 + 2;
-
-      a.fromBufferAttribute(position, ia).applyMatrix4(mesh.matrixWorld);
-      b.fromBufferAttribute(position, ib).applyMatrix4(mesh.matrixWorld);
-      c.fromBufferAttribute(position, ic).applyMatrix4(mesh.matrixWorld);
-
-      ab.subVectors(b, a);
-      ac.subVectors(c, a);
-
-      const area = ab.cross(ac).length() * 0.5;
-
-      if (area > 0.000001) {
-        totalArea += area;
-        triangles.push({
-          a: a.clone(),
-          b: b.clone(),
-          c: c.clone(),
-          area,
-          cumulative: totalArea
-        });
-      }
-    }
-
-    if (!triangles.length) return null;
-
-    const positions = [];
-    const colors = [];
-
-    for (let i = 0; i < count; i++) {
-      const r = Math.random() * totalArea;
-
-      let low = 0;
-      let high = triangles.length - 1;
-
-      while (low < high) {
-        const mid = Math.floor((low + high) / 2);
-        if (triangles[mid].cumulative < r) low = mid + 1;
-        else high = mid;
-      }
-
-      const tri = triangles[low];
-
-      let u = Math.random();
-      let v = Math.random();
-
-      if (u + v > 1) {
-        u = 1 - u;
-        v = 1 - v;
-      }
-
-      const p = tri.a.clone()
-        .add(tri.b.clone().sub(tri.a).multiplyScalar(u))
-        .add(tri.c.clone().sub(tri.a).multiplyScalar(v));
-
-      p.x += THREE.MathUtils.randFloatSpread(0.04);
-      p.y += THREE.MathUtils.randFloatSpread(0.04);
-      p.z += THREE.MathUtils.randFloatSpread(0.04);
-
-      positions.push(p.x, p.y, p.z);
-
-      const brightness = 0.86 + Math.random() * 0.22;
-
-      colors.push(
-        1.0 * brightness,
-        0.96 * brightness,
-        0.88 * brightness
-      );
-    }
-
-    const particleGeometry = new THREE.BufferGeometry();
-    particleGeometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(positions, 3)
-    );
-    particleGeometry.setAttribute(
-      'color',
-      new THREE.Float32BufferAttribute(colors, 3)
-    );
-
-    const particleMaterial = new THREE.PointsMaterial({
-      map: createSoftMistTexture(THREE),
-      alphaTest: 0.04,
-      size: 0.32,
-      sizeAttenuation: true,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.95,
-      depthWrite: false,
-      depthTest: true,
-      blending: THREE.NormalBlending
+    return createDuomoParticlesFromMeshModule({
+      THREE,
+      mesh,
+      count,
+      mapSceneGroup,
+      createSoftMistTexture
     });
-
-    const points = new THREE.Points(particleGeometry, particleMaterial);
-    points.name = `duomo-particles-${mesh.name || 'duomo'}`;
-    points.renderOrder = 32;
-
-    points.userData = {
-      baseOpacity: 0.95,
-      baseSize: 0.32
-    };
-
-    mapSceneGroup.add(points);
-
-    return points;
   }
 
   function createMountainParticlesFromMesh(mesh, count = 18000, categoryKey = null) {
-    const geometry = mesh.geometry;
-    const position = geometry.attributes.position;
-    const index = geometry.index;
-
-    if (!position) return null;
-
-    mesh.updateMatrixWorld(true);
-
-    const triangles = [];
-    let totalArea = 0;
-
-    const a = new THREE.Vector3();
-    const b = new THREE.Vector3();
-    const c = new THREE.Vector3();
-    const ab = new THREE.Vector3();
-    const ac = new THREE.Vector3();
-
-    const triCount = index ? index.count / 3 : position.count / 3;
-
-    for (let i = 0; i < triCount; i++) {
-      const ia = index ? index.getX(i * 3) : i * 3;
-      const ib = index ? index.getX(i * 3 + 1) : i * 3 + 1;
-      const ic = index ? index.getX(i * 3 + 2) : i * 3 + 2;
-
-      a.fromBufferAttribute(position, ia).applyMatrix4(mesh.matrixWorld);
-      b.fromBufferAttribute(position, ib).applyMatrix4(mesh.matrixWorld);
-      c.fromBufferAttribute(position, ic).applyMatrix4(mesh.matrixWorld);
-
-      ab.subVectors(b, a);
-      ac.subVectors(c, a);
-
-      const area = ab.cross(ac).length() * 0.5;
-
-      if (area > 0.0001) {
-        totalArea += area;
-        triangles.push({
-          a: a.clone(),
-          b: b.clone(),
-          c: c.clone(),
-          area,
-          cumulative: totalArea
-        });
-      }
-    }
-
-    if (!triangles.length) return null;
-
-    const positions = [];
-    const colors = [];
-
-    for (let i = 0; i < count; i++) {
-      const r = Math.random() * totalArea;
-
-      let low = 0;
-      let high = triangles.length - 1;
-
-      while (low < high) {
-        const mid = Math.floor((low + high) / 2);
-        if (triangles[mid].cumulative < r) low = mid + 1;
-        else high = mid;
-      }
-
-      const tri = triangles[low];
-
-      let u = Math.random();
-      let v = Math.random();
-
-      // uniform triangle sampling
-      if (u + v > 1) {
-        u = 1 - u;
-        v = 1 - v;
-      }
-
-      const p = tri.a.clone()
-        .add(tri.b.clone().sub(tri.a).multiplyScalar(u))
-        .add(tri.c.clone().sub(tri.a).multiplyScalar(v));
-
-      // very small snowy looseness, so it is not a rigid mesh outline
-      p.x += THREE.MathUtils.randFloatSpread(0.10);
-      p.y += THREE.MathUtils.randFloatSpread(0.10);
-      p.z += THREE.MathUtils.randFloatSpread(0.10);
-
-      positions.push(p.x, p.y, p.z);
-
-      // icy white-blue particle variation
-      // Snow-white mountain particles: clear, bright, stronger than background snow
-      const ridge =
-        0.5 +
-        0.5 * Math.sin(p.x * 0.20 + p.y * 0.35 + p.z * 0.08);
-
-      const brightness = 0.72 + ridge * 0.22 + Math.random() * 0.16;
-
-      // Mountains stay brighter than terrain, but not pure flat white.
-      colors.push(
-        0.92 * brightness,
-        0.97 * brightness,
-        1.0 * brightness
-      );
-    }
-
-    const particleGeometry = new THREE.BufferGeometry();
-    particleGeometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(positions, 3)
-    );
-    particleGeometry.setAttribute(
-      'color',
-      new THREE.Float32BufferAttribute(colors, 3)
-    );
-
-    const particleMaterial = new THREE.PointsMaterial({
-      map: createSoftMistTexture(THREE),
-      alphaTest: 0.055,
-      size: 0.44,
-      sizeAttenuation: true,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.96,
-      depthWrite: false,
-      depthTest: true,
-      blending: THREE.NormalBlending
+    return createMountainParticlesFromMeshModule({
+      THREE,
+      mesh,
+      count,
+      categoryKey,
+      mapSceneGroup,
+      animatedObjects,
+      createSoftMistTexture,
+      getLegacyArea
     });
-
-    const points = new THREE.Points(particleGeometry, particleMaterial);
-    points.name = `particle-${mesh.name || 'mountain'}`;
-    points.renderOrder = 24;
-
-    const area = categoryKey ? getLegacyArea(categoryKey) : null;
-
-    points.userData = {
-      key: categoryKey,
-      color: area ? area.color : 0xffffff,
-      baseSize: 0.44,
-      baseOpacity: 0.96,
-      baseColors: particleGeometry.attributes.color.array.slice()
-    };
-
-    mapSceneGroup.add(points);
-    animatedObjects.mountainParticles.push(points);
-
-    return points;
   }
 
   function createUnifiedMapModel() {
@@ -1616,8 +622,6 @@ function createTerrainBaseParticlesFromMesh(mesh, count = 90000) {
   }
 
   function createWorld() {
-    createBackgroundStars();
-
     createUnifiedMapModel();
 
     createSnow();
@@ -2126,203 +1130,31 @@ function createTerrainBaseParticlesFromMesh(mesh, count = 90000) {
   }
 
   function animateSnow(t) {
-    const snow = animatedObjects.snow;
-    if (!snow) return;
-
-    const arr = snow.geometry.attributes.position.array;
-    const base = animatedObjects.snowBase;
-    const phase = animatedObjects.snowPhase;
-    const amp = animatedObjects.snowAmp;
-
-    function wrap(value, min, max) {
-      const range = max - min;
-      return ((((value - min) % range) + range) % range) + min;
-    }
-
-    for (let i = 0, p = 0; i < arr.length; i += 3, p++) {
-      const baseX = base[i];
-      const baseY = base[i + 1];
-      const baseZ = base[i + 2];
-
-      const isLowLayer = baseY < 18;
-
-      //雪花速度
-      const fallSpeed = isLowLayer ? 0.28 : 0.16;
-
-      // 只允许非常轻微的左右漂移，不再整体往某个固定方向飞
-      const swayX = Math.sin(t * 0.45 + phase[p]) * amp[p] * 0.65;
-      const swayZ = Math.cos(t * 0.38 + phase[p]) * amp[p] * 0.45;
-
-      arr[i] = baseX + swayX;
-
-      // 核心：只沿世界 y 轴向下
-      arr[i + 1] = wrap(baseY - t * fallSpeed, 1.2, 72);
-
-      arr[i + 2] = baseZ + swayZ;
-    }
-
-    snow.geometry.attributes.position.needsUpdate = true;
-
-    // 关键：雪不再跟随相机
-    snow.position.set(0, 0, 0);
+    animateSnowParticles({
+      animatedObjects,
+      t
+    });
   }
 
   function animateForegroundSnow(t) {
-    const snow = animatedObjects.foregroundSnow;
-    if (!snow) return;
-
-    const arr = snow.geometry.attributes.position.array;
-    const base = animatedObjects.foregroundSnowBase;
-    const phase = animatedObjects.foregroundSnowPhase;
-    const amp = animatedObjects.foregroundSnowAmp;
-
-    function wrap(value, min, max) {
-      const range = max - min;
-      return ((((value - min) % range) + range) % range) + min;
-    }
-
-    for (let i = 0, p = 0; i < arr.length; i += 3, p++) {
-      const baseX = base[i];
-      const baseY = base[i + 1];
-      const baseZ = base[i + 2];
-
-      const swayX = Math.sin(t * 0.28 + phase[p]) * amp[p] * 0.42;
-      const swayZ = Math.cos(t * 0.24 + phase[p]) * amp[p] * 0.28;
-
-      arr[i] = baseX + swayX;
-      arr[i + 1] = wrap(baseY - t * 0.34, 1.2, 58);
-      arr[i + 2] = baseZ + swayZ;
-    }
-
-    snow.geometry.attributes.position.needsUpdate = true;
-    snow.position.set(0, 0, 0);
+    animateForegroundSnowParticles({
+      animatedObjects,
+      t
+    });
   }
 
   function animateIntroRings(t) {
-    const rings = animatedObjects.introRings;
-    if (!rings || !rings.visible) return;
-
-    const arr = rings.geometry.attributes.position.array;
-    const base = animatedObjects.introRingsBase;
-    const phase = animatedObjects.introRingsPhase;
-    const amp = animatedObjects.introRingsAmp;
-    const targets = animatedObjects.introRingsTargets;
-    const cpRing = animatedObjects.introRingsCountPerRing;
-
-    const progress = appState.ritualScrollProgress;
-    const land = easeInOutCubic(progress);
-
-    if (ritualHint) {
-      const hintFade = smoothstep(0.02, 0.24, progress);
-      ritualHint.style.opacity = String(1 - hintFade);
-
-      if (progress > 0.28) {
-        ritualHint.classList.add('hidden');
-      } else {
-        ritualHint.classList.remove('hidden');
-      }
-    }
-
-    // 滚动到后半段时提前显示地图/山，不要到最后才突然出现
-    if (mapSceneGroup) {
-      mapSceneGroup.visible = true;
-    
-      // 0.68 是滚动到一半时的视觉临界点，0.94 是快结束时完全显示地图的点
-      const reveal = smoothstep(0.68, 0.94, progress);
-      setMapSceneOpacity(reveal);
-    }
-
-    // Smooth the mouse parallax target
-    appState.ritualPointerX = THREE.MathUtils.lerp(
-      appState.ritualPointerX,
-      appState.ritualPointerTargetX,
-      0.06
-    );
-
-    appState.ritualPointerY = THREE.MathUtils.lerp(
-      appState.ritualPointerY,
-      appState.ritualPointerTargetY,
-      0.06
-    );
-
-    for (let i = 0, p = 0; i < arr.length; i += 3, p++) {
-      const bx = base[i];
-      const by = base[i + 1];
-      const bz = base[i + 2];
-
-      const shimX = Math.sin(t * 0.50 + phase[p]) * amp[p] * 0.22 * (1 - land);
-      const shimY = Math.cos(t * 0.42 + phase[p] * 1.1) * amp[p] * 0.07 * (1 - land);
-      const shimZ = Math.sin(t * 0.38 + phase[p] * 0.9) * amp[p] * 0.22 * (1 - land);
-
-      const gIdx =
-        targets && cpRing > 0 && p < cpRing * 5
-          ? Math.floor(p / cpRing)
-          : -1;
-
-      if (gIdx >= 0) {
-        const target = targets[gIdx];
-
-        // 每个环在下滑过程中慢慢缩小
-        const ringScale = THREE.MathUtils.lerp(1.0, 0.018, land);
-
-        // 当前粒子相对于本环中心的位置
-        const localX = bx - target.cx;
-        const localY = by - target.cy;
-        const localZ = bz - target.cz;
-
-        // 目标位置：每个环缩小后落到对应山顶
-        const targetX = target.tx + localX * ringScale;
-        const targetY = target.ty + localY * ringScale;
-        const targetZ = target.tz + localZ * ringScale;
-
-        arr[i]     = THREE.MathUtils.lerp(bx, targetX, land) + shimX;
-        arr[i + 1] = THREE.MathUtils.lerp(by, targetY, land) + shimY;
-        arr[i + 2] = THREE.MathUtils.lerp(bz, targetZ, land) + shimZ;
-      } else {
-        // 少量环境尘埃：跟随下落但逐渐散开
-        arr[i]     = bx + shimX;
-        arr[i + 1] = by - progress * 10 + shimY;
-        arr[i + 2] = bz + shimZ;
-      }
-    }
-
-    rings.geometry.attributes.position.needsUpdate = true;
-
-    // 前半段保持你现在的大五环；后半段逐渐回到世界坐标，方便落到山上
-    const groupScaleX = THREE.MathUtils.lerp(1.18, 1.0, land);
-    const groupScaleY = THREE.MathUtils.lerp(1.10, 1.0, land);
-    const groupScaleZ = THREE.MathUtils.lerp(1.12, 1.0, land);
-
-    rings.scale.set(groupScaleX, groupScaleY, groupScaleZ);
-
-    // 下落过程中逐渐取消一开始的视觉旋转，避免落点偏掉
-    rings.rotation.y = 0;
-    rings.rotation.z = 0;
-
-    // 鼠标漂浮只在前半段明显；落山时收回到真实世界坐标
-    rings.position.set(
-      appState.ritualPointerX * 0.35 * (1 - land),
-      appState.ritualPointerY * 0.20 * (1 - land),
-      0
-    );
-
-    if (appState.view === 'particle-ritual') {
-      const disappear = smoothstep(0.86, 1.0, progress);
-
-      const targetOpacity = THREE.MathUtils.lerp(0.72, 0.0, disappear);
-
-      rings.material.opacity = THREE.MathUtils.lerp(
-        rings.material.opacity,
-        targetOpacity,
-        0.08
-      );
-
-      // 五环粒子落到山上后缩到 0，避免彩色残留点漂浮在画面里
-      const landingSize = THREE.MathUtils.lerp(0.46, 0.12, land);
-      const targetSize = THREE.MathUtils.lerp(landingSize, 0.0, disappear);
-
-      rings.material.size = targetSize;
-    }
+    animateIntroRingsModule({
+      THREE,
+      t,
+      appState,
+      animatedObjects,
+      ritualHint,
+      mapSceneGroup,
+      setMapSceneOpacity,
+      easeInOutCubic,
+      smoothstep
+    });
   }
 
   function animateIntroCloud(t) {
@@ -2384,58 +1216,21 @@ function createTerrainBaseParticlesFromMesh(mesh, count = 90000) {
   }
 
   function animateChapterCloud(t) {
-    const cloud = animatedObjects.chapterCloud;
-    if (!cloud || !cloud.visible) return;
-
-    const arr = cloud.geometry.attributes.position.array;
-    const base = animatedObjects.chapterBase;
-    const phase = animatedObjects.chapterPhase;
-    const amp = animatedObjects.chapterAmp;
-
-    const isTransition = appState.view === 'transition';
-    const transitionSpeed = isTransition ? 4.2 : 0.42;
-
-    for (let i = 0, p = 0; i < arr.length; i += 3, p++) {
-      arr[i] =
-        base[i] +
-        Math.sin(t * 0.36 + phase[p]) * amp[p] * 1.8;
-
-      arr[i + 1] =
-        base[i + 1] +
-        Math.sin(t * 0.28 + phase[p]) * amp[p] * 0.7;
-
-      arr[i + 2] += transitionSpeed;
-
-      if (arr[i + 2] > 62) {
-        arr[i + 2] = -120;
-      }
-    }
-
-    cloud.geometry.attributes.position.needsUpdate = true;
-
-    if (isTransition) {
-      const elapsed = t - appState.transitionStart;
-      const progress = THREE.MathUtils.clamp(elapsed / appState.transitionDuration, 0, 1);
-
-      cloud.material.opacity = THREE.MathUtils.lerp(0.05, 0.92, progress);
-      cloud.material.size = THREE.MathUtils.lerp(0.08, 0.32, progress);
-    } else {
-      cloud.material.opacity = 0.62 + Math.sin(t * 0.8) * 0.08;
-      cloud.material.size = 0.13 + Math.sin(t * 0.7) * 0.015;
-    }
+    animateChapterCloudParticles({
+      THREE,
+      t,
+      appState,
+      animatedObjects
+    });
   }
 
   function animateHooks(t) {
-  animatedObjects.hooks.forEach((hook, index) => {
-    hook.position.y = hook.userData.pos.y + Math.sin(t * 1.25 + index * 0.9) * 0.34;
-
-    if (hook === appState.hoverHookObject) return;
-
-    hook.material.opacity = 0.78 + Math.sin(t * 1.9 + index) * 0.11;
-    const s = 4.7 + Math.sin(t * 1.2 + index) * 0.18;
-    hook.scale.set(s, s, 1);
-  });
-}
+    animateHooksModule({
+      animatedObjects,
+      appState,
+      t
+    });
+  }
 
   function animateLines(t) {
     animatedObjects.pulseLines.forEach((line, index) => {
@@ -2446,56 +1241,12 @@ function createTerrainBaseParticlesFromMesh(mesh, count = 90000) {
   }
 
   function animateRitualSnow(t) {
-    const isRitual = appState.view === 'particle-ritual';
-
-    function wrapVal(v, lo, hi) {
-      const range = hi - lo;
-      return ((((v - lo) % range) + range) % range) + lo;
-    }
-
-    const fine = animatedObjects.ritualSnowFine;
-    if (fine && fine.visible) {
-      const arr   = fine.geometry.attributes.position.array;
-      const base  = animatedObjects.ritualSnowFineBase;
-      const phase = animatedObjects.ritualSnowFinePhase;
-      const amp   = animatedObjects.ritualSnowFineAmp;
-
-      for (let i = 0, p = 0; i < arr.length; i += 3, p++) {
-        arr[i]     = base[i] + Math.sin(t * 0.28 + phase[p]) * amp[p] * 1.4;
-        arr[i + 1] = wrapVal(base[i + 1] - t * 0.20, -20, 18);
-        arr[i + 2] = base[i + 2];
-      }
-      fine.geometry.attributes.position.needsUpdate = true;
-
-      fine.material.opacity = THREE.MathUtils.lerp(
-        fine.material.opacity,
-        isRitual ? 0.46 : 0,
-        0.025
-      );
-      if (!isRitual && fine.material.opacity < 0.005) fine.visible = false;
-    }
-
-    const large = animatedObjects.ritualSnowLarge;
-    if (large && large.visible) {
-      const arr   = large.geometry.attributes.position.array;
-      const base  = animatedObjects.ritualSnowLargeBase;
-      const phase = animatedObjects.ritualSnowLargePhase;
-      const amp   = animatedObjects.ritualSnowLargeAmp;
-
-      for (let i = 0, p = 0; i < arr.length; i += 3, p++) {
-        arr[i]     = base[i] + Math.sin(t * 0.16 + phase[p]) * amp[p] * 0.9;
-        arr[i + 1] = wrapVal(base[i + 1] - t * 0.09, -14, 10);
-        arr[i + 2] = base[i + 2];
-      }
-      large.geometry.attributes.position.needsUpdate = true;
-
-      large.material.opacity = THREE.MathUtils.lerp(
-        large.material.opacity,
-        isRitual ? 0.28 : 0,
-        0.025
-      );
-      if (!isRitual && large.material.opacity < 0.005) large.visible = false;
-    }
+    animateRitualSnowModule({
+      THREE,
+      t,
+      appState,
+      animatedObjects
+    });
   }
 
   function animate() {
@@ -2566,7 +1317,7 @@ function createTerrainBaseParticlesFromMesh(mesh, count = 90000) {
     requestAnimationFrame(animate);
   }
 
-  	animate();
+  animate();
 
 	return () => {
     cleanupInfoPanel?.();
