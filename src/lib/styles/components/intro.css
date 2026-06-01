@@ -41,7 +41,7 @@ body.model-loaded .intro-rings {
 	position: absolute;
 	width: 42px;
 	height: 42px;
-	border: 2.2px solid rgba(242, 231, 218, 0.72);
+	border: 2.2px solid #F2F5F7;
 	border-radius: 50%;
 	box-shadow: none;
 }
@@ -79,14 +79,14 @@ body.model-loaded .intro-rings {
 	line-height: 0.92;
 	font-weight: 400;
 	letter-spacing: -0.035em;
-	color: rgba(242, 231, 218, 0.96);
+	color: #F2F5F7;
 	text-shadow: none;
 }
 
 .intro-text {
 	margin: 0 auto 34px;
 	max-width: 620px;
-	color: rgba(210, 222, 238, 0.78);
+	color: #F2F5F7;
 	line-height: 1.65;
 	font-family: var(--font-primary);
 	font-size: clamp(15px, 1.15vw, 18px);
@@ -94,56 +94,42 @@ body.model-loaded .intro-rings {
 }
 
 .enter-btn {
-	width: auto;
-	height: auto;
-	border: none;
-	border-radius: 0;
-	background: transparent;
-	color: rgba(242, 231, 218, 0.88);
-	padding: 0;
-	box-shadow: none;
-	backdrop-filter: none;
-	-webkit-backdrop-filter: none;
 	display: inline-flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+	gap: 12px;
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	border-radius: 999px;
+	padding: 22px 30px;
+	color: var(--color-cream);
+	transition: transform 0.28s ease, background-color 0.28s ease, border-color 0.28s ease;
 }
 
 .enter-btn:hover {
-	border: none;
-	background: transparent;
-	box-shadow: none;
-	transform: none;
-	color: var(--color-cream);
+	background: rgba(255, 255, 255, 0.14);
+	border-color: rgba(255, 255, 255, 0.26);
+	transform: translateY(-2px);
 }
 
-.enter-snowflake {
+.enter-icon {
 	display: block;
-	font-size: 68px;
+	font-size: 44px;
 	line-height: 1;
-	transform: translateY(-1px);
-	transition:
-		transform 0.28s ease,
-		color 0.28s ease,
-		opacity 0.28s ease;
 }
 
-.enter-btn:hover .enter-snowflake {
-	transform: translateY(-3px) scale(1.12) rotate(12deg);
-	color: var(--color-cream);
-	opacity: 1;
-}
-
-.enter-btn:active .enter-snowflake {
-	transform: translateY(0) scale(0.96) rotate(0deg);
+.enter-label {
+	font-size: 12px;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: #F2F5F7;
 }
 
 .intro-footer {
-	position: absolute;
-	left: 36px;
-	bottom: 34px;
-	font-size: 11px;
+	margin: 0 auto 24px;
+	font-size: 12px;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
-	color: rgba(212, 219, 227, 0.34);
+	color: #F2F5F7;
 }
