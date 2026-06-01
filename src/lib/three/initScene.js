@@ -94,6 +94,8 @@ import {
 	createDuomoParticlesFromMesh as createDuomoParticlesFromMeshModule,
 	createMountainParticlesFromMesh as createMountainParticlesFromMeshModule
 } from "$lib/three/particles/mapParticles.js";
+
+import { startAnimationLoop } from "$lib/three/animationLoop.js";
   
 export function initScene() {
 	console.log("Olympic Tracce scene started");
@@ -1249,75 +1251,39 @@ export function initScene() {
     });
   }
 
-  function animate() {
-    const t = clock.getElapsedTime();
+  startAnimationLoop({
+    THREE,
+    renderer,
+    scene,
+    camera,
+    clock,
+    appState,
+    animatedObjects,
+    orbit,
 
-    interviewPanCurrent = updateInterviewPan(interviewPanCurrent, interviewPanTarget);
+    animateTerrain,
+    animateSnow,
+    animateForegroundSnow,
+    animateHooks,
+    animateLines,
+    applyMarkerHoverVisual,
+    updateOverviewCameraByPointer,
+    animateIntroCloud,
+    animateIntroRings,
+    animateRitualSnow,
+    animateChapterCloud,
+    updateHotspotButtons,
+    updateInterviewPan,
 
-    if (appState.view === 'overview' || appState.view === 'transition') {
-      animateTerrain(t);
-      animateSnow(t);
-      animateForegroundSnow(t);
-      animateHooks(t);
-      animateLines(t);
-      applyMarkerHoverVisual();
+    enterChapter,
+    easeInOutCubic,
 
-      if (appState.view === 'overview') {
-        updateOverviewCameraByPointer();
-      }
-    }
-
-    animateIntroCloud(t);
-    animateIntroRings(t);
-    animateRitualSnow(t);
-    animateChapterCloud(t);
-
-    if (appState.view === 'transition') {
-      const elapsed = t - appState.transitionStart;
-      const progress = THREE.MathUtils.clamp(elapsed / appState.transitionDuration, 0, 1);
-      const eased = easeInOutCubic(progress);
-
-      // 从用户当前视角平滑冲向点击点
-      camera.position.lerpVectors(
-        appState.cameraStart,
-        appState.cameraEnd,
-        eased
-      );
-
-      orbit.target.lerpVectors(
-        appState.targetStart,
-        appState.targetEnd,
-        eased
-      );
-
-      camera.lookAt(orbit.target);
-
-      if (animatedObjects.chapterCloud) {
-        animatedObjects.chapterCloud.material.opacity = THREE.MathUtils.lerp(
-          0.05,
-          0.95,
-          progress
-        );
-
-        animatedObjects.chapterCloud.material.size = THREE.MathUtils.lerp(
-          0.08,
-          0.26,
-          progress
-        );
-      }
-
-      if (progress >= 1 && appState.targetChapter) {
-        enterChapter(appState.targetChapter);
-      }
-    }
-
-    updateHotspotButtons();
-
-    renderer.render(scene, camera);
-    requestAnimationFrame(animate);
-  }
-
-  animate();
+    getInterviewPanCurrent: () => interviewPanCurrent,
+    setInterviewPanCurrent: (value) => {
+      interviewPanCurrent = value;
+    },
+    getInterviewPanTarget: () => interviewPanTarget
+  });
 
 	return () => {
     cleanupInfoPanel?.();
