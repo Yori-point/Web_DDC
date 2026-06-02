@@ -1,8 +1,12 @@
 <script>
 	import { onMount } from "svelte";
+	import { createIntroButtonBackgroundDataUrl } from "$lib/three/textures.js";
+
+	let enterIconStyle = $state("");
 
 	onMount(() => {
 		document.body.classList.add("intro-active");
+		enterIconStyle = `background-image: url(${createIntroButtonBackgroundDataUrl()});`;
 	});
 
 	function enterOverview() {
@@ -39,7 +43,9 @@
 		</p>
 
 		<button id="enterBtn" class="enter-btn" aria-label="Esplora la mappa" onclick={enterOverview}>
-			<span class="enter-icon">↓</span>
+			<span class="enter-icon-shell" style={enterIconStyle}>
+				<span class="enter-icon">↓</span>
+			</span>
 			<span class="enter-label">ESPLORA LA MAPPA</span>
 		</button>
 	</div>

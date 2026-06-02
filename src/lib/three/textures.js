@@ -69,6 +69,44 @@ export function createHookTexture(THREE) {
 	return new THREE.CanvasTexture(canvas);
 }
 
+export function createIntroButtonBackgroundDataUrl(color = "#F2F5F7") {
+	const canvas = document.createElement("canvas");
+	const size = 200;
+	canvas.width = size;
+	canvas.height = size;
+
+	const ctx = canvas.getContext("2d");
+	const center = size / 2;
+	const innerRadius = size * 0.32;
+
+	ctx.clearRect(0, 0, size, size);
+
+	const innerGradient = ctx.createRadialGradient(center, center, innerRadius * 0.08, center, center, innerRadius);
+	innerGradient.addColorStop(0, "rgba(255,255,255,1)");
+	innerGradient.addColorStop(0.24, "rgba(255,255,255,0.95)");
+	innerGradient.addColorStop(0.42, "rgba(242,245,247,0.82)");
+	innerGradient.addColorStop(0.72, "rgba(242,245,247,0.4)");
+	innerGradient.addColorStop(1, "rgba(242,245,247,0.08)");
+
+	ctx.fillStyle = innerGradient;
+	ctx.beginPath();
+	ctx.arc(center, center, innerRadius, 0, Math.PI * 2);
+	ctx.fill();
+
+	ctx.strokeStyle = "rgba(255,255,255,0.8)";
+	ctx.lineWidth = size * 0.015;
+	ctx.beginPath();
+	ctx.arc(center, center, innerRadius * 0.55, 0, Math.PI * 2);
+	ctx.stroke();
+
+	ctx.fillStyle = "rgba(255,255,255,0.76)";
+	ctx.beginPath();
+	ctx.arc(center, center, size * 0.035, 0, Math.PI * 2);
+	ctx.fill();
+
+	return canvas.toDataURL();
+}
+
 export function createSoftMistTexture(THREE) {
 	const canvas = document.createElement("canvas");
 	canvas.width = 64;
