@@ -1,6 +1,12 @@
 // @ts-nocheck
 
-export function bindCategoryBar({ legacyAreas, hookHeightByKey, onSelectCategory }) {
+export function bindCategoryBar({
+	legacyAreas,
+	hookHeightByKey,
+	onSelectCategory,
+	onHoverCategory,
+	onLeaveCategory
+}) {
 	const categoryItems = document.querySelectorAll(".category-item");
 
 	function handleCategoryClick(event) {
@@ -24,13 +30,30 @@ export function bindCategoryBar({ legacyAreas, hookHeightByKey, onSelectCategory
 		});
 	}
 
+	function handleCategoryEnter(event) {
+		const item = event.currentTarget;
+		const key = item.dataset.key;
+
+		if (!key) return;
+
+		onHoverCategory?.(key);
+	}
+
+	function handleCategoryLeave() {
+		onLeaveCategory?.();
+	}
+
 	categoryItems.forEach((item) => {
 		item.addEventListener("click", handleCategoryClick);
+		item.addEventListener("mouseenter", handleCategoryEnter);
+		item.addEventListener("mouseleave", handleCategoryLeave);
 	});
 
 	return () => {
 		categoryItems.forEach((item) => {
 			item.removeEventListener("click", handleCategoryClick);
+			item.removeEventListener("mouseenter", handleCategoryEnter);
+			item.removeEventListener("mouseleave", handleCategoryLeave);
 		});
 	};
 }

@@ -1,13 +1,7 @@
 <div id="mediaPanel" class="media-panel hidden">
 	<button id="closeMediaPanel" class="media-close">×</button>
 
-	<div class="feature-rings-mark" aria-hidden="true">
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-		<span></span>
-	</div>
+	<div class="feature-snowflake-mark" aria-hidden="true">❄</div>
 
 	<div class="feature-text-block">
 		<div id="mediaPanelLabel" class="media-panel-label">TEXT</div>

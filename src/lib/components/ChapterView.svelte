@@ -10,8 +10,11 @@
 		<span>LEGACY TRACE</span>
 	</div>
 
+	<div id="chapterExplorationCounter" class="chapter-exploration-counter">
+		Esplorazione 0 / 0
+	</div>
+
 	<div class="chapter-copy">
-		<h2 id="chapterTitle">Lavoro / Opportunità</h2>
 		<p id="chapterSubtitle">Direzioni che aprono il futuro.</p>
 	</div>
 

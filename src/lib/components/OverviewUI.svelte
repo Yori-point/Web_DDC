@@ -9,7 +9,7 @@
 </div>
 
 <div class="ui top-right">
-	<button id="aboutBtn" class="about-btn">About</button>
+	<span class="about-label">ABOUT</span>
 </div>
 
 <div class="overall-meta">

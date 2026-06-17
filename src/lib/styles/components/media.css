@@ -40,82 +40,75 @@
 .media-panel {
 	position: fixed;
 	left: 50%;
-	top: 50%;
+	top: 45%;
 	z-index: var(--z-media-panel);
-	width: min(700px, calc(100vw - 72px));
-	min-height: 250px;
+	width: min(860px, calc(100vw - 96px));
 	transform: translate(-50%, -50%);
 	color: var(--color-cream);
 	opacity: 1;
 	pointer-events: auto;
-	transition: opacity 0.5s ease, transform 0.5s ease;
-	padding: 34px 44px;
+	transition: opacity 0.45s ease, transform 0.45s ease;
+
+	padding: 0;
 	background: transparent;
 	border: none;
-	border-radius: var(--radius-card);
-	overflow: hidden;
-	box-shadow:
-		0 30px 100px rgba(0, 0, 0, 0.42),
-		inset 0 0 0 1px rgba(242, 231, 218, 0.04);
+	border-radius: 0;
+	overflow: visible;
+	box-shadow: none;
+
+	display: grid;
+	grid-template-columns: 120px minmax(0, 1fr);
+	column-gap: 34px;
+	align-items: center;
 }
 
 .media-panel::before {
-	content: "";
-	position: absolute;
-	inset: 0;
-	z-index: -1;
-	border-radius: inherit;
-	background:
-		radial-gradient(circle at 18% 42%, rgba(169, 199, 230, 0.18), transparent 38%),
-		radial-gradient(circle at 78% 58%, rgba(242, 231, 218, 0.08), transparent 42%),
-		rgba(5, 18, 32, 0.72);
-	border: 1px solid rgba(242, 231, 218, 0.14);
-	backdrop-filter: var(--blur-strong);
-	-webkit-backdrop-filter: var(--blur-strong);
+	display: none;
 }
 
 .media-panel.hidden {
 	opacity: 0;
 	pointer-events: none;
-	transform: translate(-50%, -44%);
+	transform: translate(-50%, -50%) translateY(-12px);
 }
 
 .media-close {
 	position: absolute;
-	right: 18px;
-	top: 18px;
+	right: 0;
+	top: -8px;
 	z-index: 90;
 	width: 34px;
 	height: 34px;
 	padding: 0;
 	font-size: 20px;
-	border: 1px solid rgba(242, 231, 218, 0.28);
-	background: rgba(16, 24, 32, 0.35);
+	border: 1px solid rgba(242, 231, 218, 0.22);
+	border-radius: 50%;
+	background: rgba(8, 18, 35, 0.55);
 	pointer-events: auto;
 }
 
 .media-panel-label {
-	margin-bottom: 12px;
+	margin-bottom: 10px;
 	font-size: 15px;
-	font-weight: 700;
+	font-weight: 600;
 	letter-spacing: 0.02em;
-	color: rgba(242, 231, 218, 0.86);
+	color: rgba(242, 231, 218, 0.82);
 }
 
 .media-panel h3 {
 	margin: 0 0 12px;
 	font-family: var(--font-title);
-	font-size: clamp(32px, 4vw, 52px);
-	line-height: 1.05;
+	font-size: clamp(42px, 5.2vw, 78px);
+	line-height: 0.98;
 	font-weight: 400;
 	color: var(--color-cream);
 }
 
 .media-panel p {
 	margin: 0 0 18px;
-	max-width: 520px;
-	font-size: 18px;
-	line-height: 1.55;
+	max-width: 540px;
+	font-size: 19px;
+	line-height: 1.6;
 	color: rgba(242, 231, 218, 0.78);
 }
 
@@ -144,55 +137,23 @@
 	box-shadow: none;
 }
 
-.feature-rings-mark {
-	position: absolute;
-	left: 8px;
-	top: 22px;
-	width: 132px;
-	height: 64px;
-	opacity: 0.72;
+.feature-snowflake-mark {
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	font-size: 88px;
+	line-height: 1;
+	color: rgba(242, 231, 218, 0.8);
+	padding-top: 8px;
+	filter: drop-shadow(0 0 18px rgba(109, 156, 255, 0.14));
 	pointer-events: none;
-}
-
-.feature-rings-mark span {
-	position: absolute;
-	width: 38px;
-	height: 38px;
-	border: 1.8px solid rgba(242, 231, 218, 0.72);
-	border-radius: 50%;
-	box-shadow: 0 0 10px rgba(242, 231, 218, 0.08);
-}
-
-.feature-rings-mark span:nth-child(1) {
-	left: 0;
-	top: 0;
-}
-
-.feature-rings-mark span:nth-child(2) {
-	left: 44px;
-	top: 0;
-}
-
-.feature-rings-mark span:nth-child(3) {
-	left: 88px;
-	top: 0;
-}
-
-.feature-rings-mark span:nth-child(4) {
-	left: 22px;
-	top: 22px;
-}
-
-.feature-rings-mark span:nth-child(5) {
-	left: 66px;
-	top: 22px;
 }
 
 .feature-text-block {
 	position: relative;
-	margin-left: clamp(150px, 18vw, 240px);
-	padding-left: 34px;
-	border-left: 2px solid rgba(242, 231, 218, 0.62);
+	margin-left: 0;
+	padding-left: 30px;
+	border-left: 1px solid rgba(242, 231, 218, 0.46);
 }
 
 @keyframes media-float {
@@ -207,23 +168,24 @@
 }
 
 @media (max-width: 760px) {
-	.media-node {
-		width: 74px;
-		height: 74px;
+	.media-panel {
+		top: 14%;
+		width: calc(100vw - 36px);
+		grid-template-columns: 68px minmax(0, 1fr);
+		column-gap: 18px;
 	}
 
-	.media-panel {
-		top: 52%;
-		width: calc(100vw - 40px);
+	.feature-snowflake-mark {
+		font-size: 52px;
+		padding-top: 2px;
 	}
 
 	.feature-text-block {
-		margin-left: 70px;
-		padding-left: 20px;
+		padding-left: 18px;
 	}
 
 	.media-panel h3 {
-		font-size: 30px;
+		font-size: 34px;
 	}
 
 	.media-panel p {

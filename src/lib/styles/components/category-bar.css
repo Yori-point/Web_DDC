@@ -15,7 +15,7 @@
 .category-item {
 	all: unset;
 	cursor: pointer;
-	color: rgba(242, 231, 218, 0.74);
+	color: rgba(242, 231, 218, 0.58);
 	font-size: 12px;
 	letter-spacing: 0.12em;
 	text-transform: none;
@@ -25,6 +25,20 @@
 	column-gap: 8px;
 	row-gap: 7px;
 	align-items: center;
+
+	/* 不要卡片感 */
+	padding: 4px 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+
+	transform: translateX(0) translateY(0) scale(1);
+	transform-origin: center bottom;
+
+	transition:
+		transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+		opacity 0.28s ease,
+		color 0.28s ease;
 }
 
 .category-dot {
@@ -86,6 +100,42 @@
 	color: rgba(242, 231, 218, 0.38);
 }
 
+.category-item:hover,
+.category-item.is-hovered {
+	color: rgba(242, 231, 218, 0.98);
+	transform: translateY(-4px) scale(1.13);
+	z-index: 2;
+	background: transparent;
+	box-shadow: none;
+}
+
+.category-item:hover .category-name,
+.category-item.is-hovered .category-name {
+	color: rgba(242, 231, 218, 1);
+	letter-spacing: 0.145em;
+	text-shadow: 0 0 12px rgba(242, 231, 218, 0.28);
+}
+
+.category-item:hover .category-meta,
+.category-item.is-hovered .category-meta {
+	color: rgba(242, 231, 218, 0.58);
+}
+
+.category-item:hover .category-dot,
+.category-item.is-hovered .category-dot {
+	transform: scale(1.35);
+	box-shadow: 0 0 18px var(--cat-color);
+}
+
+.category-item:hover .category-line,
+.category-item.is-hovered .category-line {
+	background: rgba(242, 231, 218, 0.28);
+}
+
+.category-line {
+	border-radius: 999px;
+}
+
 .category-blue .category-dot {
 	background: var(--color-category-blue);
 	box-shadow: 0 0 12px rgba(136, 196, 232, 0.85);
@@ -111,7 +161,66 @@
 	box-shadow: 0 0 12px rgba(232, 154, 176, 0.85);
 }
 
+/* 其余项轻微退后 */
+.category-bar:has(.category-item:hover) .category-item:not(:hover),
+.category-bar:has(.category-item.is-hovered) .category-item:not(.is-hovered) {
+	opacity: 0.55;
+}
+
+/* hover 第 1 个：右侧向右让开 */
+.category-bar:has(.category-item:nth-child(1):hover) .category-item:nth-child(n + 2),
+.category-bar:has(.category-item:nth-child(1).is-hovered) .category-item:nth-child(n + 2) {
+	transform: translateX(18px);
+}
+
+/* hover 第 2 个：左边向左，右边向右 */
+.category-bar:has(.category-item:nth-child(2):hover) .category-item:nth-child(1),
+.category-bar:has(.category-item:nth-child(2).is-hovered) .category-item:nth-child(1) {
+	transform: translateX(-16px);
+}
+
+.category-bar:has(.category-item:nth-child(2):hover) .category-item:nth-child(n + 3),
+.category-bar:has(.category-item:nth-child(2).is-hovered) .category-item:nth-child(n + 3) {
+	transform: translateX(16px);
+}
+
+/* hover 第 3 个：两侧分开 */
+.category-bar:has(.category-item:nth-child(3):hover) .category-item:nth-child(-n + 2),
+.category-bar:has(.category-item:nth-child(3).is-hovered) .category-item:nth-child(-n + 2) {
+	transform: translateX(-16px);
+}
+
+.category-bar:has(.category-item:nth-child(3):hover) .category-item:nth-child(n + 4),
+.category-bar:has(.category-item:nth-child(3).is-hovered) .category-item:nth-child(n + 4) {
+	transform: translateX(16px);
+}
+
+/* hover 第 4 个：左边向左，右边向右 */
+.category-bar:has(.category-item:nth-child(4):hover) .category-item:nth-child(-n + 3),
+.category-bar:has(.category-item:nth-child(4).is-hovered) .category-item:nth-child(-n + 3) {
+	transform: translateX(-16px);
+}
+
+.category-bar:has(.category-item:nth-child(4):hover) .category-item:nth-child(5),
+.category-bar:has(.category-item:nth-child(4).is-hovered) .category-item:nth-child(5) {
+	transform: translateX(16px);
+}
+
+/* hover 第 5 个：左侧向左让开 */
+.category-bar:has(.category-item:nth-child(5):hover) .category-item:nth-child(-n + 4),
+.category-bar:has(.category-item:nth-child(5).is-hovered) .category-item:nth-child(-n + 4) {
+	transform: translateX(-18px);
+}
+
+/* 当前 hover 项必须放在最后，防止被上面的左右移动覆盖 */
+.category-item:hover,
+.category-item.is-hovered {
+	transform: translateY(-4px) scale(1.13);
+	opacity: 1;
+}
+
 body.intro-active .category-bar,
+body.ritual-active .category-bar,
 body.chapter-active .category-bar,
 body.is-transitioning .category-bar {
 	opacity: 0;

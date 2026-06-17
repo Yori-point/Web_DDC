@@ -2,7 +2,7 @@
 
 export function makeInterviewList(chapters, categoryKey, labelPrefix) {
 	const total = chapters[categoryKey]?.total ?? 10;
-	const types = ["text", "audio", "video"];
+	const types = ["text", "image", "audio", "video"];
 
 	return Array.from({ length: total }, (_, i) => {
 		const type = types[i % types.length];

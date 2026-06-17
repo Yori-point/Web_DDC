@@ -41,6 +41,27 @@
 	align-items: center;
 }
 
+.chapter-exploration-counter {
+	position: absolute;
+	right: 96px;
+	top: 64px;
+	z-index: 22;
+
+	font-family: var(--font-primary);
+	font-size: 15px;
+	font-weight: 300;
+	letter-spacing: 0.12em;
+	color: rgba(242, 231, 218, 0.68);
+	text-align: right;
+	pointer-events: none;
+}
+
+.chapter-exploration-counter strong {
+	font-size: 16px;
+	font-weight: 600;
+	color: rgba(242, 231, 218, 0.92);
+}
+
 .chapter-copy {
 	position: absolute;
 	left: 50%;
@@ -67,13 +88,23 @@
 	color: rgba(242, 231, 218, 0.7);
 }
 
-.chapter-media-map {
+.chapter-copy {
 	position: absolute;
-	inset: 0;
-	z-index: var(--z-chapter-ui);
-	opacity: 0;
-	pointer-events: none;
-	transition: opacity 1s ease 0.35s;
+	left: 50%;
+	top: 88px;
+	transform: translateX(-50%);
+	text-align: center;
+	width: min(720px, calc(100vw - 48px));
+}
+
+.chapter-copy p {
+	margin: 0 auto;
+	max-width: 520px;
+	font-family: var(--font-primary);
+	font-weight: 300;
+	font-size: 14px;
+	line-height: 1.7;
+	color: rgba(242, 231, 218, 0.7);
 }
 
 body.chapter-active .chapter-media-map {

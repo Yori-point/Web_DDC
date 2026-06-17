@@ -12,7 +12,7 @@ export function createChapterCloudParticles({
 	const phases = [];
 	const amps = [];
 
-	for (let i = 0; i < 14000; i++) {
+	for (let i = 0; i < 6500; i++) {
 		const radius = Math.pow(Math.random(), 0.62) * 92;
 		const angle = Math.random() * Math.PI * 2;
 
@@ -70,22 +70,23 @@ export function animateChapterCloudParticles({
 	const amp = animatedObjects.chapterAmp;
 
 	const isTransition = appState.view === "transition";
-	const transitionSpeed = isTransition ? 4.2 : 0.42;
+	const fallSpeed = isTransition ? 0.9 : 0.32;
 
 	for (let i = 0, p = 0; i < arr.length; i += 3, p++) {
 		arr[i] =
-			base[i] +
-			Math.sin(t * 0.36 + phase[p]) * amp[p] * 1.8;
+		base[i] +
+		Math.sin(t * 0.36 + phase[p]) * amp[p] * 1.4;
 
-		arr[i + 1] =
-			base[i + 1] +
-			Math.sin(t * 0.28 + phase[p]) * amp[p] * 0.7;
+	arr[i + 1] =
+		THREE.MathUtils.euclideanModulo(
+			base[i + 1] - t * fallSpeed + 28,
+			64
+		) - 28 +
+		Math.sin(t * 0.28 + phase[p]) * amp[p] * 0.45;
 
-		arr[i + 2] += transitionSpeed;
-
-		if (arr[i + 2] > 62) {
-			arr[i + 2] = -120;
-		}
+	arr[i + 2] =
+		base[i + 2] +
+		Math.cos(t * 0.22 + phase[p]) * amp[p] * 0.28;
 	}
 
 	cloud.geometry.attributes.position.needsUpdate = true;
@@ -98,10 +99,10 @@ export function animateChapterCloudParticles({
 			1
 		);
 
-		cloud.material.opacity = THREE.MathUtils.lerp(0.05, 0.92, progress);
-		cloud.material.size = THREE.MathUtils.lerp(0.08, 0.32, progress);
+		cloud.material.opacity = THREE.MathUtils.lerp(0.02, 0.42, progress);
+		cloud.material.size = THREE.MathUtils.lerp(0.05, 0.16, progress);
 	} else {
-		cloud.material.opacity = 0.62 + Math.sin(t * 0.8) * 0.08;
-		cloud.material.size = 0.13 + Math.sin(t * 0.7) * 0.015;
+		cloud.material.opacity = 0.34 + Math.sin(t * 0.8) * 0.04;
+		cloud.material.size = 0.075 + Math.sin(t * 0.7) * 0.01;
 	}
 }

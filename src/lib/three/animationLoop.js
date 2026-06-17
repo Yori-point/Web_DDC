@@ -47,9 +47,9 @@ export function startAnimationLoop({
 			animateForegroundSnow(t);
 			animateHooks(t);
 			animateLines(t);
-			applyMarkerHoverVisual();
 
 			if (appState.view === "overview") {
+				applyMarkerHoverVisual();
 				updateOverviewCameraByPointer();
 			}
 		}
@@ -69,33 +69,39 @@ export function startAnimationLoop({
 
 			const eased = easeInOutCubic(progress);
 
-			camera.position.lerpVectors(
-				appState.cameraStart,
-				appState.cameraEnd,
-				eased
+			const oneMinusT = 1 - eased;
+
+			// Quadratic Bézier for camera position
+			camera.position.set(
+				oneMinusT * oneMinusT * appState.cameraStart.x +
+					2 * oneMinusT * eased * appState.cameraMid.x +
+					eased * eased * appState.cameraEnd.x,
+
+				oneMinusT * oneMinusT * appState.cameraStart.y +
+					2 * oneMinusT * eased * appState.cameraMid.y +
+					eased * eased * appState.cameraEnd.y,
+
+				oneMinusT * oneMinusT * appState.cameraStart.z +
+					2 * oneMinusT * eased * appState.cameraMid.z +
+					eased * eased * appState.cameraEnd.z
 			);
 
-			orbit.target.lerpVectors(
-				appState.targetStart,
-				appState.targetEnd,
-				eased
+			// Quadratic Bézier for look-at target
+			orbit.target.set(
+				oneMinusT * oneMinusT * appState.targetStart.x +
+					2 * oneMinusT * eased * appState.targetMid.x +
+					eased * eased * appState.targetEnd.x,
+
+				oneMinusT * oneMinusT * appState.targetStart.y +
+					2 * oneMinusT * eased * appState.targetMid.y +
+					eased * eased * appState.targetEnd.y,
+
+				oneMinusT * oneMinusT * appState.targetStart.z +
+					2 * oneMinusT * eased * appState.targetMid.z +
+					eased * eased * appState.targetEnd.z
 			);
 
 			camera.lookAt(orbit.target);
-
-			if (animatedObjects.chapterCloud) {
-				animatedObjects.chapterCloud.material.opacity = THREE.MathUtils.lerp(
-					0.05,
-					0.95,
-					progress
-				);
-
-				animatedObjects.chapterCloud.material.size = THREE.MathUtils.lerp(
-					0.08,
-					0.26,
-					progress
-				);
-			}
 
 			if (progress >= 1 && appState.targetChapter) {
 				enterChapter(appState.targetChapter);

@@ -36,6 +36,10 @@
 		<button id="enterBtn" class="enter-btn" aria-label="Entra" onclick={enterOverview}>
 			<span class="enter-snowflake">❄</span>
 		</button>
+
+		<div class="intro-enter-hint">
+			Entra
+		</div>
 	</div>
 
 	<div class="intro-footer">

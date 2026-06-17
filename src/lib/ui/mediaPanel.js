@@ -33,6 +33,7 @@ export function closeMediaPanel() {
 
 export function bindMediaPanelClose() {
 	const closeMediaPanelButton = document.getElementById("closeMediaPanel");
+	const mediaPanel = document.getElementById("mediaPanel");
 
 	function handleClose(event) {
 		event?.preventDefault();
@@ -41,9 +42,26 @@ export function bindMediaPanelClose() {
 		closeMediaPanel();
 	}
 
+	function handleOutsideClick(event) {
+		const panel = document.getElementById("mediaPanel");
+
+		if (!panel || panel.classList.contains("hidden")) return;
+
+		const clickedInsidePanel = event.target.closest("#mediaPanel");
+		const clickedNode = event.target.closest(".interview-node");
+
+		if (clickedInsidePanel || clickedNode) return;
+
+		closeMediaPanel();
+	}
+
 	closeMediaPanelButton?.addEventListener("click", handleClose);
+	mediaPanel?.addEventListener("click", (event) => event.stopPropagation());
+
+	window.addEventListener("pointerdown", handleOutsideClick);
 
 	return () => {
 		closeMediaPanelButton?.removeEventListener("click", handleClose);
+		window.removeEventListener("pointerdown", handleOutsideClick);
 	};
 }

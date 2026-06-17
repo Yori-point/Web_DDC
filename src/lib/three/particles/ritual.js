@@ -265,7 +265,12 @@ export function animateIntroRings({
 	mapSceneGroup,
 	setMapSceneOpacity,
 	easeInOutCubic,
-	smoothstep
+	smoothstep,
+
+	orbit,
+	ritualCamera,
+	overviewCamera,
+	updateCamera
 }) {
 	const rings = animatedObjects.introRings;
 	if (!rings || !rings.visible) return;
@@ -278,7 +283,8 @@ export function animateIntroRings({
 	const cpRing = animatedObjects.introRingsCountPerRing;
 
 	const progress = appState.ritualScrollProgress;
-	const land = easeInOutCubic(progress);
+	const morphProgress = smoothstep(0.18, 0.96, progress);
+	const land = easeInOutCubic(morphProgress);
 
 	if (ritualHint) {
 		const hintFade = smoothstep(0.02, 0.24, progress);
@@ -293,9 +299,41 @@ export function animateIntroRings({
 
 	if (mapSceneGroup) {
 		mapSceneGroup.visible = true;
-
-		const reveal = smoothstep(0.68, 0.94, progress);
+		const reveal = THREE.MathUtils.lerp(
+			0.12,
+			1,
+			smoothstep(0.42, 0.94, progress)
+		);
 		setMapSceneOpacity(reveal);
+	}
+
+	// 相机过渡
+	if (orbit && ritualCamera && overviewCamera && updateCamera) {
+		const cameraProgress = smoothstep(0.32, 0.96, progress);
+
+		orbit.yaw = THREE.MathUtils.lerp(
+			ritualCamera.yaw,
+			overviewCamera.yaw,
+			cameraProgress
+		);
+
+		orbit.pitch = THREE.MathUtils.lerp(
+			ritualCamera.pitch,
+			overviewCamera.pitch,
+			cameraProgress
+		);
+
+		orbit.radius = THREE.MathUtils.lerp(
+			ritualCamera.radius,
+			overviewCamera.radius,
+			cameraProgress
+		);
+
+		orbit.target
+			.copy(ritualCamera.target)
+			.lerp(overviewCamera.target, cameraProgress);
+
+		updateCamera();
 	}
 
 	appState.ritualPointerX = THREE.MathUtils.lerp(
@@ -355,6 +393,7 @@ export function animateIntroRings({
 
 	rings.scale.set(groupScaleX, groupScaleY, groupScaleZ);
 
+	rings.rotation.x = 0;
 	rings.rotation.y = 0;
 	rings.rotation.z = 0;
 

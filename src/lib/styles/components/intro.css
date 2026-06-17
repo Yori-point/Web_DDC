@@ -138,6 +138,30 @@ body.model-loaded .intro-rings {
 	transform: translateY(0) scale(0.96) rotate(0deg);
 }
 
+.intro-enter-hint {
+	margin-top: 12px;
+	font-family: var(--font-primary);
+	font-size: 11px;
+	font-weight: 300;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: rgba(242, 231, 218, 0.42);
+	pointer-events: none;
+	animation: intro-hint-soft 1.8s ease-in-out infinite;
+}
+
+@keyframes intro-hint-soft {
+	0%, 100% {
+		opacity: 0.38;
+		transform: translateY(0);
+	}
+
+	50% {
+		opacity: 0.68;
+		transform: translateY(3px);
+	}
+}
+
 .intro-footer {
 	position: absolute;
 	left: 36px;

@@ -66,20 +66,35 @@ export function getChapterCameraView({
 	pos,
 	overviewCamera
 }) {
-	const target = pos.clone();
-	target.y += 7.5;
+	// pos is the hotspot / glow point, usually above the mountain.
+	// Move down to create a mountain-level anchor, not a sky-level anchor.
+	const anchor = pos.clone();
+	anchor.y -= 6.5;
 
-	const yaw = overviewCamera.yaw;
-	const pitch = 0.16;
-	const radius = 34;
+	const outward = new THREE.Vector3(anchor.x, 0, anchor.z);
 
-	const x = Math.sin(yaw) * Math.cos(pitch) * radius;
-	const y = Math.sin(pitch) * radius;
-	const z = Math.cos(yaw) * Math.cos(pitch) * radius;
+	if (outward.lengthSq() < 0.0001) {
+		outward.set(
+			Math.sin(overviewCamera.yaw),
+			0,
+			Math.cos(overviewCamera.yaw)
+		);
+	}
 
-	const cameraPos = target.clone().add(new THREE.Vector3(x, y, z));
+	outward.normalize();
 
-	cameraPos.y = Math.max(cameraPos.y, pos.y + 7);
+	// Camera stays outside the point cloud.
+	// Do not go below 15, otherwise particles become huge.
+	const cameraPos = anchor.clone()
+		.add(outward.clone().multiplyScalar(18));
+
+	cameraPos.y = anchor.y + 2.2;
+
+	// Look above the selected mountain, not back to the whole map.
+	const target = anchor.clone()
+		.add(outward.clone().multiplyScalar(-4));
+
+	target.y = anchor.y + 13;
 
 	return {
 		cameraPos,

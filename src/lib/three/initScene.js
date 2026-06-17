@@ -20,7 +20,6 @@ import {
 
 import {
 	openMediaPanel,
-	closeMediaPanel,
 	bindMediaPanelClose
 } from "$lib/ui/mediaPanel.js";
 
@@ -95,6 +94,13 @@ import {
 	createMountainParticlesFromMesh as createMountainParticlesFromMeshModule
 } from "$lib/three/particles/mapParticles.js";
 
+import {
+	createSummitParticles,
+	placeSummitParticlesAtMountain,
+	resetSummitParticles,
+	updateSummitParticlesTransition
+} from "$lib/three/particles/summitParticles.js";
+
 import { startAnimationLoop } from "$lib/three/animationLoop.js";
   
 export function initScene() {
@@ -123,6 +129,16 @@ export function initScene() {
         text: area.text,
         pos: new THREE.Vector3(area.x, area.y, area.z)
       });
+    },
+    onHoverCategory: (key) => {
+      appState.hoverHookObject = findHookByKey(key);
+      syncCategoryHoverUI();
+    },
+    onLeaveCategory: () => {
+      if (appState.view === "overview") {
+        appState.hoverHookObject = null;
+        syncCategoryHoverUI();
+      }
     }
   });
 
@@ -163,8 +179,10 @@ export function initScene() {
     overviewPointerTargetY: 0,
 
     cameraStart: new THREE.Vector3(),
+    cameraMid: new THREE.Vector3(),
     cameraEnd: new THREE.Vector3(),
     targetStart: new THREE.Vector3(),
+    targetMid: new THREE.Vector3(),
     targetEnd: new THREE.Vector3()
   };
 
@@ -193,8 +211,6 @@ export function initScene() {
   dim: new THREE.Color(0x303840),
   dark: new THREE.Color(0x2A3F56)
   };
-
-  let milanMapField = null;
 
   function getLegacyArea(key) {
     return legacyAreas.find(area => area.key === key);
@@ -254,24 +270,32 @@ export function initScene() {
       animatedObjects,
       appState
     });
+
+    syncCategoryHoverUI();
   }
 
   const orbit = {
-    yaw: -0.48,
-    pitch: 0.30,
+    yaw: 3.8,
+    pitch: 0.32,
     radius: 80,
     target: new THREE.Vector3(0.4, 2.4, 1.2)
   };
 
   const OVERVIEW_CAMERA = {
-    yaw: -0.48,
-    pitch: 0.30,
+    yaw: 3.8,
+    pitch: 0.32,
     radius: 80,
     target: new THREE.Vector3(0.4, 2.4, 1.2),
 
-    // 先别真用 90°，否则会太剧烈。稳定后再调大。
     maxYawOffset: THREE.MathUtils.degToRad(25),
     maxPitchOffset: THREE.MathUtils.degToRad(10)
+  };
+
+  const RITUAL_CAMERA = {
+    yaw: -0.48,
+    pitch: 0.30,
+    radius: 80,
+    target: new THREE.Vector3(0.4, 2.4, 1.2)
   };
 
   function updateCamera() {
@@ -292,128 +316,9 @@ export function initScene() {
     });
   }
 
-  function insideMapShape(x, z) {
-    const nx = x / (WORLD.width * 0.5);
-    const nz = z / (WORLD.depth * 0.5);
-    const angle = Math.atan2(nz, nx);
-    const r = Math.sqrt(nx * nx + nz * nz);
-
-    const boundary =
-      0.98 +
-      0.12 * Math.sin(angle * 3.0 + 0.45) +
-      0.08 * Math.sin(angle * 7.0 - 1.2) +
-      0.05 * Math.cos(angle * 11.0 + 0.4);
-
-    return r < boundary;
-  }
-
-  function edgeFade(x, z) {
-    const nx = x / (WORLD.width * 0.5);
-    const nz = z / (WORLD.depth * 0.5);
-    const r = Math.sqrt(nx * nx + nz * nz);
-    return THREE.MathUtils.clamp(1.08 - r, 0, 1);
-  }
-
-  function gaussian(x, z, cx, cz, height, radius, sx = 1, sz = 1) {
-      const dx = (x - cx) / sx;
-      const dz = (z - cz) / sz;
-      const d2 = dx * dx + dz * dz;
-      return height * Math.exp(-d2 / (2 * radius * radius));
-  }
-
   function smoothstep(edge0, edge1, x) {
       const t = THREE.MathUtils.clamp((x - edge0) / (edge1 - edge0), 0, 1);
       return t * t * (3 - 2 * t);
-  }
-
-  function sampleMapMask(x, z) {
-      if (!milanMapField) return 0;
-
-      const { width, height, data, worldWidth, worldHeight } = milanMapField;
-
-      const nx = THREE.MathUtils.clamp(x / worldWidth + 0.5, 0, 0.9999);
-      const nz = THREE.MathUtils.clamp(z / worldHeight + 0.5, 0, 0.9999);
-
-      const px = Math.floor(nx * width);
-      const py = Math.floor(nz * height);
-
-      let sum = 0;
-      let count = 0;
-
-      // Blur sampling: not only exact road pixels, but nearby city texture too.
-      for (let oy = -4; oy <= 4; oy++) {
-       for (let ox = -4; ox <= 4; ox++) {
-         const sx = Math.max(0, Math.min(width - 1, px + ox));
-         const sy = Math.max(0, Math.min(height - 1, py + oy));
-
-         const index = (sy * width + sx) * 4;
-         const r = data[index];
-         const g = data[index + 1];
-         const b = data[index + 2];
-
-         const brightness = (r + g + b) / 3 / 255;
-         sum += brightness;
-         count++;
-       }
-     }
-
-     return sum / count;
-  }
-
-  function ridgeNoise(x, z) {
-    return (
-      Math.sin(x * 0.19 + z * 0.08) * 0.42 +
-      Math.sin(x * 0.08 - z * 0.21) * 0.34 +
-      Math.cos(x * 0.33 + z * 0.13) * 0.18
-    );
-  }
-
-  function terrainHeight(x, z) {
-      const festa = legacyAreas.find(area => area.key === 'festa');
-      const opportunita = legacyAreas.find(area => area.key === 'opportunita');
-      const trasformazione = legacyAreas.find(area => area.key === 'trasformazione');
-      const criticita = legacyAreas.find(area => area.key === 'criticita');
-
-      // 1. Outer mountain system.
-      // These hills still exist, but the city/map area will flatten and cut into them.
-      let mountainY = -0.35;
-
-      // 只保留很轻微的整体起伏，不再做明显雪山
-      mountainY += gaussian(x, z, festa.x, festa.z, 2.2, 12, 1.0, 1.0);
-      mountainY += gaussian(x, z, opportunita.x, opportunita.z, 1.4, 12, 1.2, 1.0);
-      mountainY += gaussian(x, z, trasformazione.x, trasformazione.z, 1.4, 12, 1.2, 1.0);
-      mountainY += gaussian(x, z, criticita.x, criticita.z, -1.2, 10, 1.0, 1.0);
-
-      mountainY += ridgeNoise(x, z) * 0.04;
-
-      // 2. Milan map influence.
-      // Brighter road/city texture means flatter and more urban.
-      const mapMask = sampleMapMask(x, z);
-
-      // 3. Central Milan / Duomo area should be a flat city plane.
-      const d = Math.sqrt(x * x + z * z);
-      const centerMask = Math.exp(-(d * d) / (2 * 20 * 20));
-
-      // 4. Combined city mask:
-      // cityMask = where terrain should become city/map, not mountain.
-      const cityMask = THREE.MathUtils.clamp(mapMask * 1.45 + centerMask * 0.75, 0, 1);
-
-      // 5. City plane with only tiny vibration.
-      const cityPlane = -0.18 + ridgeNoise(x, z) * 0.035;
-
-      // 6. Blend mountain into city plane.
-      // This is the main fix: roads/map and terrain now belong to the same height system.
-      let y = THREE.MathUtils.lerp(mountainY, cityPlane, cityMask * 0.94);
-
-      // 7. Duomo exact center: force almost flat.
-      const duomoFlat = 1.0 - smoothstep(0, 8, d);
-      y = THREE.MathUtils.lerp(y, -0.12, duomoFlat);
-
-      // 8. Edge fade.
-      const fade = edgeFade(x, z);
-      y *= 0.72 + fade * 0.28;
-
-      return y;
   }
 
   function makePoints(name, positions, colors, size, opacity) {
@@ -426,26 +331,6 @@ export function initScene() {
       size,
       opacity
     });
-  }
-
-  function makeLineSegments(name, positions, color = 0xF3D7C4, opacity = 0.42) {
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-
-    const material = new THREE.LineBasicMaterial({
-      color,
-        transparent: true,
-      opacity,
-      blending: THREE.NormalBlending,
-      depthTest: false,
-     depthWrite: false
-    });
-
-    const lines = new THREE.LineSegments(geometry, material);
-    lines.name = name;
-    lines.renderOrder = 20;
-    mapSceneGroup.add(lines);
-    return lines;
   }
 
   const animatedObjects = {
@@ -484,7 +369,11 @@ export function initScene() {
     chapterCloud: null,
     chapterBase: null,
     chapterPhase: null,
-    chapterAmp: null
+    chapterAmp: null,
+
+    summitScene: null,
+    summitGround: null,
+    summitAir: null
   };
 
   function createLegacyHooks() {
@@ -522,6 +411,15 @@ export function initScene() {
       THREE,
       animatedObjects,
       COLORS,
+      makePoints
+    });
+  }
+
+  function createSummitScene() {
+    createSummitParticles({
+      THREE,
+      scene,
+      animatedObjects,
       makePoints
     });
   }
@@ -632,6 +530,7 @@ export function initScene() {
     createIntroParticleRings();
     createRitualForegroundSnow();
     createChapterCloud();
+    createSummitScene();
   }
 
   createWorld();
@@ -644,24 +543,7 @@ export function initScene() {
     });
   }
 
-  const panel = document.getElementById('panel');
-  const panelLabel = document.getElementById('panelLabel');
-  const panelTitle = document.getElementById('panelTitle');
-  const panelText = document.getElementById('panelText');
-  const closePanel = document.getElementById('closePanel');
-  const aboutBtn = document.getElementById('aboutBtn');
-
-  const chapterContainer = document.getElementById('chapterContainer');
-  const chapterNumber = document.getElementById('chapterNumber');
-  const chapterTitle = document.getElementById('chapterTitle');
-  const chapterSubtitle = document.getElementById('chapterSubtitle');
   const backToMap = document.getElementById('backToMap');
-
-  const mediaPanel = document.getElementById('mediaPanel');
-  const closeMediaPanel = document.getElementById('closeMediaPanel');
-  const mediaPanelLabel = document.getElementById('mediaPanelLabel');
-  const mediaPanelTitle = document.getElementById('mediaPanelTitle');
-  const mediaPanelText = document.getElementById('mediaPanelText');
 
   const INTERVIEWS_BY_CATEGORY = createInterviewsByCategory(CHAPTERS);
 
@@ -687,16 +569,30 @@ export function initScene() {
 
     appState.view = 'transition';
     appState.transitionStart = clock.getElapsedTime();
-    appState.transitionDuration = 1.45;
+    appState.transitionDuration = 2.8;
+    appState.hoverHookObject = null;
+    syncCategoryHoverUI();
+    document.body.style.cursor = "";
     appState.targetChapter = chapter;
 
-    if (panel) panel.classList.add('hidden');
+    document.getElementById('panel')?.classList.add('hidden');
 
     document.body.classList.add('is-transitioning');
 
-    // 保留地图和山作为背景，不要隐藏。
     mapSceneGroup.visible = true;
     setMapSceneOpacity(1);
+
+    if (animatedObjects.summitScene) {
+      animatedObjects.summitScene.visible = true;
+    }
+
+    if (animatedObjects.summitGround) {
+      animatedObjects.summitGround.material.opacity = 0;
+    }
+
+    if (animatedObjects.summitAir) {
+      animatedObjects.summitAir.material.opacity = 0;
+    }
 
     if (animatedObjects.chapterCloud) {
       animatedObjects.chapterCloud.visible = true;
@@ -707,20 +603,215 @@ export function initScene() {
     appState.cameraStart.copy(camera.position);
     appState.targetStart.copy(orbit.target);
 
+    // 被点击的山顶位置
     const focusPoint = data.pos.clone();
 
-    const chapterView = getChapterCameraView(focusPoint, data.key);
+    // 从当前相机直接朝被点击山靠近，不再用世界中心方向
+    const directToMountain = focusPoint.clone().sub(camera.position);
+    directToMountain.y = 0;
 
-    appState.cameraEnd.copy(chapterView.cameraPos);
-    appState.targetEnd.copy(chapterView.target);
+    if (directToMountain.lengthSq() < 0.0001) {
+      directToMountain.set(0, 0, -1);
+    }
+
+    directToMountain.normalize();
+
+    appState.cameraMid.copy(focusPoint)
+      .add(directToMountain.clone().multiplyScalar(-18));
+
+    appState.cameraMid.y = focusPoint.y + 8.0;
+
+    appState.targetMid.copy(focusPoint);
+    appState.targetMid.y = focusPoint.y + 1.5;
+
+    // 从 overview / 当前相机位置指向被点击山
+    const approachDir = focusPoint.clone().sub(camera.position);
+    approachDir.y = 0;
+
+    if (approachDir.lengthSq() < 0.0001) {
+      approachDir.set(0, 0, -1);
+    }
+
+    approachDir.normalize();
+
+    // 把 summit 粒子空间放到这座山附近
+    placeSummitParticlesAtMountain({
+      THREE,
+      animatedObjects,
+      mountainPos: focusPoint,
+      cameraDirection: approachDir
+    });
+
+    // 最终相机也落到这座山附近，而不是地图中心
+    appState.cameraEnd.copy(focusPoint)
+      .add(approachDir.clone().multiplyScalar(-26));
+
+    appState.cameraEnd.y = focusPoint.y + 5.8;
+
+    // 最终看向山后方 / 地平线
+    appState.targetEnd.copy(focusPoint)
+      .add(approachDir.clone().multiplyScalar(22));
+
+    appState.targetEnd.y = focusPoint.y + 1.4;
+  }
+
+  function updateSummitTransitionVisuals() {
+    if (appState.view !== "transition") return;
+
+    const elapsed = clock.getElapsedTime() - appState.transitionStart;
+    const progress = THREE.MathUtils.clamp(
+      elapsed / appState.transitionDuration,
+      0,
+      1
+    );
+
+    // 前半段先保留地图，让用户看到自己正在靠近被点击的山；
+    // 后半段再让旧地图消失。
+    const mapFade = 1 - smoothstep(0.22, 0.62, progress);
+    setMapSceneOpacity(mapFade);
+
+    updateSummitParticlesTransition({
+      THREE,
+      animatedObjects,
+      progress,
+      smoothstep
+    });
+  }
+
+  function focusChapterScene(activeKey) {
+    mapSceneGroup.traverse((obj) => {
+      const material = obj.material;
+      if (!material) return;
+
+      const materials = Array.isArray(material) ? material : [material];
+      const name = (obj.name || "").toLowerCase();
+
+      const isMountain = !!obj.userData?.key;
+      const isActiveMountain = obj.userData?.key === activeKey;
+
+      const isMapParticle =
+        name.includes("dense-map-points") ||
+        name.includes("terrain-base-particles") ||
+        name.includes("duomo-particles");
+
+      materials.forEach((mat) => {
+        mat.transparent = true;
+
+        if (isActiveMountain) {
+          mat.opacity = 0.72;
+
+          if ("size" in mat) {
+            mat.size = (obj.userData.baseSize || 0.44) * 0.62;
+          }
+
+          obj.renderOrder = 60;
+          return;
+        }
+
+        if (isMountain) {
+          mat.opacity = 0.035;
+
+          if ("size" in mat) {
+            mat.size = (obj.userData.baseSize || 0.44) * 0.32;
+          }
+
+          obj.renderOrder = 5;
+          return;
+        }
+
+        if (isMapParticle) {
+          const isDuomo = name.includes("duomo-particles");
+          const isMapLine = name.includes("dense-map-points");
+          const isTerrain = name.includes("terrain-base-particles");
+
+          if (isDuomo) {
+            mat.opacity = 0.45;
+            obj.renderOrder = 18;
+          } else if (isMapLine) {
+            mat.opacity = 0.28;
+            obj.renderOrder = 14;
+          } else if (isTerrain) {
+            mat.opacity = 0.18;
+            obj.renderOrder = 10;
+          }
+
+          if ("size" in mat && obj.userData?.baseSize !== undefined) {
+            mat.size = obj.userData.baseSize * 0.75;
+          }
+
+          return;
+        }
+      });
+    });
+
+    animatedObjects.hooks.forEach((hook) => {
+      const isActive = hook.userData.key === activeKey;
+
+      hook.material.opacity = isActive ? 0.72 : 0.08;
+      hook.scale.set(
+        isActive ? 2.8 : 1.2,
+        isActive ? 2.8 : 1.2,
+        1
+      );
+    });
+  }
+
+  function resetChapterSceneFocus() {
+    mapSceneGroup.traverse((obj) => {
+      const material = obj.material;
+      if (!material) return;
+
+      const materials = Array.isArray(material) ? material : [material];
+
+      materials.forEach((mat) => {
+        mat.transparent = true;
+
+        if (obj.userData?.baseOpacity !== undefined) {
+          mat.opacity = obj.userData.baseOpacity;
+        } else if (mat.userData?.baseOpacity !== undefined) {
+          mat.opacity = mat.userData.baseOpacity;
+        }
+
+        if ("size" in mat && obj.userData?.baseSize !== undefined) {
+          mat.size = obj.userData.baseSize;
+        }
+      });
+
+      if (obj.userData?.key) {
+        obj.renderOrder = 24;
+      }
+    });
+
+    animatedObjects.hooks.forEach((hook) => {
+      hook.material.opacity = 0.86;
+      hook.scale.set(2.4, 2.4, 1);
+      hook.renderOrder = 35;
+    });
   }
 
   function enterChapter(chapter) {
     appState.view = 'chapter';
 
-    // 保留当前 zoom-in 后的 3D 背景，不切到新页面。
-    mapSceneGroup.visible = true;
-    setMapSceneOpacity(1);
+    // 旧地图隐藏，但不要隐藏 summit 粒子
+    mapSceneGroup.visible = false;
+
+    if (animatedObjects.summitScene) {
+      animatedObjects.summitScene.visible = true;
+    }
+
+    if (animatedObjects.summitGround) {
+      animatedObjects.summitGround.material.opacity = 0.82;
+      animatedObjects.summitGround.material.size = 0.095;
+    }
+
+    if (animatedObjects.summitAir) {
+      animatedObjects.summitAir.material.opacity = 0.28;
+      animatedObjects.summitAir.material.size = 0.038;
+    }
+
+    if (animatedObjects.chapterCloud) {
+      animatedObjects.chapterCloud.visible = true;
+    }
 
     updateChapterCopy(chapter);
     showChapterContainer();
@@ -737,6 +828,9 @@ export function initScene() {
 
     mapSceneGroup.visible = true;
     setMapSceneOpacity(1);
+    resetChapterSceneFocus();
+
+    resetSummitParticles({ animatedObjects });
 
     if (animatedObjects.chapterCloud) {
       animatedObjects.chapterCloud.visible = false;
@@ -754,6 +848,7 @@ export function initScene() {
     document.body.classList.remove('chapter-active');
     document.body.classList.remove('is-transitioning');
     document.body.classList.remove('intro-active');
+    document.body.classList.remove('ritual-active');
 
     // 地图初始视角
     appState.overviewPointerX = 0;
@@ -789,8 +884,22 @@ export function initScene() {
     updateOverallProgressText(overallExplored, overallTotal);
   }
 
+  function updateChapterExplorationCounter(categoryKey) {
+    const counter = document.getElementById("chapterExplorationCounter");
+    const chapter = CHAPTERS[categoryKey];
+
+    if (!counter || !chapter) return;
+
+    const explored = exploredByCategory[categoryKey]?.size || 0;
+    const total = chapter.total ?? 0;
+
+    counter.innerHTML = `Esplorazione <strong>${explored}</strong> / ${total}`;
+  }
+
   function renderInterviewNodes(categoryKey) {
     const interviews = INTERVIEWS_BY_CATEGORY[categoryKey] || [];
+
+    updateChapterExplorationCounter(categoryKey);
 
     renderInterviewNodeList({
       categoryKey,
@@ -798,19 +907,21 @@ export function initScene() {
       exploredSet: exploredByCategory[categoryKey],
       onSelect: (item) => {
         exploredByCategory[categoryKey].add(item.id);
+
         openMediaPanel(item);
+
+        updateChapterExplorationCounter(categoryKey);
         updateCategoryProgress();
       }
     });
 
+    updateChapterExplorationCounter(categoryKey);
     updateCategoryProgress();
   }
 
   if (backToMap) {
     backToMap.addEventListener('click', returnToOverview);
   }
-
-  const mediaMap = document.querySelector('.chapter-media-map');
 
   let interviewPanTarget = 0;
   let interviewPanCurrent = 0;
@@ -832,6 +943,23 @@ export function initScene() {
 
   function findHookByKey(key) {
     return animatedObjects.hooks.find(hook => hook.userData.key === key) || null;
+  }
+
+  let lastHoveredCategoryKey = null;
+
+  function syncCategoryHoverUI() {
+    const hoveredKey =
+      appState.view === "overview"
+        ? appState.hoverHookObject?.userData?.key || null
+        : null;
+
+    if (hoveredKey === lastHoveredCategoryKey) return;
+
+    lastHoveredCategoryKey = hoveredKey;
+
+    document.querySelectorAll(".category-item").forEach((item) => {
+      item.classList.toggle("is-hovered", item.dataset.key === hoveredKey);
+    });
   }
 
   function pickMountainByPointer(event) {
@@ -867,18 +995,18 @@ export function initScene() {
         appState.hoverHookObject = null;
       },
       onSelect: (area) => {
-        const fallbackPos = new THREE.Vector3(
-          area.fallback.x,
-          area.fallback.y,
-          area.fallback.z
-        );
+        const hook = findHookByKey(area.key);
+
+        const pos = hook?.userData?.pos
+          ? hook.userData.pos.clone()
+          : new THREE.Vector3(area.x, hookHeightByKey[area.key] || area.y || 9.5, area.z);
 
         startChapterTransition({
           id: area.id,
           key: area.key,
           title: area.title,
           text: area.text,
-          pos: area.pos || fallbackPos
+          pos
         });
       }
     });
@@ -921,6 +1049,13 @@ export function initScene() {
     if (appState.view !== 'overview') return;
 
     const isOverHotspot = e.target.closest && e.target.closest('.hotspot-btn');
+    const isOverCategory = e.target.closest && e.target.closest('.category-item');
+
+    if (isOverCategory) {
+      appState.overviewPointerTargetX = 0;
+      appState.overviewPointerTargetY = 0;
+      return;
+    }
 
     // 如果鼠标不在 DOM hotspot 上，就用 raycaster 检测山体
     if (!isOverHotspot) {
@@ -1016,7 +1151,14 @@ export function initScene() {
         mapSceneGroup.visible = true;
         setMapSceneOpacity(1);
 
+        orbit.yaw = RITUAL_CAMERA.yaw;
+        orbit.pitch = RITUAL_CAMERA.pitch;
+        orbit.radius = RITUAL_CAMERA.radius;
+        orbit.target.copy(RITUAL_CAMERA.target);
+        updateCamera();
+
         document.body.classList.remove('intro-active');
+        document.body.classList.remove('ritual-active');
         appState.view = 'overview';
 
         if (ritualHint) {
@@ -1043,6 +1185,7 @@ export function initScene() {
 
   function startParticleRitual() {
     appState.view = 'particle-ritual';
+    document.body.classList.add('ritual-active');
 
     updateIntroRingTargetsFromCurrentHotspots();
 
@@ -1074,6 +1217,7 @@ export function initScene() {
       animatedObjects.introRings.material.size = 0.46;
       animatedObjects.introRings.position.set(0.8, 0.15, 0);
       animatedObjects.introRings.scale.set(1.18, 1.10, 1.12);
+      animatedObjects.introRings.rotation.x = 0;
       animatedObjects.introRings.rotation.y = 0;
       animatedObjects.introRings.rotation.z = 0;
     }
@@ -1087,7 +1231,7 @@ export function initScene() {
       animatedObjects.ritualSnowLarge.material.opacity = 0;
     }
 
-    if (panel) panel.classList.add('hidden');
+    document.getElementById('panel')?.classList.add('hidden');
     if (ritualHint) {
       ritualHint.classList.remove('hidden');
       ritualHint.style.opacity = '1';
@@ -1155,7 +1299,12 @@ export function initScene() {
       mapSceneGroup,
       setMapSceneOpacity,
       easeInOutCubic,
-      smoothstep
+      smoothstep,
+
+      orbit,
+      ritualCamera: RITUAL_CAMERA,
+      overviewCamera: OVERVIEW_CAMERA,
+      updateCamera
     });
   }
 
@@ -1224,6 +1373,8 @@ export function initScene() {
       appState,
       animatedObjects
     });
+
+    updateSummitTransitionVisuals();
   }
 
   function animateHooks(t) {
