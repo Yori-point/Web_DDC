@@ -98,7 +98,8 @@ import {
 	createSummitParticles,
 	placeSummitParticlesAtMountain,
 	resetSummitParticles,
-	updateSummitParticlesTransition
+	updateSummitParticlesTransition,
+  animateSummitParticles
 } from "$lib/three/particles/summitParticles.js";
 
 import { startAnimationLoop } from "$lib/three/animationLoop.js";
@@ -127,7 +128,11 @@ export function initScene() {
         key: area.key,
         title: area.title,
         text: area.text,
-        pos: new THREE.Vector3(area.x, area.y, area.z)
+        pos: new THREE.Vector3(
+          area.x,
+          hookHeightByKey[area.key] || 9.5,
+          area.z
+        )
       });
     },
     onHoverCategory: (key) => {
@@ -164,6 +169,9 @@ export function initScene() {
     transitionStart: 0,
     transitionDuration: 2.1,
     targetChapter: null,
+
+    summitImmerseStart: 0,
+    summitImmerseDuration: 2.0,
 
     hoverHookObject: null,
 
@@ -586,16 +594,32 @@ export function initScene() {
       animatedObjects.summitScene.visible = true;
     }
 
+    if (animatedObjects.summitForeground) {
+      animatedObjects.summitForeground.visible = true;
+      animatedObjects.summitForeground.material.opacity = 0;
+      animatedObjects.summitForeground.material.size = 0.08;
+    }
+
     if (animatedObjects.summitGround) {
+      animatedObjects.summitGround.visible = true;
       animatedObjects.summitGround.material.opacity = 0;
+      animatedObjects.summitGround.material.size = 0.06;
+    }
+
+    if (animatedObjects.summitRidge) {
+      animatedObjects.summitRidge.visible = true;
+      animatedObjects.summitRidge.material.opacity = 0;
+      animatedObjects.summitRidge.material.size = 0.09;
     }
 
     if (animatedObjects.summitAir) {
+      animatedObjects.summitAir.visible = true;
       animatedObjects.summitAir.material.opacity = 0;
+      animatedObjects.summitAir.material.size = 0.07;
     }
 
     if (animatedObjects.chapterCloud) {
-      animatedObjects.chapterCloud.visible = true;
+      animatedObjects.chapterCloud.visible = false;
       animatedObjects.chapterCloud.material.opacity = 0;
       animatedObjects.chapterCloud.material.size = 0.08;
     }
@@ -634,25 +658,45 @@ export function initScene() {
 
     approachDir.normalize();
 
-    // 把 summit 粒子空间放到这座山附近
+    // 最终相机也落到这座山附近，而不是地图中心
+    appState.cameraEnd.copy(focusPoint)
+      .add(approachDir.clone().multiplyScalar(-18));
+
+    appState.cameraEnd.y = focusPoint.y + 5.4;
+
+    appState.targetEnd.copy(focusPoint)
+      .add(approachDir.clone().multiplyScalar(14));
+
+    appState.targetEnd.y = focusPoint.y + 0.6;
+
     placeSummitParticlesAtMountain({
       THREE,
       animatedObjects,
       mountainPos: focusPoint,
-      cameraDirection: approachDir
+      cameraDirection: approachDir,
+      cameraPosition: appState.cameraEnd,
+      targetPosition: appState.targetEnd
     });
 
-    // 最终相机也落到这座山附近，而不是地图中心
-    appState.cameraEnd.copy(focusPoint)
-      .add(approachDir.clone().multiplyScalar(-26));
-
-    appState.cameraEnd.y = focusPoint.y + 5.8;
-
-    // 最终看向山后方 / 地平线
-    appState.targetEnd.copy(focusPoint)
-      .add(approachDir.clone().multiplyScalar(22));
-
-    appState.targetEnd.y = focusPoint.y + 1.4;
+    console.log("SUMMIT DEBUG", {
+      sceneVisible: animatedObjects.summitScene?.visible,
+      foregroundVisible: animatedObjects.summitForeground?.visible,
+      groundVisible: animatedObjects.summitGround?.visible,
+      ridgeVisible: animatedObjects.summitRidge?.visible,
+      airVisible: animatedObjects.summitAir?.visible,
+      foregroundOpacity: animatedObjects.summitForeground?.material?.opacity,
+      groundOpacity: animatedObjects.summitGround?.material?.opacity,
+      ridgeOpacity: animatedObjects.summitRidge?.material?.opacity,
+      airOpacity: animatedObjects.summitAir?.material?.opacity,
+      foregroundSize: animatedObjects.summitForeground?.material?.size,
+      groundSize: animatedObjects.summitGround?.material?.size,
+      ridgeSize: animatedObjects.summitRidge?.material?.size,
+      airSize: animatedObjects.summitAir?.material?.size,
+      groupPosition: animatedObjects.summitScene?.position?.toArray(),
+      cameraPosition: camera.position.toArray(),
+      cameraEnd: appState.cameraEnd.toArray(),
+      targetEnd: appState.targetEnd.toArray()
+    });
   }
 
   function updateSummitTransitionVisuals() {
@@ -789,8 +833,37 @@ export function initScene() {
     });
   }
 
+  function enterSummitImmerse(chapter) {
+    appState.view = 'summit-immerse';
+    appState.summitImmerseStart = clock.getElapsedTime();
+
+    mapSceneGroup.visible = false;
+
+    if (animatedObjects.summitScene) {
+      animatedObjects.summitScene.visible = true;
+    }
+
+    if (animatedObjects.summitForeground) {
+      animatedObjects.summitForeground.material.opacity = 1.0;
+      animatedObjects.summitForeground.material.size = 0.19;
+    }
+    if (animatedObjects.summitGround) {
+      animatedObjects.summitGround.material.opacity = 1.0;
+      animatedObjects.summitGround.material.size = 0.12;
+    }
+    if (animatedObjects.summitRidge) {
+      animatedObjects.summitRidge.material.opacity = 1.0;
+      animatedObjects.summitRidge.material.size = 0.13;
+    }
+    if (animatedObjects.summitAir) {
+      animatedObjects.summitAir.material.opacity = 0.3;
+      animatedObjects.summitAir.material.size = 0.07;
+    }
+  }
+
   function enterChapter(chapter) {
     appState.view = 'chapter';
+    document.body.classList.add('chapter-active');
 
     // 旧地图隐藏，但不要隐藏 summit 粒子
     mapSceneGroup.visible = false;
@@ -799,18 +872,61 @@ export function initScene() {
       animatedObjects.summitScene.visible = true;
     }
 
+    if (animatedObjects.summitForeground) {
+      animatedObjects.summitForeground.visible = true;
+      animatedObjects.summitForeground.frustumCulled = false;
+      animatedObjects.summitForeground.material.transparent = true;
+      animatedObjects.summitForeground.material.opacity = 0.75;
+      animatedObjects.summitForeground.material.size = 0.12;
+    }
+
     if (animatedObjects.summitGround) {
-      animatedObjects.summitGround.material.opacity = 0.82;
-      animatedObjects.summitGround.material.size = 0.095;
+      animatedObjects.summitGround.visible = true;
+      animatedObjects.summitGround.frustumCulled = false;
+      animatedObjects.summitGround.material.transparent = true;
+      animatedObjects.summitGround.material.opacity = 0.9;
+      animatedObjects.summitGround.material.size = 0.1;
+    }
+
+    if (animatedObjects.summitRidge) {
+      animatedObjects.summitRidge.visible = true;
+      animatedObjects.summitRidge.frustumCulled = false;
+      animatedObjects.summitRidge.material.transparent = true;
+      animatedObjects.summitRidge.material.opacity = 0.85;
+      animatedObjects.summitRidge.material.size = 0.12;
     }
 
     if (animatedObjects.summitAir) {
-      animatedObjects.summitAir.material.opacity = 0.28;
-      animatedObjects.summitAir.material.size = 0.038;
+      animatedObjects.summitAir.visible = true;
+      animatedObjects.summitAir.frustumCulled = false;
+      animatedObjects.summitAir.material.transparent = true;
+      animatedObjects.summitAir.material.opacity = 0.25;
+      animatedObjects.summitAir.material.size = 0.08;
     }
 
+    console.log("SUMMIT CHAPTER DEBUG", {
+      sceneVisible: animatedObjects.summitScene?.visible,
+      foregroundVisible: animatedObjects.summitForeground?.visible,
+      groundVisible: animatedObjects.summitGround?.visible,
+      ridgeVisible: animatedObjects.summitRidge?.visible,
+      airVisible: animatedObjects.summitAir?.visible,
+      foregroundOpacity: animatedObjects.summitForeground?.material?.opacity,
+      groundOpacity: animatedObjects.summitGround?.material?.opacity,
+      ridgeOpacity: animatedObjects.summitRidge?.material?.opacity,
+      airOpacity: animatedObjects.summitAir?.material?.opacity,
+      foregroundSize: animatedObjects.summitForeground?.material?.size,
+      groundSize: animatedObjects.summitGround?.material?.size,
+      ridgeSize: animatedObjects.summitRidge?.material?.size,
+      airSize: animatedObjects.summitAir?.material?.size,
+      groupPosition: animatedObjects.summitScene?.position?.toArray(),
+      cameraPosition: camera.position.toArray(),
+      cameraEnd: appState.cameraEnd?.toArray?.() || null,
+      targetEnd: appState.targetEnd?.toArray?.() || null
+    });
+
     if (animatedObjects.chapterCloud) {
-      animatedObjects.chapterCloud.visible = true;
+      animatedObjects.chapterCloud.visible = false;
+      animatedObjects.chapterCloud.material.opacity = 0;
     }
 
     updateChapterCopy(chapter);
@@ -1374,6 +1490,13 @@ export function initScene() {
       animatedObjects
     });
 
+    animateSummitParticles({
+      THREE,
+      animatedObjects,
+      t,
+      appState
+    });
+
     updateSummitTransitionVisuals();
   }
 
@@ -1426,6 +1549,7 @@ export function initScene() {
     updateHotspotButtons,
     updateInterviewPan,
 
+    enterSummitImmerse,
     enterChapter,
     easeInOutCubic,
 
