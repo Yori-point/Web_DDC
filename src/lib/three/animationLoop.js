@@ -13,6 +13,7 @@ export function startAnimationLoop({
 	animateTerrain,
 	animateSnow,
 	animateForegroundSnow,
+	animateCursorSnow,
 	animateHooks,
 	animateLines,
 	applyMarkerHoverVisual,
@@ -41,6 +42,8 @@ export function startAnimationLoop({
 		);
 
 		setInterviewPanCurrent(nextInterviewPan);
+
+		animateCursorSnow(t);
 
 		if (appState.view === "overview" || appState.view === "transition") {
 			animateTerrain(t);

@@ -10,6 +10,11 @@
 
 	width: auto;
 	pointer-events: auto;
+	z-index: 80;
+
+	opacity: 1;
+	visibility: visible;
+	transition: opacity 0.35s ease, visibility 0.35s ease;
 }
 
 .category-item {
@@ -221,10 +226,16 @@
 
 body.intro-active .category-bar,
 body.ritual-active .category-bar,
-body.chapter-active .category-bar,
 body.is-transitioning .category-bar {
 	opacity: 0;
 	pointer-events: none;
+}
+
+body.chapter-active .category-bar {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+	z-index: 80;
 }
 
 @media (max-width: 760px) {

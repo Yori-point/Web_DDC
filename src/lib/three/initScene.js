@@ -67,6 +67,12 @@ import {
 } from "$lib/three/particles/snow.js";
 
 import {
+	createCursorSnowTrail,
+	emitCursorSnowTrail,
+	animateCursorSnowTrail
+} from "$lib/three/particles/cursorSnow.js";
+
+import {
 	createIntroParticleRings as createIntroParticleRingsModule,
 	updateIntroRingTargetsFromCurrentHotspots as updateIntroRingTargetsModule,
 	createRitualForegroundSnow as createRitualForegroundSnowModule,
@@ -379,9 +385,18 @@ export function initScene() {
     chapterPhase: null,
     chapterAmp: null,
 
+    // GLB summit scene shown after zooming into a mountain.
     summitScene: null,
-    summitGround: null,
-    summitAir: null
+    summitModel: null,
+    summitModelRoot: null,
+    summitModelMaterials: [],
+    summitModelReady: false,
+
+    cursorSnow: null,
+    cursorSnowLife: null,
+    cursorSnowVelocity: null,
+    cursorSnowIndex: 0,
+    cursorSnowLastEmit: 0
   };
 
   function createLegacyHooks() {
@@ -409,6 +424,16 @@ export function initScene() {
     createForegroundSnowParticles({
       THREE,
       mapSceneGroup,
+      animatedObjects,
+      createSnowFlakeTexture
+    });
+  }
+
+  function createCursorSnow() {
+    createCursorSnowTrail({
+      THREE,
+      scene,
+      camera,
       animatedObjects,
       createSnowFlakeTexture
     });
@@ -534,6 +559,7 @@ export function initScene() {
 
     createSnow();
     createForegroundSnow();
+    createCursorSnow();
     
     createIntroParticleRings();
     createRitualForegroundSnow();
@@ -594,29 +620,9 @@ export function initScene() {
       animatedObjects.summitScene.visible = true;
     }
 
-    if (animatedObjects.summitForeground) {
-      animatedObjects.summitForeground.visible = true;
-      animatedObjects.summitForeground.material.opacity = 0;
-      animatedObjects.summitForeground.material.size = 0.08;
-    }
-
-    if (animatedObjects.summitGround) {
-      animatedObjects.summitGround.visible = true;
-      animatedObjects.summitGround.material.opacity = 0;
-      animatedObjects.summitGround.material.size = 0.06;
-    }
-
-    if (animatedObjects.summitRidge) {
-      animatedObjects.summitRidge.visible = true;
-      animatedObjects.summitRidge.material.opacity = 0;
-      animatedObjects.summitRidge.material.size = 0.09;
-    }
-
-    if (animatedObjects.summitAir) {
-      animatedObjects.summitAir.visible = true;
-      animatedObjects.summitAir.material.opacity = 0;
-      animatedObjects.summitAir.material.size = 0.07;
-    }
+    animatedObjects.summitModelMaterials?.forEach((material) => {
+      material.opacity = 0;
+    });
 
     if (animatedObjects.chapterCloud) {
       animatedObjects.chapterCloud.visible = false;
@@ -675,23 +681,15 @@ export function initScene() {
       mountainPos: focusPoint,
       cameraDirection: approachDir,
       cameraPosition: appState.cameraEnd,
-      targetPosition: appState.targetEnd
+      targetPosition: appState.targetEnd,
+      categoryKey: chapter.key
     });
 
-    console.log("SUMMIT DEBUG", {
+    console.log("SUMMIT MODEL DEBUG", {
       sceneVisible: animatedObjects.summitScene?.visible,
-      foregroundVisible: animatedObjects.summitForeground?.visible,
-      groundVisible: animatedObjects.summitGround?.visible,
-      ridgeVisible: animatedObjects.summitRidge?.visible,
-      airVisible: animatedObjects.summitAir?.visible,
-      foregroundOpacity: animatedObjects.summitForeground?.material?.opacity,
-      groundOpacity: animatedObjects.summitGround?.material?.opacity,
-      ridgeOpacity: animatedObjects.summitRidge?.material?.opacity,
-      airOpacity: animatedObjects.summitAir?.material?.opacity,
-      foregroundSize: animatedObjects.summitForeground?.material?.size,
-      groundSize: animatedObjects.summitGround?.material?.size,
-      ridgeSize: animatedObjects.summitRidge?.material?.size,
-      airSize: animatedObjects.summitAir?.material?.size,
+      modelReady: animatedObjects.summitModelReady,
+      modelVisible: animatedObjects.summitModelRoot?.visible,
+      materialCount: animatedObjects.summitModelMaterials?.length || 0,
       groupPosition: animatedObjects.summitScene?.position?.toArray(),
       cameraPosition: camera.position.toArray(),
       cameraEnd: appState.cameraEnd.toArray(),
@@ -842,82 +840,24 @@ export function initScene() {
     if (animatedObjects.summitScene) {
       animatedObjects.summitScene.visible = true;
     }
-
-    if (animatedObjects.summitForeground) {
-      animatedObjects.summitForeground.material.opacity = 1.0;
-      animatedObjects.summitForeground.material.size = 0.19;
-    }
-    if (animatedObjects.summitGround) {
-      animatedObjects.summitGround.material.opacity = 1.0;
-      animatedObjects.summitGround.material.size = 0.12;
-    }
-    if (animatedObjects.summitRidge) {
-      animatedObjects.summitRidge.material.opacity = 1.0;
-      animatedObjects.summitRidge.material.size = 0.13;
-    }
-    if (animatedObjects.summitAir) {
-      animatedObjects.summitAir.material.opacity = 0.3;
-      animatedObjects.summitAir.material.size = 0.07;
-    }
   }
 
   function enterChapter(chapter) {
     appState.view = 'chapter';
     document.body.classList.add('chapter-active');
 
-    // 旧地图隐藏，但不要隐藏 summit 粒子
+    // Hide the original map. Keep the GLB summit scene as the background.
     mapSceneGroup.visible = false;
 
     if (animatedObjects.summitScene) {
       animatedObjects.summitScene.visible = true;
     }
 
-    if (animatedObjects.summitForeground) {
-      animatedObjects.summitForeground.visible = true;
-      animatedObjects.summitForeground.frustumCulled = false;
-      animatedObjects.summitForeground.material.transparent = true;
-      animatedObjects.summitForeground.material.opacity = 0.75;
-      animatedObjects.summitForeground.material.size = 0.12;
-    }
-
-    if (animatedObjects.summitGround) {
-      animatedObjects.summitGround.visible = true;
-      animatedObjects.summitGround.frustumCulled = false;
-      animatedObjects.summitGround.material.transparent = true;
-      animatedObjects.summitGround.material.opacity = 0.9;
-      animatedObjects.summitGround.material.size = 0.1;
-    }
-
-    if (animatedObjects.summitRidge) {
-      animatedObjects.summitRidge.visible = true;
-      animatedObjects.summitRidge.frustumCulled = false;
-      animatedObjects.summitRidge.material.transparent = true;
-      animatedObjects.summitRidge.material.opacity = 0.85;
-      animatedObjects.summitRidge.material.size = 0.12;
-    }
-
-    if (animatedObjects.summitAir) {
-      animatedObjects.summitAir.visible = true;
-      animatedObjects.summitAir.frustumCulled = false;
-      animatedObjects.summitAir.material.transparent = true;
-      animatedObjects.summitAir.material.opacity = 0.25;
-      animatedObjects.summitAir.material.size = 0.08;
-    }
-
     console.log("SUMMIT CHAPTER DEBUG", {
       sceneVisible: animatedObjects.summitScene?.visible,
-      foregroundVisible: animatedObjects.summitForeground?.visible,
-      groundVisible: animatedObjects.summitGround?.visible,
-      ridgeVisible: animatedObjects.summitRidge?.visible,
-      airVisible: animatedObjects.summitAir?.visible,
-      foregroundOpacity: animatedObjects.summitForeground?.material?.opacity,
-      groundOpacity: animatedObjects.summitGround?.material?.opacity,
-      ridgeOpacity: animatedObjects.summitRidge?.material?.opacity,
-      airOpacity: animatedObjects.summitAir?.material?.opacity,
-      foregroundSize: animatedObjects.summitForeground?.material?.size,
-      groundSize: animatedObjects.summitGround?.material?.size,
-      ridgeSize: animatedObjects.summitRidge?.material?.size,
-      airSize: animatedObjects.summitAir?.material?.size,
+      modelReady: animatedObjects.summitModelReady,
+      modelVisible: animatedObjects.summitModelRoot?.visible,
+      materialCount: animatedObjects.summitModelMaterials?.length || 0,
       groupPosition: animatedObjects.summitScene?.position?.toArray(),
       cameraPosition: camera.position.toArray(),
       cameraEnd: appState.cameraEnd?.toArray?.() || null,
@@ -1152,6 +1092,13 @@ export function initScene() {
   updateCategoryProgress();
 
   window.addEventListener('pointermove', e => {
+    emitCursorSnowTrail({
+      THREE,
+      camera,
+      animatedObjects,
+      event: e
+    });
+
     const nx = e.clientX / window.innerWidth - 0.5;
     const ny = e.clientY / window.innerHeight - 0.5;
 
@@ -1405,6 +1352,15 @@ export function initScene() {
     });
   }
 
+  function animateCursorSnow(t) {
+    animateCursorSnowTrail({
+      THREE,
+      camera,
+      animatedObjects,
+      t
+    });
+  }
+
   function animateIntroRings(t) {
     animateIntroRingsModule({
       THREE,
@@ -1538,6 +1494,7 @@ export function initScene() {
     animateTerrain,
     animateSnow,
     animateForegroundSnow,
+    animateCursorSnow,
     animateHooks,
     animateLines,
     applyMarkerHoverVisual,
