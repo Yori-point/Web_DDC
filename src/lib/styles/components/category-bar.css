@@ -227,8 +227,10 @@
 body.intro-active .category-bar,
 body.ritual-active .category-bar,
 body.is-transitioning .category-bar {
-	opacity: 0;
-	pointer-events: none;
+	opacity: 0 !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+	transform: translateX(-50%) translateY(18px);
 }
 
 body.chapter-active .category-bar {

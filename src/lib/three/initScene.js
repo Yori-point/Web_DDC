@@ -42,7 +42,8 @@ import {
 	createGlowSprite,
 	createHookTexture,
 	createSoftMistTexture,
-	createSnowFlakeTexture
+	createSnowFlakeTexture,
+  createSnowCrystalTexture
 } from "$lib/three/textures.js";
 
 import {
@@ -414,18 +415,20 @@ export function initScene() {
     createSnowParticles({
       THREE,
       WORLD,
-      mapSceneGroup,
+      mapSceneGroup: scene,
       animatedObjects,
-      createSnowFlakeTexture
+      createSnowFlakeTexture,
+      createSnowCrystalTexture
     });
   }
 
   function createForegroundSnow() {
     createForegroundSnowParticles({
       THREE,
-      mapSceneGroup,
+      mapSceneGroup: scene,
       animatedObjects,
-      createSnowFlakeTexture
+      createSnowFlakeTexture,
+      createSnowCrystalTexture
     });
   }
 
@@ -565,6 +568,9 @@ export function initScene() {
     createRitualForegroundSnow();
     createChapterCloud();
     createSummitScene();
+
+    // Intro 阶段隐藏地图，只保留全局雪花背景
+    mapSceneGroup.visible = false;
   }
 
   createWorld();

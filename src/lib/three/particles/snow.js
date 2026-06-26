@@ -5,7 +5,8 @@ export function createSnowParticles({
 	WORLD,
 	mapSceneGroup,
 	animatedObjects,
-	createSnowFlakeTexture
+	createSnowFlakeTexture,
+	createSnowCrystalTexture
 }) {
 	const positions = [];
 	const base = [];
@@ -41,12 +42,12 @@ export function createSnowParticles({
 
 	const snowMaterial = new THREE.PointsMaterial({
 		map: createSnowFlakeTexture(THREE),
-		alphaTest: 0.008,
+		alphaTest: 0.001,
 		color: 0xffffff,
-		size: 0.32,
+		size: 0.5,
 		sizeAttenuation: true,
 		transparent: true,
-		opacity: 0.66,
+		opacity: 0.38,
 		depthWrite: false,
 		depthTest: false,
 		blending: THREE.NormalBlending
@@ -64,19 +65,20 @@ export function createForegroundSnowParticles({
 	THREE,
 	mapSceneGroup,
 	animatedObjects,
-	createSnowFlakeTexture
+	createSnowFlakeTexture,
+	createSnowCrystalTexture
 }) {
 	const positions = [];
 	const base = [];
 	const phases = [];
 	const amps = [];
 
-	const count = 260;
+	const count = 680;
 
 	for (let i = 0; i < count; i++) {
-		const x = THREE.MathUtils.randFloatSpread(120);
-		const y = THREE.MathUtils.randFloat(4, 54);
-		const z = THREE.MathUtils.randFloat(-35, 52);
+		const x = THREE.MathUtils.randFloatSpread(165);
+		const y = THREE.MathUtils.randFloat(3, 62);
+		const z = THREE.MathUtils.randFloat(-48, 58);
 
 		positions.push(x, y, z);
 		base.push(x, y, z);
@@ -92,13 +94,15 @@ export function createForegroundSnowParticles({
 	geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
 
 	const mat = new THREE.PointsMaterial({
-		map: createSnowFlakeTexture(THREE),
-		alphaTest: 0.004,
+		map: createSnowCrystalTexture
+			? createSnowCrystalTexture(THREE)
+			: createSnowFlakeTexture(THREE),
+		alphaTest: 0.001,
 		color: 0xffffff,
-		size: 0.76,
+		size: 1.9,
 		sizeAttenuation: true,
 		transparent: true,
-		opacity: 0.42,
+		opacity: 0.5,
 		depthWrite: false,
 		depthTest: false,
 		blending: THREE.NormalBlending
@@ -132,13 +136,14 @@ export function animateSnowParticles({ animatedObjects, t }) {
 		const baseZ = base[i + 2];
 
 		const isLowLayer = baseY < 18;
-		const fallSpeed = isLowLayer ? 0.28 : 0.16;
+		const fallSpeed = isLowLayer ? 0.22 : 0.13;
 
-		const swayX = Math.sin(t * 0.45 + phase[p]) * amp[p] * 0.65;
-		const swayZ = Math.cos(t * 0.38 + phase[p]) * amp[p] * 0.45;
+		const driftA = Math.sin(t * 0.32 + phase[p]) * amp[p] * 1.15;
+		const driftB = Math.sin(t * 0.17 + phase[p] * 1.7) * amp[p] * 0.75;
+		const swayZ = Math.cos(t * 0.24 + phase[p] * 1.3) * amp[p] * 0.7;
 
-		arr[i] = baseX + swayX;
-		arr[i + 1] = wrap(baseY - t * fallSpeed, 1.2, 72);
+		arr[i] = baseX + driftA + driftB;
+		arr[i + 1] = wrap(baseY - t * fallSpeed - Math.sin(t * 0.2 + phase[p]) * 0.45, 1.2, 72);
 		arr[i + 2] = baseZ + swayZ;
 	}
 
@@ -160,11 +165,18 @@ export function animateForegroundSnowParticles({ animatedObjects, t }) {
 		const baseY = base[i + 1];
 		const baseZ = base[i + 2];
 
-		const swayX = Math.sin(t * 0.28 + phase[p]) * amp[p] * 0.42;
-		const swayZ = Math.cos(t * 0.24 + phase[p]) * amp[p] * 0.28;
+		const swayX =
+			Math.sin(t * 0.22 + phase[p]) * amp[p] * 1.25 +
+			Math.cos(t * 0.11 + phase[p] * 1.9) * amp[p] * 0.8;
+
+		const swayZ =
+			Math.cos(t * 0.18 + phase[p]) * amp[p] * 0.7 +
+			Math.sin(t * 0.09 + phase[p] * 1.4) * amp[p] * 0.45;
+
+		const fall = 0.2 + Math.sin(phase[p]) * 0.08;
 
 		arr[i] = baseX + swayX;
-		arr[i + 1] = wrap(baseY - t * 0.34, 1.2, 58);
+		arr[i + 1] = wrap(baseY - t * fall, 1.2, 64);
 		arr[i + 2] = baseZ + swayZ;
 	}
 
