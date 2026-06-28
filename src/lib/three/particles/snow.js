@@ -44,10 +44,10 @@ export function createSnowParticles({
 		map: createSnowFlakeTexture(THREE),
 		alphaTest: 0.001,
 		color: 0xffffff,
-		size: 0.5,
+		size: 0.42,
 		sizeAttenuation: true,
 		transparent: true,
-		opacity: 0.38,
+		opacity: 0.28,
 		depthWrite: false,
 		depthTest: false,
 		blending: THREE.NormalBlending
@@ -73,7 +73,7 @@ export function createForegroundSnowParticles({
 	const phases = [];
 	const amps = [];
 
-	const count = 680;
+	const count = 260;
 
 	for (let i = 0; i < count; i++) {
 		const x = THREE.MathUtils.randFloatSpread(165);
@@ -94,15 +94,13 @@ export function createForegroundSnowParticles({
 	geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
 
 	const mat = new THREE.PointsMaterial({
-		map: createSnowCrystalTexture
-			? createSnowCrystalTexture(THREE)
-			: createSnowFlakeTexture(THREE),
+		map: createSnowFlakeTexture(THREE),
 		alphaTest: 0.001,
 		color: 0xffffff,
-		size: 1.9,
+		size: 1.2,
 		sizeAttenuation: true,
 		transparent: true,
-		opacity: 0.5,
+		opacity: 0.24,
 		depthWrite: false,
 		depthTest: false,
 		blending: THREE.NormalBlending

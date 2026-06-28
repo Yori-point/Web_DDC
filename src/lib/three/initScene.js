@@ -49,7 +49,6 @@ import {
 import {
 	updateCamera as updateCameraController,
 	updateOverviewCameraByPointer as updateOverviewCameraByPointerController,
-	getChapterCameraView as getChapterCameraViewController
 } from "$lib/three/cameraController.js";
 
 import {
@@ -116,6 +115,12 @@ export function initScene() {
 
 	const BG_COLOR = 0x070e17;
 	document.body.classList.add("intro-active");
+  document.body.classList.remove(
+    "overview-active",
+    "chapter-active",
+    "ritual-active",
+    "is-transitioning"
+  );
 
   const canvas = document.getElementById('scene');
 
@@ -144,11 +149,13 @@ export function initScene() {
     },
     onHoverCategory: (key) => {
       appState.hoverHookObject = findHookByKey(key);
+      window.showCategoryHoverByKey?.(key);
       syncCategoryHoverUI();
     },
     onLeaveCategory: () => {
       if (appState.view === "overview") {
         appState.hoverHookObject = null;
+        window.hideCategoryHoverText?.();
         syncCategoryHoverUI();
       }
     }
@@ -172,7 +179,7 @@ export function initScene() {
   });
 
   const appState = {
-    view: 'overview',
+    view: 'intro',
     transitionStart: 0,
     transitionDuration: 2.1,
     targetChapter: null,
@@ -289,29 +296,36 @@ export function initScene() {
     syncCategoryHoverUI();
   }
 
-  const orbit = {
-    yaw: 3.8,
-    pitch: 0.32,
-    radius: 80,
-    target: new THREE.Vector3(0.4, 2.4, 1.2)
-  };
+  const MAP_FINAL_CAMERA = {
+  yaw: 4.0, //地图视角
+  pitch: 0.26,
+  radius: 66,
+  target: new THREE.Vector3(0.4, 2.1, 1.2)
+};
 
-  const OVERVIEW_CAMERA = {
-    yaw: 3.8,
-    pitch: 0.32,
-    radius: 80,
-    target: new THREE.Vector3(0.4, 2.4, 1.2),
+const orbit = {
+  yaw: MAP_FINAL_CAMERA.yaw,
+  pitch: MAP_FINAL_CAMERA.pitch,
+  radius: MAP_FINAL_CAMERA.radius,
+  target: MAP_FINAL_CAMERA.target.clone()
+};
 
-    maxYawOffset: THREE.MathUtils.degToRad(25),
-    maxPitchOffset: THREE.MathUtils.degToRad(10)
-  };
+const OVERVIEW_CAMERA = {
+  yaw: MAP_FINAL_CAMERA.yaw,
+  pitch: MAP_FINAL_CAMERA.pitch,
+  radius: MAP_FINAL_CAMERA.radius,
+  target: MAP_FINAL_CAMERA.target.clone(),
 
-  const RITUAL_CAMERA = {
-    yaw: -0.48,
-    pitch: 0.30,
-    radius: 80,
-    target: new THREE.Vector3(0.4, 2.4, 1.2)
-  };
+  maxYawOffset: THREE.MathUtils.degToRad(18),
+  maxPitchOffset: THREE.MathUtils.degToRad(6)
+};
+
+const RITUAL_CAMERA = {
+  yaw: MAP_FINAL_CAMERA.yaw,
+  pitch: MAP_FINAL_CAMERA.pitch,
+  radius: MAP_FINAL_CAMERA.radius,
+  target: MAP_FINAL_CAMERA.target.clone()
+};
 
   function updateCamera() {
     updateCameraController({
@@ -438,7 +452,8 @@ export function initScene() {
       scene,
       camera,
       animatedObjects,
-      createSnowFlakeTexture
+      createSnowFlakeTexture,
+      createSnowCrystalTexture
     });
   }
 
@@ -595,14 +610,6 @@ export function initScene() {
     relazioni: new Set()
   };
 
-  function getChapterCameraView(pos, key) {
-    return getChapterCameraViewController({
-      THREE,
-      pos,
-      overviewCamera: OVERVIEW_CAMERA
-    });
-  }
-
   function startChapterTransition(data) {
     const chapter = CHAPTERS[data.key];
     if (!chapter) return;
@@ -611,6 +618,12 @@ export function initScene() {
     appState.transitionStart = clock.getElapsedTime();
     appState.transitionDuration = 2.8;
     appState.hoverHookObject = null;
+    window.hideCategoryHoverText?.();
+    document.body.classList.remove("category-hover-active");
+
+    document.querySelectorAll(".category-item").forEach((item) => {
+      item.classList.remove("is-hovered");
+    });
     syncCategoryHoverUI();
     document.body.style.cursor = "";
     appState.targetChapter = chapter;
@@ -619,8 +632,8 @@ export function initScene() {
 
     document.body.classList.add('is-transitioning');
 
-    mapSceneGroup.visible = true;
-    setMapSceneOpacity(1);
+    mapSceneGroup.visible = false;
+    setMapSceneOpacity(0);
 
     if (animatedObjects.summitScene) {
       animatedObjects.summitScene.visible = true;
@@ -884,6 +897,90 @@ export function initScene() {
     document.body.classList.remove('is-transitioning');
   }
 
+  function returnToIntro() {
+    appState.view = "intro";
+    appState.targetChapter = null;
+    appState.hoverHookObject = null;
+
+    appState.transitionStart = 0;
+    appState.ritualStartTime = 0;
+    appState.ritualScrollProgress = 0;
+
+    appState.ritualPointerX = 0;
+    appState.ritualPointerY = 0;
+    appState.ritualPointerTargetX = 0;
+    appState.ritualPointerTargetY = 0;
+
+    appState.overviewPointerX = 0;
+    appState.overviewPointerY = 0;
+    appState.overviewPointerTargetX = 0;
+    appState.overviewPointerTargetY = 0;
+
+    const intro = document.getElementById("intro");
+    const ritualHint = document.getElementById("ritualHint");
+
+    intro?.classList.remove("hidden");
+
+    document.body.classList.add("intro-active");
+    document.body.classList.remove("ritual-active");
+    document.body.classList.remove("chapter-active");
+    document.body.classList.remove("is-transitioning");
+    document.body.classList.remove("category-hover-active");
+
+    document.getElementById("panel")?.classList.add("hidden");
+    document.getElementById("infoPanel")?.classList.add("hidden");
+    document.getElementById("mediaPanel")?.classList.add("hidden");
+
+    document.querySelector(".chapter-media-map")?.classList.remove("has-open");
+
+    hideChapterContainer();
+    clearChapterState();
+
+    window.hideCategoryHoverText?.();
+    syncCategoryHoverUI();
+
+    mapSceneGroup.visible = false;
+    setMapSceneOpacity(0);
+
+    resetSummitParticles({ animatedObjects });
+
+    if (animatedObjects.summitScene) {
+      animatedObjects.summitScene.visible = false;
+    }
+
+    if (animatedObjects.chapterCloud) {
+      animatedObjects.chapterCloud.visible = false;
+      animatedObjects.chapterCloud.material.opacity = 0;
+    }
+
+    if (animatedObjects.introRings) {
+      animatedObjects.introRings.visible = false;
+      animatedObjects.introRings.material.opacity = 0;
+      animatedObjects.introRings.material.size = 0;
+    }
+
+    if (animatedObjects.ritualSnowFine) {
+      animatedObjects.ritualSnowFine.visible = false;
+      animatedObjects.ritualSnowFine.material.opacity = 0;
+    }
+
+    if (animatedObjects.ritualSnowLarge) {
+      animatedObjects.ritualSnowLarge.visible = false;
+      animatedObjects.ritualSnowLarge.material.opacity = 0;
+    }
+
+    if (ritualHint) {
+      ritualHint.classList.add("hidden");
+      ritualHint.style.opacity = "0";
+    }
+
+    orbit.yaw = OVERVIEW_CAMERA.yaw;
+    orbit.pitch = OVERVIEW_CAMERA.pitch;
+    orbit.radius = OVERVIEW_CAMERA.radius;
+    orbit.target.copy(OVERVIEW_CAMERA.target);
+    updateCamera();
+  }
+
   function returnToOverview() {
     appState.view = 'overview';
     appState.targetChapter = null;
@@ -911,6 +1008,7 @@ export function initScene() {
     document.body.classList.remove('is-transitioning');
     document.body.classList.remove('intro-active');
     document.body.classList.remove('ritual-active');
+    document.body.classList.add('overview-active');
 
     // 地图初始视角
     appState.overviewPointerX = 0;
@@ -985,6 +1083,8 @@ export function initScene() {
     backToMap.addEventListener('click', returnToOverview);
   }
 
+  window.addEventListener("tracce:return-intro", returnToIntro);
+
   let interviewPanTarget = 0;
   let interviewPanCurrent = 0;
 
@@ -1052,9 +1152,13 @@ export function initScene() {
       findHookByKey,
       onHover: (key) => {
         appState.hoverHookObject = findHookByKey(key);
+        window.showCategoryHoverByKey?.(key);
+        syncCategoryHoverUI();
       },
       onLeave: () => {
         appState.hoverHookObject = null;
+        window.hideCategoryHoverText?.();
+        syncCategoryHoverUI();
       },
       onSelect: (area) => {
         const hook = findHookByKey(area.key);
@@ -1131,12 +1235,19 @@ export function initScene() {
       const pickedHook = pickMountainByPointer(e);
 
       if (pickedHook) {
+        const key = pickedHook.userData.key;
+
         appState.hoverHookObject = pickedHook;
+        window.showCategoryHoverByKey?.(key);
+        syncCategoryHoverUI();
+
         appState.overviewPointerTargetX = 0;
         appState.overviewPointerTargetY = 0;
         return;
       } else {
         appState.hoverHookObject = null;
+        window.hideCategoryHoverText?.();
+        syncCategoryHoverUI();
       }
     }
 
@@ -1220,14 +1331,16 @@ export function initScene() {
         mapSceneGroup.visible = true;
         setMapSceneOpacity(1);
 
-        orbit.yaw = RITUAL_CAMERA.yaw;
-        orbit.pitch = RITUAL_CAMERA.pitch;
-        orbit.radius = RITUAL_CAMERA.radius;
-        orbit.target.copy(RITUAL_CAMERA.target);
+        orbit.yaw = OVERVIEW_CAMERA.yaw;
+        orbit.pitch = OVERVIEW_CAMERA.pitch;
+        orbit.radius = OVERVIEW_CAMERA.radius;
+        orbit.target.copy(OVERVIEW_CAMERA.target);
         updateCamera();
 
         document.body.classList.remove('intro-active');
         document.body.classList.remove('ritual-active');
+        document.body.classList.add('overview-active');
+
         appState.view = 'overview';
 
         if (ritualHint) {
@@ -1254,6 +1367,9 @@ export function initScene() {
 
   function startParticleRitual() {
     appState.view = 'particle-ritual';
+
+    document.body.classList.remove('overview-active');
+    document.body.classList.remove('chapter-active');
     document.body.classList.add('ritual-active');
 
     updateIntroRingTargetsFromCurrentHotspots();
@@ -1527,6 +1643,8 @@ export function initScene() {
     cleanupInfoPanel?.();
     cleanupMediaPanel?.();
     cleanupCategoryBar?.();
+
+    window.removeEventListener("tracce:return-intro", returnToIntro);
 
 		renderer.dispose();
 	};

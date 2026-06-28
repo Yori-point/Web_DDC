@@ -11,6 +11,29 @@
 	width: min(440px, calc(100vw - 64px));
 }
 
+.top-left .brand-link {
+	all: unset;
+	display: block;
+	pointer-events: auto;
+	cursor: pointer;
+}
+
+body.intro-active .top-left .brand-link {
+	pointer-events: none;
+	cursor: default;
+}
+
+body:not(.intro-active) .top-left {
+	pointer-events: auto;
+}
+
+body:not(.intro-active) .top-left .brand-link:hover h1 {
+	opacity: 0.68;
+	text-shadow:
+		0 0 10px rgba(242, 245, 247, 0.18),
+		0 0 28px rgba(242, 245, 247, 0.08);
+}
+
 .kicker {
 	color: rgba(169, 199, 230, 0.78);
 	font-size: 12px;
@@ -43,8 +66,8 @@ h1 {
 }
 
 .top-right {
-	right: 32px;
-	top: 36px;
+	right: 70px;
+	top: 42px;
 	display: flex;
 	gap: 10px;
 	pointer-events: auto;
@@ -54,8 +77,8 @@ h1 {
 
 /* Overview header: only keep small TRACCE */
 body:not(.intro-active) .top-left {
-	left: 32px;
-	top: 36px;
+	left: 70px;
+	top: 42px;
 	width: auto;
 }
 
@@ -66,15 +89,17 @@ body:not(.intro-active) .top-left p {
 
 body:not(.intro-active) .top-left h1 {
 	margin: 0;
-	font-family: var(--font-primary);
-	font-size: 14px;
-	line-height: 1;
-	font-weight: 500;
-	letter-spacing: 0.18em;
-	text-transform: uppercase;
-	color: rgba(242, 231, 218, 0.72);
+	font-family: var(--font-title);
+	font-size: 32px;
+	line-height: 0.9;
+	font-weight: 300;
+	letter-spacing: 0.08em;
+	text-transform: none;
+	color: #f2f5f7;
 	opacity: 1;
-	text-shadow: none;
+	text-shadow: 0 0 22px rgba(242, 245, 247, 0.06);
+	-webkit-font-smoothing: antialiased;
+	font-synthesis: none;
 }
 
 @media (max-width: 720px) {
@@ -101,15 +126,59 @@ body:not(.intro-active) .about-btn {
 	background: transparent;
 	box-shadow: none;
 
-	font-family: var(--font-primary);
-	font-size: 14px;
+	font-family: var(--font-light);
+	font-size: 22px;
 	line-height: 1;
-	font-weight: 500;
-	letter-spacing: 0.18em;
+	font-weight: 200;
+	letter-spacing: 0.02em;
 	text-transform: uppercase;
-	color: rgba(242, 231, 218, 0.72);
+	color: rgba(242, 245, 247, 0.76);
 	opacity: 1;
 	text-shadow: none;
 
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-synthesis: none;
+	font-synthesis-weight: none;
+
 	cursor: default;
+}
+
+body:not(.intro-active) .top-right .about-label,
+body:not(.intro-active) .top-right .about-btn {
+	font-family: "Omnes Light", "Omnes", "Helvetica Neue", Arial, sans-serif !important;
+	font-weight: 200 !important;
+	font-style: normal !important;
+	font-size: 20px !important;
+	letter-spacing: 0.035em !important;
+	color: #f2f5f7 !important;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-synthesis: none !important;
+}
+
+body.ritual-active .top-left,
+body.ritual-active .top-right {
+	display: none !important;
+}
+
+body:not(.overview-active):not(.chapter-active) .top-left,
+body:not(.overview-active):not(.chapter-active) .top-right,
+body.intro-active .top-left,
+body.intro-active .top-right,
+body.ritual-active .top-left,
+body.ritual-active .top-right,
+body.is-transitioning .top-left,
+body.is-transitioning .top-right {
+	display: none !important;
+}
+
+body.overview-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .top-left,
+body.chapter-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .top-left {
+	display: block !important;
+}
+
+body.overview-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .top-right,
+body.chapter-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .top-right {
+	display: flex !important;
 }

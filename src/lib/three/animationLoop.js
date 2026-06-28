@@ -45,10 +45,17 @@ export function startAnimationLoop({
 
 		animateCursorSnow(t);
 
-		if (appState.view === "overview" || appState.view === "transition") {
-			animateTerrain(t);
+		if (
+			appState.view === "overview" ||
+			appState.view === "transition" ||
+			appState.view === "particle-ritual"
+		) {
 			animateSnow(t);
 			animateForegroundSnow(t);
+		}
+
+		if (appState.view === "overview" || appState.view === "transition") {
+			animateTerrain(t);
 			animateHooks(t);
 			animateLines(t);
 

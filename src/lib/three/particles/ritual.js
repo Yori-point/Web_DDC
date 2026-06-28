@@ -287,24 +287,15 @@ export function animateIntroRings({
 	const land = easeInOutCubic(morphProgress);
 
 	if (ritualHint) {
-		const hintFade = smoothstep(0.02, 0.24, progress);
-		ritualHint.style.opacity = String(1 - hintFade);
+		const hintFade = smoothstep(0.96, 1.0, progress);
 
-		if (progress > 0.28) {
-			ritualHint.classList.add("hidden");
-		} else {
-			ritualHint.classList.remove("hidden");
-		}
+		ritualHint.classList.remove("hidden");
+		ritualHint.style.opacity = String(1 - hintFade);
 	}
 
-	if (mapSceneGroup) {
-		mapSceneGroup.visible = true;
-		const reveal = THREE.MathUtils.lerp(
-			0.12,
-			1,
-			smoothstep(0.42, 0.94, progress)
-		);
-		setMapSceneOpacity(reveal);
+	if (mapSceneGroup && appState.view === "particle-ritual") {
+		mapSceneGroup.visible = false;
+		setMapSceneOpacity(0);
 	}
 
 	// 相机过渡

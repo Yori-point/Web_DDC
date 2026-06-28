@@ -34,7 +34,8 @@ export function createCursorSnowTrail({
 	scene,
 	camera,
 	animatedObjects,
-	createSnowFlakeTexture
+	createSnowFlakeTexture,
+	createSnowCrystalTexture
 }) {
 	const positions = new Float32Array(CURSOR_SNOW_COUNT * 3);
 	const colors = new Float32Array(CURSOR_SNOW_COUNT * 3);
@@ -58,16 +59,18 @@ export function createCursorSnowTrail({
 	geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 
 	const material = new THREE.PointsMaterial({
-		map: createSnowFlakeTexture(THREE),
-		alphaTest: 0.006,
-		size: 0.72,
+		map: createSnowCrystalTexture
+			? createSnowCrystalTexture(THREE)
+			: createSnowFlakeTexture(THREE),
+		alphaTest: 0.01,
+		size: 0.46,
 		sizeAttenuation: true,
 		vertexColors: true,
 		transparent: true,
-		opacity: 0.9,
+		opacity: 0.38,
 		depthWrite: false,
 		depthTest: false,
-		blending: THREE.AdditiveBlending
+		blending: THREE.NormalBlending
 	});
 
 	const points = new THREE.Points(geometry, material);
