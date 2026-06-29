@@ -4,7 +4,7 @@ export const CHAPTERS = {
 		key: "festa",
 		title: "Festa / Celebrazione",
 		subtitle: "Il cuore che celebra. La cima più luminosa.",
-		total: 72
+		total: 41
 	},
 
 	opportunita: {
@@ -12,7 +12,7 @@ export const CHAPTERS = {
 		key: "opportunita",
 		title: "Lavoro / Opportunità",
 		subtitle: "Direzioni che aprono il futuro.",
-		total: 14
+		total: 6
 	},
 
 	trasformazione: {
@@ -20,7 +20,7 @@ export const CHAPTERS = {
 		key: "trasformazione",
 		title: "Cambiamento / Trasformazione",
 		subtitle: "Territori in divenire, forme che si ridisegnano.",
-		total: 14
+		total: 9
 	},
 
 	criticita: {
@@ -28,7 +28,7 @@ export const CHAPTERS = {
 		key: "criticita",
 		title: "Problemi / Criticità",
 		subtitle: "Le valli da ascoltare. Ombre che chiedono cura.",
-		total: 18
+		total: 20
 	},
 
 	relazioni: {
@@ -36,6 +36,6 @@ export const CHAPTERS = {
 		key: "relazioni",
 		title: "Relazioni / Incontri",
 		subtitle: "Incontri che generano nuove possibilità.",
-		total: 52
+		total: 31
 	}
 };

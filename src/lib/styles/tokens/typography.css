@@ -3,6 +3,7 @@
 	--font-light: "Omnes Light", "Omnes", "Satoshi", "Manrope", sans-serif;
 	--font-secondary: "Inter", sans-serif;
 	--font-title: "Americana", Georgia, serif;
+	--font-quote: "Domaine Text", "Americana", Georgia, serif;
 
 	font-feature-settings: "liga" 1, "calt" 1;
 }

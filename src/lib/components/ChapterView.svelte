@@ -3,19 +3,12 @@
 </script>
 
 <div id="chapterContainer" class="chapter-container hidden">
-	<button id="backToMap" class="chapter-back">← MAPPA</button>
+	<button id="backToMap" class="chapter-back" type="button" aria-label="Back to map"></button>
 
-	<div class="chapter-meta">
-		<span id="chapterNumber">02</span>
-		<span>LEGACY TRACE</span>
-	</div>
-
-	<div id="chapterExplorationCounter" class="chapter-exploration-counter">
-		Esplorazione 0 / 0
-	</div>
-
-	<div class="chapter-copy">
-		<p id="chapterSubtitle">Direzioni che aprono il futuro.</p>
+	<div id="chapterHoverIntro" class="chapter-hover-intro" aria-hidden="true">
+		<div id="chapterHoverTitle" class="chapter-hover-title"></div>
+		<p id="chapterHoverText" class="chapter-hover-text"></p>
+		<div id="chapterHoverCredit" class="chapter-hover-credit"></div>
 	</div>
 
 	<div class="chapter-media-map">

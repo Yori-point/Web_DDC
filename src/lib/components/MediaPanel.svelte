@@ -1,14 +1,33 @@
-<div id="mediaPanel" class="media-panel hidden">
-	<button id="closeMediaPanel" class="media-close">×</button>
+<div id="mediaPanel" class="media-panel hidden" aria-hidden="true">
+	<button id="closeMediaPanel" class="media-close" type="button" aria-label="Close detail">×</button>
 
-	<div class="feature-snowflake-mark" aria-hidden="true">❄</div>
+	<div class="media-detail-inner">
+		<aside class="media-detail-copy">
+			<h2 id="mediaPanelTitle" class="media-detail-title">Gianluca</h2>
+			<p id="mediaPanelText" class="media-detail-text"></p>
+		</aside>
 
-	<div class="feature-text-block">
-		<div id="mediaPanelLabel" class="media-panel-label">TEXT</div>
-		<h3 id="mediaPanelTitle">Interview fragment</h3>
-		<p id="mediaPanelText">
-			“Durante quei giorni la città sembrava parlare più lingue.”
-		</p>
-		<button class="read-more-btn">Leggi di più</button>
+		<section id="mediaStage" class="media-stage" aria-label="Interview media">
+			<video
+				id="mediaPanelVideo"
+				class="media-video"
+				controls
+				playsinline
+				hidden
+			></video>
+
+			<img
+				id="mediaPanelImage"
+				class="media-image"
+				src=""
+				alt=""
+				hidden
+			/>
+
+			<div id="mediaPanelAudioShell" class="media-audio-shell" hidden>
+				<div class="media-waveform" aria-hidden="true"></div>
+				<audio id="mediaPanelAudio" class="media-audio-player" controls></audio>
+			</div>
+		</section>
 	</div>
 </div>

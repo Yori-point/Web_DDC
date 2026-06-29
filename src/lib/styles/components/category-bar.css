@@ -129,6 +129,19 @@ body.category-hover-active .category-hover-overlay {
 	transform: none;
 }
 
+body.chapter-active .category-item.is-active {
+	color: rgba(255, 255, 255, 1);
+	opacity: 1;
+	text-shadow:
+		0 0 10px rgba(255, 255, 255, 0.16),
+		0 0 24px rgba(255, 255, 255, 0.08);
+}
+
+body.chapter-active .category-bar .category-item:not(.is-active):not(:hover):not(.is-hovered) {
+	color: rgba(255, 255, 255, 0.36);
+	opacity: 1;
+}
+
 .category-bar:hover .category-item:not(:hover),
 .category-bar:has(.category-item.is-hovered) .category-item:not(.is-hovered) {
 	color: rgba(255, 255, 255, 0.36);
@@ -186,7 +199,9 @@ body.chapter-active .category-bar {
 .category-bar .category-item:focus,
 .category-bar .category-item:focus-visible,
 .category-bar .category-item:active,
-.category-bar .category-item.is-hovered {
+.category-bar .category-item.is-hovered,
+.category-bar .category-item.is-active {
+	
 	background: transparent !important;
 	box-shadow: none !important;
 	border: none !important;

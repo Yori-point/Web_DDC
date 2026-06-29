@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { legacyAreas } from "$lib/data/legacyAreas.js";
 
 function hashString(str) {
 	let h = 2166136261;
@@ -18,6 +19,90 @@ function createSeededRandom(seedString) {
 		seed = (seed * 1664525 + 1013904223) >>> 0;
 		return seed / 4294967296;
 	};
+}
+
+function hexToRgb(hex) {
+	return {
+		r: (hex >> 16) & 255,
+		g: (hex >> 8) & 255,
+		b: hex & 255
+	};
+}
+
+function getCategoryColor(categoryKey) {
+	const area = legacyAreas.find((item) => item.key === categoryKey);
+	const rgb = hexToRgb(area?.color ?? 0x93ABDB);
+
+	return `${rgb.r}, ${rgb.g}, ${rgb.b}`;
+}
+
+function normalizeText(text) {
+	return String(text ?? "")
+		.replace(/\s+/g, " ")
+		.trim();
+}
+
+function formatQuote(text) {
+	const value = normalizeText(text);
+
+	if (!value) return "";
+
+	if (
+		value.startsWith("“") ||
+		value.startsWith("«") ||
+		value.startsWith('"')
+	) {
+		return value;
+	}
+
+	return `“${value}”`;
+}
+
+function showInterviewHoverIntro(item, categoryKey) {
+	const area = legacyAreas.find((areaItem) => areaItem.key === categoryKey);
+	const intro = document.getElementById("chapterHoverIntro");
+	const title = document.getElementById("chapterHoverTitle");
+	const text = document.getElementById("chapterHoverText");
+	const credit = document.getElementById("chapterHoverCredit");
+
+	if (!intro || !title || !text) return;
+
+	title.textContent = normalizeText(
+		item.hoverLabel ||
+		item.label ||
+		area?.title ||
+		"Intervista"
+	);
+
+	text.textContent = formatQuote(
+		item.hoverText ||
+		item.sintesi ||
+		item.text ||
+		area?.hoverText ||
+		area?.text ||
+		""
+	);
+
+	if (credit) {
+		credit.textContent = normalizeText(
+			item.hoverCredit ||
+			item.personName ||
+			item.title ||
+			""
+		);
+	}
+
+	intro.classList.add("is-visible");
+	intro.setAttribute("aria-hidden", "false");
+}
+
+function hideChapterHoverIntro() {
+	const intro = document.getElementById("chapterHoverIntro");
+
+	if (!intro) return;
+
+	intro.classList.remove("is-visible");
+	intro.setAttribute("aria-hidden", "true");
 }
 
 function getIconMarkup(type) {
@@ -66,8 +151,8 @@ function generateNodeLayout(interviews, categoryKey) {
 	const isMany = total > 45;
 	const isMedium = total > 22 && total <= 45;
 
-	const minSize = isMany ? 34 : isMedium ? 42 : 52;
-	const maxSize = isMany ? 46 : isMedium ? 58 : 74;
+	const minSize = isMany ? 26 : isMedium ? 32 : 40;
+	const maxSize = isMany ? 36 : isMedium ? 46 : 58;
 
 	const virtualWidthVw = isMany ? 190 : isMedium ? 150 : 118;
 	const virtualHeightVh = 72;
@@ -158,6 +243,8 @@ export function renderInterviewNodes({
 
 	container.innerHTML = "";
 
+	window.setActiveCategoryByKey?.(categoryKey);
+
 	const layoutData = generateNodeLayout(interviews, categoryKey);
 	const layout = layoutData.nodes;
 
@@ -183,10 +270,28 @@ export function renderInterviewNodes({
 		button.style.setProperty("--float-duration", `${nodeLayout.floatDuration}s`);
 		button.style.setProperty("--float-delay", `${nodeLayout.floatDelay}s`);
 
-		button.innerHTML = getIconMarkup(item.type);
+		button.innerHTML = "";
+		button.style.setProperty("--node-color-rgb", getCategoryColor(categoryKey));
+
+		button.addEventListener("mouseenter", () => {
+			showInterviewHoverIntro(item, categoryKey);
+		});
+
+		button.addEventListener("mouseleave", () => {
+			hideChapterHoverIntro();
+		});
+
+		button.addEventListener("focus", () => {
+			showInterviewHoverIntro(item, categoryKey);
+		});
+
+		button.addEventListener("blur", () => {
+			hideChapterHoverIntro();
+		});
 
 		button.addEventListener("click", (event) => {
 			event.stopPropagation();
+			hideChapterHoverIntro();
 
 			document.querySelectorAll(".interview-node").forEach((node) => {
 				node.classList.remove("is-active");
