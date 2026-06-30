@@ -7,7 +7,7 @@ export function updateCamera({
 	windowWidth = window.innerWidth,
 	windowHeight = window.innerHeight
 }) {
-	orbit.pitch = Math.max(0.08, Math.min(1.05, orbit.pitch));
+	orbit.pitch = Math.max(0.08, Math.min(1.45, orbit.pitch));
 	orbit.radius = Math.max(34, Math.min(145, orbit.radius));
 
 	const topViewBoost =
@@ -19,11 +19,15 @@ export function updateCamera({
 	const effectiveRadius = orbit.radius + topViewBoost + responsiveBoost;
 
 	const x = Math.sin(orbit.yaw) * Math.cos(orbit.pitch) * effectiveRadius;
-	const y = orbit.target.y + Math.sin(orbit.pitch) * effectiveRadius;
+	const y = orbit.target.y + Math.sin(orbit.pitch) * effectiveRadius + 15;
 	const z = Math.cos(orbit.yaw) * Math.cos(orbit.pitch) * effectiveRadius;
 
 	camera.position.set(x, y, z);
-	camera.lookAt(orbit.target);
+
+	const viewTarget = orbit.target.clone();
+	viewTarget.y -= 5;
+
+	camera.lookAt(viewTarget);
 }
 
 export function updateOverviewCameraByPointer({

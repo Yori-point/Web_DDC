@@ -1,7 +1,49 @@
+@font-face {
+	font-family: "Omnes";
+	src: url("/fonts/Omnes-Light.ttf") format("truetype");
+	font-weight: 200;
+	font-style: normal;
+	font-display: block;
+}
+
+@font-face {
+	font-family: "Omnes";
+	src: url("/fonts/Omnes-Regular.ttf") format("truetype");
+	font-weight: 400;
+	font-style: normal;
+	font-display: block;
+}
+
+@font-face {
+	font-family: "Omnes";
+	src: url("/fonts/Omnes-Medium.ttf") format("truetype");
+	font-weight: 500;
+	font-style: normal;
+	font-display: block;
+}
+
+@font-face {
+	font-family: "Domaine Text";
+	src: url("/fonts/Domaine-Text-RegularItalic.otf") format("opentype");
+	font-weight: 400;
+	font-style: italic;
+	font-display: block;
+}
+
+@font-face {
+	font-family: "Americana";
+	src: url("/fonts/Americana-Regular.otf") format("opentype");
+	font-weight: 400;
+	font-style: normal;
+	font-display: block;
+}
+
 :root {
-	--font-primary: "Omnes Light", "Omnes", "Satoshi", "Manrope", sans-serif;
-	--font-light: "Omnes Light", "Omnes", "Satoshi", "Manrope", sans-serif;
-	--font-secondary: "Inter", sans-serif;
+	--font-primary: "Omnes", "Satoshi", "Manrope", "Helvetica Neue", Arial, sans-serif;
+	--font-light: "Omnes", "Satoshi", "Manrope", "Helvetica Neue", Arial, sans-serif;
+	--font-medium: "Omnes", "Satoshi", "Manrope", "Helvetica Neue", Arial, sans-serif;
+
+	--font-secondary: "Inter", "Helvetica Neue", Arial, sans-serif;
 	--font-title: "Americana", Georgia, serif;
 	--font-quote: "Domaine Text", "Americana", Georgia, serif;
 

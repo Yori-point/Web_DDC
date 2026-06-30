@@ -170,6 +170,10 @@ function generateNodeLayout(interviews, categoryKey) {
 		const minY = 18;
 		const maxY = 78;
 
+		const isInsideHoverTextZone = (x, y) => {
+			return x > 38 && x < 62 && y > 34 && y < 62;
+		};
+
 		let x = 50;
 		let y = 45;
 		let found = false;
@@ -177,6 +181,10 @@ function generateNodeLayout(interviews, categoryKey) {
 		for (let attempt = 0; attempt < 260; attempt++) {
 			const tryX = minX + rand() * (maxX - minX);
 			const tryY = minY + rand() * (maxY - minY);
+
+			if (isInsideHoverTextZone(tryX, tryY)) {
+				continue;
+			}
 
 			const tryXPx = (tryX / 100) * virtualWidthPx;
 			const tryYPx = (tryY / 100) * virtualHeightPx;
@@ -209,6 +217,11 @@ function generateNodeLayout(interviews, categoryKey) {
 
 			x += Math.sin(index * 1.7) * 2.8;
 			y += Math.cos(index * 1.3) * 2.4;
+
+			if (isInsideHoverTextZone(x, y)) {
+				y = y < 50 ? 28 + rand() * 6 : 66 + rand() * 8;
+				x += x < 50 ? -6 : 6;
+			}
 		}
 
 		const xPx = (x / 100) * virtualWidthPx;

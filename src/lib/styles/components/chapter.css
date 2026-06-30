@@ -4,9 +4,7 @@
 	z-index: var(--z-chapter);
 	color: var(--color-cream);
 	pointer-events: auto;
-	background:
-		radial-gradient(circle at 50% 58%, rgba(169, 199, 230, 0.08), transparent 42%),
-		rgba(16, 24, 32, 0.18);
+	background: transparent;
 	opacity: 1;
 	visibility: visible;
 	transition: opacity var(--transition-slow), visibility var(--transition-slow);
@@ -25,7 +23,7 @@
 	top: 28px;
 	z-index: 30;
 
-	width: 42px;
+	width: 28px;
 	height: 28px;
 
 	display: flex;
@@ -35,19 +33,27 @@
 	cursor: pointer;
 	pointer-events: auto;
 
-	opacity: 0.68;
+	opacity: 1;
 
 	transition:
 		opacity 0.25s ease,
 		transform 0.25s ease;
+
+	background: transparent !important;
+	box-shadow: none !important;
+	border: none !important;
+	outline: none;
+	-webkit-appearance: none;
+	appearance: none;
 }
 
 .chapter-back::before {
 	content: "";
 	position: absolute;
-	width: 36px;
-	height: 3px;
-	background: rgba(242, 231, 218, 0.75);
+	left: 3px;
+	width: 24px;
+	height: 2px;
+	background: rgba(242, 245, 247, 0.60);
 	border-radius: 999px;
 }
 
@@ -56,11 +62,11 @@
 	position: absolute;
 	left: 2px;
 
-	width: 16px;
-	height: 16px;
+	width: 13px;
+	height: 13px;
 
-	border-left: 3px solid rgba(242, 231, 218, 0.75);
-	border-bottom: 3px solid rgba(242, 231, 218, 0.75);
+	border-left: 2px solid rgba(242, 245, 247, 0.60);
+	border-bottom: 2px solid rgba(242, 245, 247, 0.60);
 
 	transform: rotate(45deg);
 	border-radius: 1px;
@@ -69,10 +75,28 @@
 .chapter-back:hover {
 	opacity: 0.95;
 	transform: translateX(-2px);
+
+	.chapter-back:hover,
+	.chapter-back:focus,
+	.chapter-back:active {
+		background: transparent !important;
+		box-shadow: none !important;
+		border: none !important;
+		outline: none;
+	}
+}
+
+.chapter-back:hover::before {
+	background: var(--Color-Content, #F2F5F7);
+}
+
+.chapter-back:hover::after {
+	border-left-color: var(--Color-Content, #F2F5F7);
+	border-bottom-color: var(--Color-Content, #F2F5F7);
 }
 
 .chapter-back:focus-visible {
-	outline: 1px solid rgba(242, 231, 218, 0.45);
+	outline: 1px solid rgba(242, 245, 247, 0.45);
 	outline-offset: 6px;
 }
 
@@ -166,7 +190,192 @@
 	visibility: hidden;
 }
 
-body.chapter-active .chapter-media-map {
+/* =========================
+   Summit title entrance
+   ========================= */
+
+.summit-title-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 29;
+	pointer-events: none;
+
+	opacity: 1;
+	visibility: visible;
+
+	transition:
+		opacity 0.75s ease,
+		visibility 0.75s ease;
+}
+
+.summit-title-overlay.hidden {
+	opacity: 0;
+	visibility: hidden;
+}
+
+.summit-title-text {
+	position: absolute;
+	right: 8.5vw;
+	top: 40vh;
+
+	margin: 0;
+
+	font-family: "Americano", var(--font-primary);
+	font-size: clamp(48px, 7.2vw, 112px);
+	font-weight: 400;
+	line-height: 0.92;
+	letter-spacing: 0.09em;
+	text-transform: uppercase;
+
+	color: transparent;
+	text-shadow: none;
+	z-index: 1;
+
+	opacity: 0;
+	pointer-events: none;
+
+	width: max-content;
+	white-space: nowrap;
+}
+
+body.summit-title-active .summit-title-text {
+	opacity: 1;
+	transform: translateY(0);
+	filter: blur(0);
+}
+
+.summit-title-canvas {
+	position: absolute;
+	right: 8.5vw;
+	top: 40vh;
+
+	width: min(74vw, 920px);
+	height: 150px;
+
+	pointer-events: auto;
+	background: transparent !important;
+
+	opacity: 0;
+
+	mix-blend-mode: normal;
+
+	transition: opacity 0.9s ease;
+
+	z-index: 1;
+}
+
+body.summit-title-active .summit-title-canvas {
+	opacity: 1;
+}
+
+.summit-scroll-hint {
+	position: fixed;
+	left: 50%;
+	bottom: 72px;
+	transform: translateX(-50%);
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+
+	font-family: var(--font-primary);
+	font-size: 11px;
+	font-weight: 400;
+	letter-spacing: 0.26em;
+	text-transform: uppercase;
+
+	color: rgba(242, 231, 218, 0.48);
+
+	opacity: 0;
+	transition: opacity 0.75s ease 0.35s;
+}
+
+body.summit-title-active .summit-scroll-hint {
+	opacity: 1;
+}
+
+.summit-scroll-arrow {
+	font-size: 18px;
+	line-height: 1;
+	opacity: 0.56;
+	animation: summit-scroll-arrow-float 1.55s ease-in-out infinite;
+}
+
+@keyframes summit-scroll-arrow-float {
+	0%,
+	100% {
+		transform: translateY(0);
+		opacity: 0.42;
+	}
+
+	50% {
+		transform: translateY(6px);
+		opacity: 0.8;
+	}
+}
+
+.chapter-media-map {
+	position: absolute;
+	inset: 0;
+	z-index: 22;
+
+	opacity: 0;
+	pointer-events: none;
+
+	transform: translate3d(0, -56vh, 0);
+	will-change: transform, opacity;
+}
+
+/* title 阶段：nodes 保持在画面上方，不显示 */
+body.chapter-active.summit-title-active .chapter-media-map {
+	opacity: 0;
+	pointer-events: none;
+	transform: translate3d(0, -56vh, 0);
+}
+
+/* nodes 刚 render 出来时：先放在上面 */
+body.chapter-active.chapter-nodes-preenter .chapter-media-map {
+	opacity: 0;
+	pointer-events: none;
+	transform: translate3d(0, -56vh, 0); /* 掉落高度 */
+}
+
+/* nodes active：从上面掉下来 */
+body.chapter-active.chapter-nodes-active .chapter-media-map {
 	opacity: 1;
 	pointer-events: auto;
+	transform: translate3d(0, 0, 0);
+
+	transition:
+		transform 0.7s cubic-bezier(0.16, 0.88, 0.2, 1), /* 速度 */
+		opacity 0.72s ease;
+}
+
+body.summit-title-active .summit-title-text {
+	opacity: 1;
+	transform:
+		translateY(0)
+		translate3d(var(--title-mx, 0px), var(--title-my, 0px), 0);
+	filter: blur(0);
+}
+
+body.chapter-active #scene,
+body.summit-title-active #scene,
+body.chapter-nodes-preenter #scene,
+body.chapter-nodes-active #scene {
+	filter: none !important;
+	-webkit-filter: none !important;
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+	mix-blend-mode: normal !important;
+}
+
+body.summit-title-active .summit-title-canvas {
+	filter: none !important;
+	-webkit-filter: none !important;
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+	mix-blend-mode: normal !important;
+	image-rendering: auto;
 }

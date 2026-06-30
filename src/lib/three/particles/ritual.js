@@ -14,15 +14,18 @@ export function createIntroParticleRings({
 	const amps = [];
 
 	const countPerRing = 9000;
-	const ringRadius = 9.8;
-	const ringThickness = 3.2;
+	const ringRadius = 9.6;
+	const ringThickness = 2.45;
 
 	const ringData = [
-		{ x: -14.4, y: 6.0, z: -6.2, color: new THREE.Color(0x88c4e8) },
-		{ x: 0, y: 6.0, z: -6.2, color: new THREE.Color(0xe8c860) },
-		{ x: 14.4, y: 6.0, z: -6.2, color: new THREE.Color(0xe0eaf4) },
-		{ x: -7.2, y: 3.05, z: 5.7, color: new THREE.Color(0x88c8a8) },
-		{ x: 7.2, y: 3.05, z: 5.7, color: new THREE.Color(0xe89ab0) }
+		// 上排三个环：标准对称
+		{ x: -13.2, y: 7.4, z: 0.0, color: new THREE.Color(0x88c4e8) },
+		{ x: 0.0, y: 7.4, z: 0.0, color: new THREE.Color(0xe8c860) },
+		{ x: 13.2, y: 7.4, z: 0.0, color: new THREE.Color(0xe0eaf4) },
+
+		// 下排两个环：正好落在上排三个环的两个空隙下方
+		{ x: -6.6, y: 2.2, z: 0.0, color: new THREE.Color(0x88c8a8) },
+		{ x: 6.6, y: 2.2, z: 0.0, color: new THREE.Color(0xe89ab0) }
 	];
 
 	for (let ringIndex = 0; ringIndex < ringData.length; ringIndex++) {
@@ -153,11 +156,11 @@ export function updateIntroRingTargetsFromCurrentHotspots({
 	const p05 = getLegacyPoint("relazioni");
 
 	animatedObjects.introRingsTargets = [
-		{ cx: -14.4, cy: 6.0, cz: -6.2, tx: p02.x, ty: p02.y, tz: p02.z },
-		{ cx: 0.0, cy: 6.0, cz: -6.2, tx: p01.x, ty: p01.y, tz: p01.z },
-		{ cx: 14.4, cy: 6.0, cz: -6.2, tx: p03.x, ty: p03.y, tz: p03.z },
-		{ cx: -7.2, cy: 3.05, cz: 5.7, tx: p04.x, ty: p04.y, tz: p04.z },
-		{ cx: 7.2, cy: 3.05, cz: 5.7, tx: p05.x, ty: p05.y, tz: p05.z }
+		{ cx: -13.2, cy: 7.4, cz: 0.0, tx: p02.x, ty: p02.y, tz: p02.z },
+		{ cx: 0.0, cy: 7.4, cz: 0.0, tx: p01.x, ty: p01.y, tz: p01.z },
+		{ cx: 13.2, cy: 7.4, cz: 0.0, tx: p03.x, ty: p03.y, tz: p03.z },
+		{ cx: -6.6, cy: 2.2, cz: 0.0, tx: p04.x, ty: p04.y, tz: p04.z },
+		{ cx: 6.6, cy: 2.2, cz: 0.0, tx: p05.x, ty: p05.y, tz: p05.z }
 	];
 }
 
@@ -378,9 +381,9 @@ export function animateIntroRings({
 
 	rings.geometry.attributes.position.needsUpdate = true;
 
-	const groupScaleX = THREE.MathUtils.lerp(1.18, 1.0, land);
-	const groupScaleY = THREE.MathUtils.lerp(1.10, 1.0, land);
-	const groupScaleZ = THREE.MathUtils.lerp(1.12, 1.0, land);
+	const groupScaleX = THREE.MathUtils.lerp(1.06, 1.0, land);
+	const groupScaleY = THREE.MathUtils.lerp(1.00, 1.0, land);
+	const groupScaleZ = THREE.MathUtils.lerp(0.92, 1.0, land);
 
 	rings.scale.set(groupScaleX, groupScaleY, groupScaleZ);
 

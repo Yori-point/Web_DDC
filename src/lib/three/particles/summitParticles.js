@@ -7,55 +7,55 @@ const SUMMIT_VIEW_PRESETS = {
     sceneYaw: -0.38,
     modelYaw: 0.18,
     localX: -5.5,
-    localY: -8.6,
+    localY: -7.4,
     localZ: 0,
     scale: 1.0,
-    distance: 9.5,
-    verticalOffset: -7.5
+    distance: 8.2,
+    verticalOffset: -6.6
   },
 
   relazioni: {
     sceneYaw: 0.28,
     modelYaw: -0.22,
     localX: 4.5,
-    localY: -8.4,
+    localY: -7.4,
     localZ: -1.5,
     scale: 1.05,
-    distance: 9.2,
-    verticalOffset: -7.2
+    distance: 8.1,
+    verticalOffset: -6.5
   },
 
   trasformazione: {
     sceneYaw: 0.62,
     modelYaw: 0.42,
     localX: -2.5,
-    localY: -8.8,
+    localY: -7.5,
     localZ: 2.2,
     scale: 1.12,
-    distance: 8.7,
-    verticalOffset: -7.8
+    distance: 7.8,
+    verticalOffset: -6.8
   },
 
   opportunita: {
     sceneYaw: -0.72,
     modelYaw: -0.48,
     localX: 6.0,
-    localY: -8.5,
+    localY: -7.4,
     localZ: 1.2,
     scale: 0.98,
-    distance: 9.8,
-    verticalOffset: -7.4
+    distance: 8.4,
+    verticalOffset: -6.6
   },
 
   festa: {
     sceneYaw: 0.92,
     modelYaw: 0.66,
     localX: -7.0,
-    localY: -8.7,
+    localY: -7.4,
     localZ: -0.8,
     scale: 1.08,
-    distance: 8.9,
-    verticalOffset: -7.6
+    distance: 8.0,
+    verticalOffset: -6.7
   }
 };
 
@@ -63,24 +63,22 @@ const DEFAULT_SUMMIT_VIEW = {
   sceneYaw: 0,
   modelYaw: 0,
   localX: 0,
-  localY: -8.6,
+  localY: -7.4,
   localZ: 0,
   scale: 1,
-  distance: 9.5,
-  verticalOffset: -7.5
+  distance: 8.2,
+  verticalOffset: -6.6
 };
 
 const SUMMIT_MODEL_URL = "/scene.glb";
 
-// Main framing controls. Keep these stable unless the entire model is too large/small.
 const MODEL_TARGET_WIDTH = 58;
-const MODEL_LOCAL_Y = -8.6;
+const MODEL_LOCAL_Y = -7.6;
 
-// Particle controls for the GLB summit terrain.
 const SUMMIT_PARTICLE_COUNT = 135000;
-const SUMMIT_PARTICLE_SIZE = 0.16;
-const SUMMIT_PARTICLE_OPACITY = 0.94;
-const SUMMIT_PARTICLE_JITTER = 0.022;
+const SUMMIT_PARTICLE_SIZE = 0.155;
+const SUMMIT_PARTICLE_OPACITY = 0.96;
+const SUMMIT_PARTICLE_JITTER = 0.014;
 
 function createSummitParticleTexture(THREE) {
   const canvas = document.createElement("canvas");
@@ -90,9 +88,9 @@ function createSummitParticleTexture(THREE) {
   const ctx = canvas.getContext("2d");
   const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
 
-  gradient.addColorStop(0.0, "rgba(255,255,255,0.92)");
-  gradient.addColorStop(0.24, "rgba(255,255,255,0.44)");
-  gradient.addColorStop(0.58, "rgba(255,255,255,0.10)");
+  gradient.addColorStop(0.0, "rgba(255,255,255,0.96)");
+  gradient.addColorStop(0.20, "rgba(255,255,255,0.52)");
+  gradient.addColorStop(0.50, "rgba(255,255,255,0.10)");
   gradient.addColorStop(1.0, "rgba(255,255,255,0)");
 
   ctx.fillStyle = gradient;
@@ -288,17 +286,17 @@ function createSummitParticlesFromModel({ THREE, root, model }) {
   geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
 
   const material = new THREE.PointsMaterial({
-    map: createSummitParticleTexture(THREE),
-    alphaTest: 0.025,
-    size: SUMMIT_PARTICLE_SIZE,
-    sizeAttenuation: true,
-    vertexColors: true,
-    transparent: true,
-    opacity: 0,
-    depthWrite: false,
-    depthTest: true,
-    blending: THREE.NormalBlending
-  });
+  map: createSummitParticleTexture(THREE),
+  alphaTest: 0.035,
+  size: SUMMIT_PARTICLE_SIZE,
+  sizeAttenuation: true,
+  vertexColors: true,
+  transparent: true,
+  opacity: 0,
+  depthWrite: false,
+  depthTest: true,
+  blending: THREE.NormalBlending
+});
 
   const points = new THREE.Points(geometry, material);
   points.name = "summit-glb-surface-particles";
@@ -520,7 +518,11 @@ export function animateSummitParticles({
       Math.sin(t * 0.55) * 0.006;
   }
 
-  if (appState.view === "chapter" || appState.view === "summit-immerse") {
+  if (
+    appState.view === "chapter" ||
+    appState.view === "summit-immerse" ||
+    appState.view === "summit-title"
+  ) {
     setSummitModelOpacity(animatedObjects, SUMMIT_PARTICLE_OPACITY);
   }
 }

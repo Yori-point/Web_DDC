@@ -2,12 +2,25 @@
 	<p id="categoryHoverText" class="category-hover-text"></p>
 </div>
 
-<div class="category-bar">
+<button
+	id="categoryMenuBtn"
+	class="category-menu-btn"
+	type="button"
+	aria-label="Open category menu"
+	aria-controls="categoryBar"
+	aria-expanded="false"
+>
+	<span></span>
+	<span></span>
+	<span></span>
+</button>
+
+<div id="categoryBar" class="category-bar">
 	<button
 		class="category-item"
-		data-key="criticita"
+		data-key="festa"
 	>
-		<span class="category-name">Problemi</span>
+		<span class="category-name">Celebrazioni</span>
 	</button>
 
 	<button
@@ -19,9 +32,9 @@
 
 	<button
 		class="category-item"
-		data-key="trasformazione"
+		data-key="criticita"
 	>
-		<span class="category-name">Cambiamento</span>
+		<span class="category-name">Problemi</span>
 	</button>
 
 	<button
@@ -33,8 +46,8 @@
 
 	<button
 		class="category-item"
-		data-key="festa"
+		data-key="trasformazione"
 	>
-		<span class="category-name">Celebrazioni</span>
+		<span class="category-name">Cambiamento</span>
 	</button>
 </div>

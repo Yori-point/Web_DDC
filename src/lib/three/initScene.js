@@ -119,7 +119,8 @@ export function initScene() {
     "overview-active",
     "chapter-active",
     "ritual-active",
-    "is-transitioning"
+    "is-transitioning",
+    "category-menu-open"
   );
 
   const canvas = document.getElementById('scene');
@@ -185,7 +186,7 @@ export function initScene() {
     targetChapter: null,
 
     summitImmerseStart: 0,
-    summitImmerseDuration: 2.0,
+    summitImmerseDuration: 0.8,
 
     hoverHookObject: null,
 
@@ -321,10 +322,11 @@ const OVERVIEW_CAMERA = {
 };
 
 const RITUAL_CAMERA = {
-  yaw: MAP_FINAL_CAMERA.yaw,
-  pitch: MAP_FINAL_CAMERA.pitch,
-  radius: MAP_FINAL_CAMERA.radius,
-  target: MAP_FINAL_CAMERA.target.clone()
+  // 五环阶段用正视角，不沿用地图斜视角
+  yaw: 0,
+  pitch: 0.26,
+  radius: 66,
+  target: new THREE.Vector3(0, 4.2, 0)
 };
 
   function updateCamera() {
@@ -602,6 +604,300 @@ const RITUAL_CAMERA = {
 
   const INTERVIEWS_BY_CATEGORY = createInterviewsByCategory(CHAPTERS);
 
+  const SUMMIT_TITLE_LABELS = {
+    festa: "Celebrazioni",
+    opportunita: "Opportunità",
+    trasformazione: "Cambiamento",
+    criticita: "Problemi",
+    relazioni: "Relazioni"
+  };
+
+  const summitTitleParticles = {
+    canvas: null,
+    ctx: null,
+    text: "",
+    particles: [],
+    mouseX: -9999,
+    mouseY: -9999,
+    active: false,
+    raf: null,
+    dpr: 1,
+    sprite: null
+  };
+
+  function getSummitDisplayTitle(chapter) {
+    return SUMMIT_TITLE_LABELS[chapter.key] || chapter.title || chapter.key || "";
+  }
+
+  function createSummitTitleParticleSprite() {
+    const sprite = document.createElement("canvas");
+    sprite.width = 64;
+    sprite.height = 64;
+
+    const ctx = sprite.getContext("2d");
+    if (!ctx) return null;
+
+    const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+
+    gradient.addColorStop(0.0, "rgba(242,245,247,0.82)");
+    gradient.addColorStop(0.22, "rgba(210,226,238,0.36)");
+    gradient.addColorStop(0.52, "rgba(170,198,220,0.10)");
+    gradient.addColorStop(1.0, "rgba(170,198,220,0)");
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 64, 64);
+
+    return sprite;
+  }
+
+  function randSpread(value) {
+    return (Math.random() - 0.5) * value;
+  }
+
+  function setupSummitParticleTitle(text) {
+    const canvas = document.getElementById("summitTitleCanvas");
+    const title = document.getElementById("summitTitleText");
+
+    if (!canvas || !title) return;
+
+    title.textContent = text;
+    title.dataset.text = text;
+
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    canvas.width = Math.floor(rect.width * dpr);
+    canvas.height = Math.floor(rect.height * dpr);
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    summitTitleParticles.canvas = canvas;
+    summitTitleParticles.ctx = ctx;
+    summitTitleParticles.text = text;
+    summitTitleParticles.particles = [];
+    summitTitleParticles.dpr = dpr;
+    summitTitleParticles.sprite = null;
+
+    const offscreen = document.createElement("canvas");
+    offscreen.width = canvas.width;
+    offscreen.height = canvas.height;
+
+    const offCtx = offscreen.getContext("2d");
+    if (!offCtx) return;
+
+    const fontSize = Math.min(canvas.width * 0.12, canvas.height * 0.54);
+
+    offCtx.clearRect(0, 0, offscreen.width, offscreen.height);
+    offCtx.fillStyle = "white";
+    offCtx.textAlign = "center";
+    offCtx.textBaseline = "middle";
+
+    // 如果你的 @font-face 名字叫 Americana，就把 Americano 改成 Americana
+    offCtx.font = `400 ${fontSize}px Americano, sans-serif`;
+
+    if ("letterSpacing" in offCtx) {
+      offCtx.letterSpacing = "0.085em";
+    }
+
+    offCtx.fillText(
+      text.toUpperCase(),
+      offscreen.width / 2,
+      offscreen.height / 2
+    );
+
+    const imageData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height);
+    const data = imageData.data;
+
+    const candidates = [];
+    const scanGap = Math.max(2, Math.floor(1.8 * dpr));
+
+    for (let y = 0; y < offscreen.height; y += scanGap) {
+      for (let x = 0; x < offscreen.width; x += scanGap) {
+        const index = (y * offscreen.width + x) * 4;
+        const alpha = data[index + 3];
+
+        if (alpha > 55) {
+          candidates.push({ x, y, alpha });
+        }
+      }
+    }
+
+    const particleCount = Math.min(15000, candidates.length);
+
+    for (let i = 0; i < particleCount; i++) {
+      const point = candidates[Math.floor(Math.random() * candidates.length)];
+      if (!point) continue;
+
+      const baseX = point.x + randSpread(scanGap * 0.25);
+      const baseY = point.y + randSpread(scanGap * 0.25);
+
+      summitTitleParticles.particles.push({
+        x: baseX + randSpread(1.2 * dpr),
+        y: baseY + randSpread(1.0 * dpr),
+        baseX,
+        baseY,
+        vx: 0,
+        vy: 0,
+        radius: (Math.random() * 0.75 + 0.65) * dpr,
+        alpha: (point.alpha / 255) * (Math.random() * 0.18 + 0.62),
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  function animateSummitParticleTitle() {
+    const state = summitTitleParticles;
+    const { canvas, ctx, sprite } = state;
+
+    if (!canvas || !ctx || !state.active) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.globalCompositeOperation = "source-over";
+
+    const time = performance.now() * 0.001;
+    const repelRadius = 86 * state.dpr;
+    const repelStrength = 2.7 * state.dpr;
+
+    state.particles.forEach((p) => {
+      const dx = p.x - state.mouseX;
+      const dy = p.y - state.mouseY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < repelRadius) {
+        const force = Math.pow(1 - dist / repelRadius, 1.8) * repelStrength;
+        const angle = Math.atan2(dy, dx);
+
+        p.vx += Math.cos(angle) * force;
+        p.vy += Math.sin(angle) * force;
+      }
+
+      const floatX = Math.sin(time * 0.55 + p.phase) * 0.24 * state.dpr;
+      const floatY = Math.cos(time * 0.48 + p.phase) * 0.22 * state.dpr;
+
+      p.vx += (p.baseX + floatX - p.x) * 0.014;
+      p.vy += (p.baseY + floatY - p.y) * 0.014;
+
+      p.vx *= 0.88;
+      p.vy *= 0.88;
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      const movement = Math.min(Math.abs(p.vx) + Math.abs(p.vy), 7) / 7;
+      const radius = p.radius * (1 + movement * 0.12);
+      const alpha = Math.min(1, p.alpha + movement * 0.08);
+
+      ctx.globalAlpha = alpha;
+
+      if (sprite) {
+        ctx.drawImage(
+          sprite,
+          p.x - radius,
+          p.y - radius,
+          radius * 2,
+          radius * 2
+        );
+      } else {
+        ctx.beginPath();
+        ctx.fillStyle = "rgba(242,245,247,0.95)";
+        ctx.arc(p.x, p.y, radius * 0.85, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = "source-over";
+
+    state.raf = requestAnimationFrame(animateSummitParticleTitle);
+  }
+
+  function startSummitParticleTitle() {
+    if (summitTitleParticles.raf) {
+      cancelAnimationFrame(summitTitleParticles.raf);
+    }
+
+    summitTitleParticles.active = true;
+    animateSummitParticleTitle();
+  }
+
+  function stopSummitParticleTitle() {
+    summitTitleParticles.active = false;
+
+    if (summitTitleParticles.raf) {
+      cancelAnimationFrame(summitTitleParticles.raf);
+      summitTitleParticles.raf = null;
+    }
+
+    const { canvas, ctx } = summitTitleParticles;
+    if (canvas && ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  function updateSummitTitleParticlesPointer(event) {
+    const canvas = summitTitleParticles.canvas;
+    if (!canvas || !summitTitleParticles.active) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const dpr = summitTitleParticles.dpr || 1;
+
+    summitTitleParticles.mouseX = (event.clientX - rect.left) * dpr;
+    summitTitleParticles.mouseY = (event.clientY - rect.top) * dpr;
+  }
+
+  function resetSummitTitleParticlesPointer() {
+    summitTitleParticles.mouseX = -9999;
+    summitTitleParticles.mouseY = -9999;
+  }
+
+  function showSummitTitle(chapter) {
+    const overlay = document.getElementById("summitTitleOverlay");
+    const title = document.getElementById("summitTitleText");
+
+    if (!overlay || !title) return;
+
+    const displayTitle = getSummitDisplayTitle(chapter);
+
+    setupSummitParticleTitle(displayTitle);
+    startSummitParticleTitle();
+
+    overlay.classList.remove("hidden");
+    overlay.setAttribute("aria-hidden", "false");
+
+    document.body.classList.add("chapter-active");
+    document.body.classList.add("summit-title-active");
+    document.body.classList.remove("chapter-nodes-active");
+    document.body.classList.remove("chapter-nodes-preenter");
+  }
+
+  function hideSummitTitle() {
+    const overlay = document.getElementById("summitTitleOverlay");
+
+    stopSummitParticleTitle();
+    resetSummitTitleParticlesPointer();
+
+    overlay?.classList.add("hidden");
+    overlay?.setAttribute("aria-hidden", "true");
+
+    document.body.classList.remove("summit-title-active");
+  }
+
+  function clearSummitEntranceState() {
+    hideSummitTitle();
+
+    document.body.classList.remove("summit-title-active");
+    document.body.classList.remove("chapter-nodes-active");
+    document.body.classList.remove("chapter-nodes-preenter");
+
+    const interviewNodes = document.getElementById("interviewNodes");
+    if (interviewNodes) {
+      interviewNodes.innerHTML = "";
+    }
+
+    document.querySelector(".chapter-media-map")?.classList.remove("has-open");
+  }
+
   const exploredByCategory = {
     festa: new Set(),
     opportunita: new Set(),
@@ -620,6 +916,7 @@ const RITUAL_CAMERA = {
     appState.hoverHookObject = null;
     window.hideCategoryHoverText?.();
     document.body.classList.remove("category-hover-active");
+    document.body.classList.remove("category-menu-open");
 
     document.querySelectorAll(".category-item").forEach((item) => {
       item.classList.remove("is-hovered");
@@ -862,8 +1159,11 @@ const RITUAL_CAMERA = {
   }
 
   function enterChapter(chapter) {
-    appState.view = 'chapter';
-    document.body.classList.add('chapter-active');
+    appState.view = "summit-title";
+
+    document.body.classList.add("chapter-active");
+    document.body.classList.remove("chapter-nodes-active");
+    document.body.classList.remove("chapter-nodes-preenter");
 
     // Hide the original map. Keep the GLB summit scene as the background.
     mapSceneGroup.visible = false;
@@ -872,7 +1172,7 @@ const RITUAL_CAMERA = {
       animatedObjects.summitScene.visible = true;
     }
 
-    console.log("SUMMIT CHAPTER DEBUG", {
+    console.log("SUMMIT TITLE DEBUG", {
       sceneVisible: animatedObjects.summitScene?.visible,
       modelReady: animatedObjects.summitModelReady,
       modelVisible: animatedObjects.summitModelRoot?.visible,
@@ -891,10 +1191,50 @@ const RITUAL_CAMERA = {
     updateChapterCopy(chapter);
     showChapterContainer();
 
+    const interviewNodes = document.getElementById("interviewNodes");
+    if (interviewNodes) {
+      interviewNodes.innerHTML = "";
+    }
+
+    showSummitTitle(chapter);
+    updateCategoryProgress();
+
+    document.body.classList.remove("is-transitioning");
+  }
+
+  function enterChapterNodes() {
+    const chapter = appState.targetChapter;
+    if (!chapter) return;
+
+    appState.view = "chapter";
+    document.body.classList.remove("category-menu-open");
+
+    hideSummitTitle();
+
+    document.body.classList.add("chapter-active");
+    document.body.classList.add("chapter-nodes-preenter");
+    document.body.classList.remove("chapter-nodes-active");
+
+    document.querySelector(".chapter-media-map")?.classList.remove("has-open");
+
+    const hoverIntro = document.getElementById("chapterHoverIntro");
+    hoverIntro?.classList.remove("is-visible");
+    hoverIntro?.setAttribute("aria-hidden", "true");
+
     renderInterviewNodes(chapter.key);
     updateCategoryProgress();
 
-    document.body.classList.remove('is-transitioning');
+    const mediaMap = document.querySelector(".chapter-media-map");
+
+    // 强制浏览器先读取一次 preenter 状态，避免动画被合并掉
+    mediaMap?.getBoundingClientRect();
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.body.classList.add("chapter-nodes-active");
+        document.body.classList.remove("chapter-nodes-preenter");
+      });
+    });
   }
 
   function returnToIntro() {
@@ -926,6 +1266,7 @@ const RITUAL_CAMERA = {
     document.body.classList.remove("chapter-active");
     document.body.classList.remove("is-transitioning");
     document.body.classList.remove("category-hover-active");
+    document.body.classList.remove("category-menu-open");
 
     document.getElementById("panel")?.classList.add("hidden");
     document.getElementById("infoPanel")?.classList.add("hidden");
@@ -935,6 +1276,7 @@ const RITUAL_CAMERA = {
 
     hideChapterContainer();
     clearChapterState();
+    clearSummitEntranceState();
 
     window.hideCategoryHoverText?.();
     syncCategoryHoverUI();
@@ -974,10 +1316,10 @@ const RITUAL_CAMERA = {
       ritualHint.style.opacity = "0";
     }
 
-    orbit.yaw = OVERVIEW_CAMERA.yaw;
-    orbit.pitch = OVERVIEW_CAMERA.pitch;
-    orbit.radius = OVERVIEW_CAMERA.radius;
-    orbit.target.copy(OVERVIEW_CAMERA.target);
+    orbit.yaw = RITUAL_CAMERA.yaw;
+    orbit.pitch = RITUAL_CAMERA.pitch;
+    orbit.radius = RITUAL_CAMERA.radius;
+    orbit.target.copy(RITUAL_CAMERA.target);
     updateCamera();
   }
 
@@ -1009,6 +1351,7 @@ const RITUAL_CAMERA = {
     document.body.classList.remove('intro-active');
     document.body.classList.remove('ritual-active');
     document.body.classList.add('overview-active');
+    document.body.classList.remove("category-menu-open");
 
     // 地图初始视角
     appState.overviewPointerX = 0;
@@ -1202,6 +1545,21 @@ const RITUAL_CAMERA = {
   updateCategoryProgress();
 
   window.addEventListener('pointermove', e => {
+    if (appState.view === "summit-title") {
+      updateSummitTitleParticlesPointer(e);
+    }
+
+    emitCursorSnowTrail({
+      THREE,
+      camera,
+      animatedObjects,
+      event: e
+    });
+
+	window.addEventListener("pointerleave", () => {
+    resetSummitTitleParticlesPointer();
+  });
+
     emitCursorSnowTrail({
       THREE,
       camera,
@@ -1230,15 +1588,17 @@ const RITUAL_CAMERA = {
       return;
     }
 
-    // 如果鼠标不在 DOM hotspot 上，就用 raycaster 检测山体
     if (!isOverHotspot) {
       const pickedHook = pickMountainByPointer(e);
 
       if (pickedHook) {
-        const key = pickedHook.userData.key;
-
         appState.hoverHookObject = pickedHook;
-        window.showCategoryHoverByKey?.(key);
+
+        // 山体 hover：只保留山体变色 + 底部 category 亮起
+        // 不显示中间文字，也不让背景变暗
+        window.hideCategoryHoverText?.();
+        document.body.classList.remove("category-hover-active");
+
         syncCategoryHoverUI();
 
         appState.overviewPointerTargetX = 0;
@@ -1246,7 +1606,11 @@ const RITUAL_CAMERA = {
         return;
       } else {
         appState.hoverHookObject = null;
+
+        // 离开山体后，也清掉可能残留的 hover overlay
         window.hideCategoryHoverText?.();
+        document.body.classList.remove("category-hover-active");
+
         syncCategoryHoverUI();
       }
     }
@@ -1356,6 +1720,14 @@ const RITUAL_CAMERA = {
       return;
     }
 
+    	if (appState.view === "summit-title") {
+        if (e.deltaY > 0) {
+          enterChapterNodes();
+        }
+
+        return;
+      }
+
     if (appState.view === 'overview') {
       return;
     }
@@ -1371,6 +1743,7 @@ const RITUAL_CAMERA = {
     document.body.classList.remove('overview-active');
     document.body.classList.remove('chapter-active');
     document.body.classList.add('ritual-active');
+    document.body.classList.remove("category-menu-open");
 
     updateIntroRingTargetsFromCurrentHotspots();
 
@@ -1399,12 +1772,22 @@ const RITUAL_CAMERA = {
     if (animatedObjects.introRings) {
       animatedObjects.introRings.visible = true;
       animatedObjects.introRings.material.opacity = 0;
-      animatedObjects.introRings.material.size = 0.46;
-      animatedObjects.introRings.position.set(0.8, 0.15, 0);
-      animatedObjects.introRings.scale.set(1.18, 1.10, 1.12);
-      animatedObjects.introRings.rotation.x = 0;
-      animatedObjects.introRings.rotation.y = 0;
-      animatedObjects.introRings.rotation.z = 0;
+
+      // 五环粒子大小
+      animatedObjects.introRings.material.size = 0.42;
+
+      // 五环整体位置：x 左右，y 上下，z 前后
+      animatedObjects.introRings.position.set(-0.2, 2.6, 0);
+
+      // 五环整体比例：x 横向，y 高度，z 深度
+      animatedObjects.introRings.scale.set(1.08, 0.92, 0.86);
+
+      // 五环整体倾斜角度
+      animatedObjects.introRings.rotation.set(
+        THREE.MathUtils.degToRad(-8),
+        0,
+        THREE.MathUtils.degToRad(-3)
+      );
     }
 
     if (animatedObjects.ritualSnowFine) {

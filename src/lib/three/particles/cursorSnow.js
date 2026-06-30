@@ -1,8 +1,8 @@
 // @ts-nocheck
 
-const CURSOR_SNOW_COUNT = 160;
-const CURSOR_SNOW_LIFE = 0.85;
-const EMIT_PER_MOVE = 7;
+const CURSOR_SNOW_COUNT = 42;
+const CURSOR_SNOW_LIFE = 0.48;
+const EMIT_PER_MOVE = 1;
 
 function getCameraBasis({ THREE, camera }) {
 	const right = new THREE.Vector3();
@@ -62,12 +62,12 @@ export function createCursorSnowTrail({
 		map: createSnowCrystalTexture
 			? createSnowCrystalTexture(THREE)
 			: createSnowFlakeTexture(THREE),
-		alphaTest: 0.01,
-		size: 0.46,
+		alphaTest: 0.012,
+		size: 1.0,
 		sizeAttenuation: true,
 		vertexColors: true,
 		transparent: true,
-		opacity: 0.38,
+		opacity: 0.32,
 		depthWrite: false,
 		depthTest: false,
 		blending: THREE.NormalBlending
@@ -102,7 +102,7 @@ export function emitCursorSnowTrail({
 	const now = performance.now();
 
 	// 防止鼠标事件太密导致粒子过多
-	if (now - animatedObjects.cursorSnowLastEmit < 10) return;
+	if (now - animatedObjects.cursorSnowLastEmit < 22) return;
 	animatedObjects.cursorSnowLastEmit = now;
 
 	const positions = points.geometry.attributes.position.array;
@@ -121,8 +121,8 @@ export function emitCursorSnowTrail({
 		const i = animatedObjects.cursorSnowIndex % CURSOR_SNOW_COUNT;
 		animatedObjects.cursorSnowIndex++;
 
-		const spreadX = THREE.MathUtils.randFloatSpread(0.75);
-		const spreadY = THREE.MathUtils.randFloatSpread(0.52);
+		const spreadX = THREE.MathUtils.randFloatSpread(0.08);
+		const spreadY = THREE.MathUtils.randFloatSpread(0.08);
 
 		const p = base.clone()
 			.add(right.clone().multiplyScalar(spreadX))
@@ -133,20 +133,17 @@ export function emitCursorSnowTrail({
 		positions[i * 3 + 2] = p.z;
 
 		const vx =
-			right.x * THREE.MathUtils.randFloatSpread(0.9) +
-			up.x * THREE.MathUtils.randFloat(-0.08, 0.35) +
-			forward.x * THREE.MathUtils.randFloat(-0.12, 0.2);
+			right.x * THREE.MathUtils.randFloatSpread(0.06) +
+			up.x * THREE.MathUtils.randFloat(-0.02, 0.04);
 
 		const vy =
-			right.y * THREE.MathUtils.randFloatSpread(0.9) +
-			up.y * THREE.MathUtils.randFloat(-0.08, 0.35) +
-			forward.y * THREE.MathUtils.randFloat(-0.12, 0.2) -
-			0.18;
+			right.y * THREE.MathUtils.randFloatSpread(0.06) +
+			up.y * THREE.MathUtils.randFloat(-0.02, 0.04) -
+			0.035;
 
 		const vz =
-			right.z * THREE.MathUtils.randFloatSpread(0.9) +
-			up.z * THREE.MathUtils.randFloat(-0.08, 0.35) +
-			forward.z * THREE.MathUtils.randFloat(-0.12, 0.2);
+			right.z * THREE.MathUtils.randFloatSpread(0.06) +
+			up.z * THREE.MathUtils.randFloat(-0.02, 0.04);
 
 		velocity[i * 3] = vx;
 		velocity[i * 3 + 1] = vy;
@@ -154,7 +151,7 @@ export function emitCursorSnowTrail({
 
 		life[i] = CURSOR_SNOW_LIFE + Math.random() * 0.25;
 
-		const brightness = 0.78 + Math.random() * 0.22;
+		const brightness = 0.42 + Math.random() * 0.18;
 
 		colors[i * 3] = brightness;
 		colors[i * 3 + 1] = brightness;
@@ -186,7 +183,7 @@ export function animateCursorSnowTrail({
 			continue;
 		}
 
-		life[i] -= 0.018;
+		life[i] -= 0.026;
 
 		const fade = THREE.MathUtils.clamp(life[i] / CURSOR_SNOW_LIFE, 0, 1);
 		const softFade = fade * fade;
@@ -196,13 +193,13 @@ export function animateCursorSnowTrail({
 		positions[i * 3 + 2] += velocity[i * 3 + 2] * 0.035;
 
 		// 缓慢下落，像雪被鼠标扰动后飘散
-		velocity[i * 3 + 1] -= 0.0035;
+		velocity[i * 3 + 1] -= 0.0018;
 
 		// 横向轻微摆动
 		positions[i * 3] += Math.sin(t * 3.2 + i * 0.7) * 0.006;
 		positions[i * 3 + 2] += Math.cos(t * 2.6 + i * 0.5) * 0.004;
 
-		const brightness = 0.95 * softFade;
+		const brightness = 0.48 * softFade;
 
 		colors[i * 3] = brightness;
 		colors[i * 3 + 1] = brightness;

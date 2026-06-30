@@ -266,56 +266,97 @@ body.model-loaded .intro-rings {
 	left: 50%;
 	top: 77.5%;
 	transform: translate(-50%, -50%);
-	width: 66px;
-	height: 66px;
-	border: 1.2px solid rgba(242, 245, 247, 0.72);
-	border-radius: 50%;
-	background:
-		radial-gradient(circle,
-			rgba(242, 245, 247, 0.9) 0%,
-			rgba(242, 245, 247, 0.62) 15%,
-			rgba(242, 245, 247, 0.22) 36%,
-			rgba(7, 14, 23, 0.72) 68%
-		);
-	color: transparent;
+
+	width: 70px;
+	height: 70px;
 	padding: 0;
-	box-shadow:
-		0 0 12px rgba(242, 245, 247, 0.92),
-		0 0 32px rgba(242, 245, 247, 0.62),
-		0 0 76px rgba(242, 245, 247, 0.32),
-		inset 0 0 18px rgba(242, 245, 247, 0.2);
-	backdrop-filter: var(--blur-ui);
-	-webkit-backdrop-filter: var(--blur-ui);
+	border: none;
+	border-radius: 50%;
+	background: transparent;
+	box-shadow: none;
+
+	color: transparent;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
-	transition:
-		box-shadow 0.35s ease,
-		transform 0.35s ease,
-		border-color 0.35s ease;
+
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+
+	transition: transform 0.35s ease, filter 0.35s ease;
 }
 
 .enter-btn::before {
 	content: "";
-	width: 38px;
-	height: 38px;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 70px;
+	height: 70px;
 	border-radius: 50%;
-	background: rgba(242, 245, 247, 0.92);
-	box-shadow:
-		0 0 12px rgba(242, 245, 247, 1),
-		0 0 28px rgba(242, 245, 247, 0.78);
-	display: block;
+	transform: translate(-50%, -50%);
+
+	background:
+		radial-gradient(
+			circle,
+			rgba(242, 245, 247, 1) 0%,
+			rgba(242, 245, 247, 0.95) 13%,
+			rgba(242, 245, 247, 0.34) 24%,
+			rgba(242, 245, 247, 0.06) 34%,
+			transparent 42%,
+			transparent 58%,
+			rgba(242, 245, 247, 0.48) 60%,
+			rgba(242, 245, 247, 0.18) 62%,
+			transparent 66%,
+			rgba(242, 245, 247, 0.08) 76%,
+			transparent 100%
+		);
+
+	filter: blur(0.4px);
+	opacity: 0.92;
+	pointer-events: none;
+}
+
+.enter-btn::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 160px;
+	height: 160px;
+	border-radius: 50%;
+	transform: translate(-50%, -50%);
+
+	background:
+		radial-gradient(
+			circle,
+			rgba(242, 245, 247, 0.28) 0%,
+			rgba(242, 245, 247, 0.16) 26%,
+			rgba(242, 245, 247, 0.055) 48%,
+			transparent 72%
+		);
+
+	filter: blur(18px);
+	opacity: 0.9;
+	pointer-events: none;
+	z-index: -1;
 }
 
 .enter-btn:hover {
-	border-color: rgba(242, 245, 247, 0.9);
-	box-shadow:
-		0 0 14px rgba(242, 245, 247, 1),
-		0 0 36px rgba(242, 245, 247, 0.72),
-		0 0 80px rgba(242, 245, 247, 0.38),
-		inset 0 0 18px rgba(242, 245, 247, 0.28);
-	transform: translate(-50%, -50%) translateY(-2px);
+	transform: translate(-50%, -50%) scale(1.08);
+	filter: brightness(1.18);
+}
+
+.enter-btn:hover::before {
+	opacity: 1;
+}
+
+.enter-btn:hover::after {
+	width: 180px;
+	height: 180px;
+	opacity: 1;
+	filter: blur(20px);
 }
 
 .intro-enter-hint {

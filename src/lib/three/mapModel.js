@@ -23,9 +23,9 @@ export function loadUnifiedMapModel({
 			const model = gltf.scene;
 			model.name = "unified-map-model";
 
-			model.position.set(0, 5.8, 0);
-			model.rotation.set(0, 0, 0);
-			model.scale.set(2, 2, 2);
+			model.position.set(0, 8.5, 5);
+			model.rotation.set(0, THREE.MathUtils.degToRad(-10), 0);
+			model.scale.set(2.5, 2.5, 2.5);
 			model.updateMatrixWorld(true);
 
 			// First read Blender hotspot positions.
