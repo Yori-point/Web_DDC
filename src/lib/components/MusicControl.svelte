@@ -23,6 +23,9 @@
 	let isPlaying = $state(false);
 	let userPaused = $state(false);
 
+	let mediaPaused = $state(false);
+	let wasPlayingBeforeMedia = $state(false);
+
 	function normalizeTrackKey(key: unknown): TrackKey {
 		if (typeof key === "string" && key in TRACKS) {
 			return key as TrackKey;
@@ -63,7 +66,7 @@
 			audio.currentTime = 0;
 		}
 
-		if (shouldPlay && !userPaused) {
+		if (shouldPlay && !userPaused && !mediaPaused) {
 			await playCurrent();
 		}
 	}
@@ -104,14 +107,42 @@
 			pauseCurrent();
 		};
 
+		const handleMediaPause = () => {
+			if (!mediaPaused) {
+				wasPlayingBeforeMedia = isPlaying;
+				mediaPaused = true;
+			}
+
+			if (isPlaying) {
+				pauseCurrent();
+			}
+		};
+
+		const handleMediaResume = () => {
+			if (!mediaPaused) return;
+
+			const shouldResume = wasPlayingBeforeMedia && !userPaused;
+
+			mediaPaused = false;
+			wasPlayingBeforeMedia = false;
+
+			if (shouldResume) {
+				playCurrent();
+			}
+		};
+
 		window.addEventListener("tracce:music-start", handleStart);
 		window.addEventListener("tracce:music-track", handleTrack);
 		window.addEventListener("tracce:music-stop", handleStop);
+		window.addEventListener("tracce:music-pause-for-media", handleMediaPause);
+		window.addEventListener("tracce:music-resume-after-media", handleMediaResume);
 
 		return () => {
 			window.removeEventListener("tracce:music-start", handleStart);
 			window.removeEventListener("tracce:music-track", handleTrack);
 			window.removeEventListener("tracce:music-stop", handleStop);
+			window.removeEventListener("tracce:music-pause-for-media", handleMediaPause);
+			window.removeEventListener("tracce:music-resume-after-media", handleMediaResume);
 
 			if (audio) {
 				audio.pause();

@@ -125,6 +125,19 @@ function getMediaSrc(item, type) {
 	return "";
 }
 
+function pauseBackgroundMusicForMedia(type) {
+	if (type !== "audio" && type !== "video") {
+		window.dispatchEvent(new CustomEvent("tracce:music-resume-after-media"));
+		return;
+	}
+
+	window.dispatchEvent(new CustomEvent("tracce:music-pause-for-media"));
+}
+
+function resumeBackgroundMusicAfterMedia() {
+	window.dispatchEvent(new CustomEvent("tracce:music-resume-after-media"));
+}
+
 function resetMediaElements() {
 	const stage = document.getElementById("mediaStage");
 	const video = document.getElementById("mediaPanelVideo");
@@ -188,6 +201,9 @@ export function openMediaPanel(item) {
 	const media = item?.media ?? {};
 
 	resetMediaElements();
+	pauseBackgroundMusicForMedia(type);
+
+	resetMediaElements();
 
 	mediaPanel.classList.remove("is-text", "is-image", "is-audio", "is-video");
 	mediaPanel.classList.add(`is-${type}`);
@@ -242,6 +258,7 @@ export function closeMediaPanel() {
 	const mediaMap = document.querySelector(".chapter-media-map");
 
 	resetMediaElements();
+	resumeBackgroundMusicAfterMedia();
 
 	if (mediaPanel) {
 		mediaPanel.classList.add("hidden");
