@@ -1,3 +1,14 @@
+:root {
+	--ui-padding-x: 40px;
+	--ui-header-height: 88px;
+	--ui-bottom-height: 72px;
+	--icon-button-size: 56px;
+	--icon-padding: 16px;
+
+	--ui-bottom-icon-offset: calc((var(--ui-bottom-height) - var(--icon-button-size)) / 2);
+	--ui-bottom-text-offset: calc((var(--ui-bottom-height) - 24px) / 2);
+}
+
 .ui {
 	position: fixed;
 	z-index: var(--z-ui);
@@ -66,25 +77,38 @@ h1 {
 }
 
 .top-right {
-	right: 70px;
-	top: 42px;
+	right: var(--ui-padding-x);
+	top: 0;
+	height: var(--ui-header-height);
+
 	display: flex;
+	align-items: center;
 	gap: 10px;
+
 	pointer-events: auto;
 	flex-wrap: wrap;
 	justify-content: flex-end;
 }
 
-/* Overview header: only keep small TRACCE */
 body:not(.intro-active) .top-left {
-	left: 70px;
-	top: 42px;
+	left: var(--ui-padding-x);
+	top: 0;
+	height: var(--ui-header-height);
 	width: auto;
+
+	display: flex;
+	align-items: center;
 }
 
 body:not(.intro-active) .top-left .kicker,
 body:not(.intro-active) .top-left p {
 	display: none !important;
+}
+
+body.overview-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .top-left,
+body.chapter-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .top-left {
+	display: flex !important;
+	align-items: center;
 }
 
 body:not(.intro-active) .top-left h1 {
@@ -175,10 +199,25 @@ body.is-transitioning .top-right {
 
 body.overview-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .top-left,
 body.chapter-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .top-left {
-	display: block !important;
+	display: flex !important;
+	align-items: center;
 }
 
 body.overview-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .top-right,
 body.chapter-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .top-right {
 	display: flex !important;
+}
+
+body:not(.intro-active) .top-right .about-btn {
+	text-decoration: none;
+	cursor: pointer;
+	pointer-events: auto;
+}
+
+body:not(.intro-active) .top-right .about-btn:hover {
+	opacity: 0.62;
+	text-shadow:
+		0 0 10px rgba(242, 245, 247, 0.18),
+		0 0 26px rgba(242, 245, 247, 0.08);
+	transform: none;
 }

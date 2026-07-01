@@ -151,8 +151,8 @@ function generateNodeLayout(interviews, categoryKey) {
 	const isMany = total > 45;
 	const isMedium = total > 22 && total <= 45;
 
-	const minSize = isMany ? 26 : isMedium ? 32 : 40;
-	const maxSize = isMany ? 36 : isMedium ? 46 : 58;
+	const minSize = isMany ? 34 : isMedium ? 40 : 46;
+	const maxSize = isMany ? 46 : isMedium ? 58 : 74;
 
 	const virtualWidthVw = isMany ? 190 : isMedium ? 150 : 118;
 	const virtualHeightVh = 72;

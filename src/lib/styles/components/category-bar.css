@@ -46,14 +46,14 @@ body.category-hover-active .category-hover-overlay {
 .category-bar {
 	position: fixed;
 	left: 50%;
-	bottom: 42px;
+	bottom: var(--ui-bottom-text-offset);
 	transform: translateX(-50%);
 
 	display: flex;
 	align-items: center;
 	justify-content: center;
 
-	width: min(1180px, calc(100vw - 96px));
+	width: min(1180px, calc(100vw - (var(--ui-padding-x) * 2)));
 	pointer-events: auto;
 	z-index: 90;
 
@@ -279,16 +279,15 @@ body.chapter-active.chapter-nodes-preenter:not(.intro-active):not(.ritual-active
 	pointer-events: none !important;
 }
 
-/* Menu button: collapsed category navigation */
 .category-menu-btn {
 	all: unset;
 
 	position: fixed;
-	left: 36px;
-	bottom: 26px;
+	left: var(--ui-padding-x);
+	bottom: var(--ui-bottom-icon-offset);
 
-	width: 56px;
-	height: 56px;
+	width: var(--icon-button-size);
+	height: var(--icon-button-size);
 
 	z-index: 96;
 

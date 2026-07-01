@@ -17,3 +17,9 @@
 		dell’esperienza olimpica nella città.
 	</p>
 </div>
+
+<div class="ui top-right">
+	<a class="about-btn" href="/about" aria-label="Open about page">
+		ABOUT
+	</a>
+</div>

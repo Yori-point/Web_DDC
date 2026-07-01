@@ -19,8 +19,8 @@
 .chapter-back {
 	all: unset;
 	position: absolute;
-	left: 28px;
-	top: 28px;
+	left: var(--ui-padding-x);
+	top: calc((var(--ui-header-height) - 28px) / 2);
 	z-index: 30;
 
 	width: 28px;

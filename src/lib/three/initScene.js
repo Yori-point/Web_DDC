@@ -200,6 +200,8 @@ export function initScene() {
     overviewPointerY: 0,
     overviewPointerTargetX: 0,
     overviewPointerTargetY: 0,
+    summitPanCurrent: 0,
+    summitPanTarget: 0,
 
     cameraStart: new THREE.Vector3(),
     cameraMid: new THREE.Vector3(),
@@ -592,6 +594,17 @@ const RITUAL_CAMERA = {
 
   createWorld();
 
+  const shouldOpenMapFromAbout =
+    sessionStorage.getItem("tracce-open-map") === "1";
+
+  sessionStorage.removeItem("tracce-open-map");
+
+  if (shouldOpenMapFromAbout) {
+    document.getElementById("intro")?.classList.add("hidden");
+
+    returnToOverview();
+  }
+
   function setMapSceneOpacity(progress) {
     setMapSceneOpacityController({
       THREE,
@@ -925,6 +938,12 @@ const RITUAL_CAMERA = {
     document.body.style.cursor = "";
     appState.targetChapter = chapter;
 
+    window.dispatchEvent(
+      new CustomEvent("tracce:music-track", {
+        detail: { key: chapter.key }
+      })
+    );
+
     document.getElementById('panel')?.classList.add('hidden');
 
     document.body.classList.add('is-transitioning');
@@ -1208,6 +1227,8 @@ const RITUAL_CAMERA = {
 
     appState.view = "chapter";
     document.body.classList.remove("category-menu-open");
+    appState.summitPanCurrent = 0;
+    appState.summitPanTarget = 0;
 
     hideSummitTitle();
 
@@ -1267,6 +1288,8 @@ const RITUAL_CAMERA = {
     document.body.classList.remove("is-transitioning");
     document.body.classList.remove("category-hover-active");
     document.body.classList.remove("category-menu-open");
+
+    window.dispatchEvent(new CustomEvent("tracce:music-stop"));
 
     document.getElementById("panel")?.classList.add("hidden");
     document.getElementById("infoPanel")?.classList.add("hidden");
@@ -1352,6 +1375,12 @@ const RITUAL_CAMERA = {
     document.body.classList.remove('ritual-active');
     document.body.classList.add('overview-active');
     document.body.classList.remove("category-menu-open");
+
+    window.dispatchEvent(
+      new CustomEvent("tracce:music-track", {
+        detail: { key: "overall" }
+      })
+    );
 
     // 地图初始视角
     appState.overviewPointerX = 0;
@@ -1439,8 +1468,11 @@ const RITUAL_CAMERA = {
 
     const normalized = event.clientX / window.innerWidth - 0.5;
 
-    // 左右最多移动约 28vw，不要太夸张
+    // nodes 横向移动强度
     interviewPanTarget = -normalized * window.innerWidth * 0.28;
+
+    // summit 山顶背景横向移动强度
+    appState.summitPanTarget = -normalized * 2.4;
   });
 
   const hotspotLayer = document.getElementById('hotspotLayer');
@@ -1745,6 +1777,12 @@ const RITUAL_CAMERA = {
     document.body.classList.add('ritual-active');
     document.body.classList.remove("category-menu-open");
 
+    window.dispatchEvent(
+      new CustomEvent("tracce:music-start", {
+        detail: { key: "overall" }
+      })
+    );
+
     updateIntroRingTargetsFromCurrentHotspots();
 
     mapSceneGroup.visible = true;
@@ -1943,6 +1981,45 @@ const RITUAL_CAMERA = {
     }
   }
 
+  function updateSummitScenePan() {
+    const group = animatedObjects.summitScene;
+
+    if (!group || !group.visible) return;
+
+    if (!group.userData.summitBasePosition) {
+      group.userData.summitBasePosition = group.position.clone();
+      group.userData.summitBaseRotationY = group.rotation.y;
+    }
+
+    const target = appState.view === "chapter"
+      ? appState.summitPanTarget
+      : 0;
+
+    // 这里的 0.04 和 interviewNodes.js 里的 pan 缓动速度保持一致
+    appState.summitPanCurrent = THREE.MathUtils.lerp(
+      appState.summitPanCurrent,
+      target,
+      0.04
+    );
+
+    const cameraRight = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+    cameraRight.y = 0;
+
+    if (cameraRight.lengthSq() < 0.0001) {
+      cameraRight.set(1, 0, 0);
+    }
+
+    cameraRight.normalize();
+
+    group.position
+      .copy(group.userData.summitBasePosition)
+      .add(cameraRight.multiplyScalar(appState.summitPanCurrent));
+
+    group.rotation.y =
+      group.userData.summitBaseRotationY +
+      appState.summitPanCurrent * 0.035;
+  }
+
   function animateChapterCloud(t) {
     animateChapterCloudParticles({
       THREE,
@@ -1957,6 +2034,8 @@ const RITUAL_CAMERA = {
       t,
       appState
     });
+
+    updateSummitScenePan();
 
     updateSummitTransitionVisuals();
   }

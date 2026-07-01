@@ -334,6 +334,13 @@ function applySummitModelPreset(animatedObjects, preset = DEFAULT_SUMMIT_VIEW) {
   root.scale.setScalar(baseScale * preset.scale);
 }
 
+function rememberSummitBaseTransform(group) {
+  if (!group) return;
+
+  group.userData.summitBasePosition = group.position.clone();
+  group.userData.summitBaseRotationY = group.rotation.y;
+}
+
 /**
  * Compatibility name kept intentionally:
  * initScene.js already imports createSummitParticles().
@@ -465,6 +472,8 @@ export function placeSummitParticlesAtMountain({
 
     applySummitModelPreset(animatedObjects, preset);
 
+    rememberSummitBaseTransform(group);
+
     return;
   }
 
@@ -477,6 +486,8 @@ export function placeSummitParticlesAtMountain({
   group.scale.set(1, 1, 1);
 
   applySummitModelPreset(animatedObjects, preset);
+
+  rememberSummitBaseTransform(group);
 }
 
 export function updateSummitParticlesTransition({
