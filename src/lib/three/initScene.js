@@ -925,7 +925,7 @@ const RITUAL_CAMERA = {
 
     appState.view = 'transition';
     appState.transitionStart = clock.getElapsedTime();
-    appState.transitionDuration = 2.8;
+    appState.transitionDuration = 3.4;
     appState.hoverHookObject = null;
     window.hideCategoryHoverText?.();
     document.body.classList.remove("category-hover-active");
@@ -948,8 +948,8 @@ const RITUAL_CAMERA = {
 
     document.body.classList.add('is-transitioning');
 
-    mapSceneGroup.visible = false;
-    setMapSceneOpacity(0);
+    mapSceneGroup.visible = true;
+    setMapSceneOpacity(1);
 
     if (animatedObjects.summitScene) {
       animatedObjects.summitScene.visible = true;
@@ -1042,9 +1042,7 @@ const RITUAL_CAMERA = {
       1
     );
 
-    // 前半段先保留地图，让用户看到自己正在靠近被点击的山；
-    // 后半段再让旧地图消失。
-    const mapFade = 1 - smoothstep(0.22, 0.62, progress);
+    const mapFade = 1 - smoothstep(0.58, 0.9, progress);
     setMapSceneOpacity(mapFade);
 
     updateSummitParticlesTransition({
@@ -1469,7 +1467,7 @@ const RITUAL_CAMERA = {
     const normalized = event.clientX / window.innerWidth - 0.5;
 
     // nodes 横向移动强度
-    interviewPanTarget = -normalized * window.innerWidth * 0.28;
+    interviewPanTarget = -normalized * window.innerWidth * 0.14;
 
     // summit 山顶背景横向移动强度
     appState.summitPanTarget = -normalized * 2.4;

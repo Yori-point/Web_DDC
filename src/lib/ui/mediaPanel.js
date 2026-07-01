@@ -4,20 +4,104 @@ function normalizeText(text) {
 	return String(text ?? "").trim();
 }
 
-function getMediaType(item) {
-	const media = item?.media ?? {};
-	const value = `${item?.type || ""} ${media.type || ""} ${media.src || ""}`.toLowerCase();
+function pickMediaSrc(value, type) {
+	if (!Array.isArray(value)) return value || "";
 
-	if (media.video || value.includes("video") || value.includes(".mp4") || value.includes(".mov")) {
+	const EXTENSIONS = {
+		video: [".mp4", ".mov", ".webm"],
+		audio: [".mp3", ".m4a", ".wav", ".ogg"],
+		image: [".jpg", ".jpeg", ".png", ".webp"]
+	};
+
+	const extensions = EXTENSIONS[type] || [];
+
+	return (
+		value.find((src) =>
+			extensions.some((ext) => String(src).toLowerCase().includes(ext))
+		) ||
+		value[0] ||
+		""
+	);
+}
+
+function formatAudioTime(seconds) {
+	if (!Number.isFinite(seconds)) return "0:00";
+
+	const minutes = Math.floor(seconds / 60);
+	const rest = Math.floor(seconds % 60);
+
+	return `${minutes}:${String(rest).padStart(2, "0")}`;
+}
+
+function updateAudioUI() {
+	const audio = document.getElementById("mediaPanelAudio");
+	const audioShell = document.getElementById("mediaPanelAudioShell");
+	const audioToggle = document.getElementById("mediaAudioToggle");
+	const audioProgress = document.getElementById("mediaAudioProgress");
+	const audioTime = document.getElementById("mediaAudioTime");
+
+	if (!audio) return;
+
+	const duration = audio.duration || 0;
+	const current = audio.currentTime || 0;
+	const percent = duration ? (current / duration) * 100 : 0;
+
+	audioShell?.classList.toggle("is-playing", !audio.paused);
+
+	if (audioToggle) {
+		audioToggle.textContent = audio.paused ? "▶" : "Ⅱ";
+		audioToggle.setAttribute("aria-label", audio.paused ? "Play audio" : "Pause audio");
+	}
+
+	if (audioProgress) {
+		audioProgress.style.setProperty("--progress", `${percent}%`);
+	}
+
+	if (audioTime) {
+		audioTime.textContent = `${formatAudioTime(current)} / ${formatAudioTime(duration)}`;
+	}
+}
+
+function normalizeMediaType(value) {
+	const text = String(value ?? "").toLowerCase();
+
+	if (text.includes("video")) return "video";
+	if (text.includes("audio")) return "audio";
+	if (text.includes("foto")) return "image";
+	if (text.includes("photo")) return "image";
+	if (text.includes("image")) return "image";
+	if (text.includes("testo")) return "text";
+	if (text.includes("text")) return "text";
+
+	return "";
+}
+
+function getMediaType(item) {
+	const declaredType = normalizeMediaType(item?.type || item?.fileType || item?.label);
+
+	if (declaredType) return declaredType;
+
+	const media = item?.media ?? {};
+	const src = Array.isArray(media.src) ? media.src[0] : media.src;
+
+	const value = `
+		${media.type || ""}
+		${src || ""}
+		${media.video || ""}
+		${media.audio || ""}
+		${media.image || ""}
+		${media.cover || ""}
+	`.toLowerCase();
+
+	if (value.includes("video") || value.includes(".mp4") || value.includes(".mov")) {
 		return "video";
 	}
 
-	if (media.audio || value.includes("audio") || value.includes(".mp3") || value.includes(".m4a")) {
+	if (value.includes("audio") || value.includes(".mp3") || value.includes(".m4a")) {
 		return "audio";
 	}
 
 	if (
-		media.image ||
 		value.includes("image") ||
 		value.includes("foto") ||
 		value.includes(".jpg") ||
@@ -34,9 +118,9 @@ function getMediaType(item) {
 function getMediaSrc(item, type) {
 	const media = item?.media ?? {};
 
-	if (type === "video") return media.video || media.src || "";
-	if (type === "audio") return media.audio || media.src || "";
-	if (type === "image") return media.image || media.src || media.cover || "";
+	if (type === "video") return media.video || pickMediaSrc(media.src, "video");
+	if (type === "audio") return media.audio || pickMediaSrc(media.src, "audio");
+	if (type === "image") return media.image || media.cover || pickMediaSrc(media.src, "image");
 
 	return "";
 }
@@ -69,8 +153,17 @@ function resetMediaElements() {
 		audio.load?.();
 	}
 
+	const audioToggle = document.getElementById("mediaAudioToggle");
+	const audioProgress = document.getElementById("mediaAudioProgress");
+	const audioTime = document.getElementById("mediaAudioTime");
+
+	if (audioToggle) audioToggle.textContent = "▶";
+	if (audioProgress) audioProgress.style.setProperty("--progress", "0%");
+	if (audioTime) audioTime.textContent = "0:00 / 0:00";
+
 	if (audioShell) {
 		audioShell.hidden = true;
+		audioShell.classList.remove("is-playing");
 		audioShell.style.backgroundImage = "";
 	}
 }
@@ -133,13 +226,7 @@ export function openMediaPanel(item) {
 	if (type === "audio" && audioShell && audio && src) {
 		audio.src = src;
 		audioShell.hidden = false;
-
-		if (media.cover) {
-			audioShell.style.backgroundImage = `
-				linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.55)),
-				url("${media.cover}")
-			`;
-		}
+		updateAudioUI();
 	}
 
 	if (type === "text") {
@@ -171,6 +258,9 @@ export function closeMediaPanel() {
 export function bindMediaPanelClose() {
 	const closeMediaPanelButton = document.getElementById("closeMediaPanel");
 	const mediaPanel = document.getElementById("mediaPanel");
+	const audio = document.getElementById("mediaPanelAudio");
+	const audioToggle = document.getElementById("mediaAudioToggle");
+	const audioProgress = document.getElementById("mediaAudioProgress");
 
 	function handleClose(event) {
 		event?.preventDefault();
@@ -192,13 +282,59 @@ export function bindMediaPanelClose() {
 		closeMediaPanel();
 	}
 
+	function handleAudioToggle(event) {
+		event?.preventDefault();
+		event?.stopPropagation();
+
+		if (!audio || !audio.src) return;
+
+		if (audio.paused) {
+			audio.play?.();
+		} else {
+			audio.pause?.();
+		}
+
+		updateAudioUI();
+	}
+
+	function handleAudioProgress(event) {
+		event?.preventDefault();
+		event?.stopPropagation();
+
+		if (!audio || !audio.duration) return;
+
+		const rect = audioProgress.getBoundingClientRect();
+		const ratio = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
+
+		audio.currentTime = ratio * audio.duration;
+		updateAudioUI();
+	}
+
 	closeMediaPanelButton?.addEventListener("click", handleClose);
 	mediaPanel?.addEventListener("click", (event) => event.stopPropagation());
 
 	window.addEventListener("pointerdown", handleOutsideClick);
 
+	audioToggle?.addEventListener("click", handleAudioToggle);
+	audioProgress?.addEventListener("pointerdown", handleAudioProgress);
+
+	audio?.addEventListener("play", updateAudioUI);
+	audio?.addEventListener("pause", updateAudioUI);
+	audio?.addEventListener("timeupdate", updateAudioUI);
+	audio?.addEventListener("loadedmetadata", updateAudioUI);
+	audio?.addEventListener("ended", updateAudioUI);
+
 	return () => {
 		closeMediaPanelButton?.removeEventListener("click", handleClose);
 		window.removeEventListener("pointerdown", handleOutsideClick);
+
+		audioToggle?.removeEventListener("click", handleAudioToggle);
+		audioProgress?.removeEventListener("pointerdown", handleAudioProgress);
+
+		audio?.removeEventListener("play", updateAudioUI);
+		audio?.removeEventListener("pause", updateAudioUI);
+		audio?.removeEventListener("timeupdate", updateAudioUI);
+		audio?.removeEventListener("loadedmetadata", updateAudioUI);
+		audio?.removeEventListener("ended", updateAudioUI);
 	};
 }

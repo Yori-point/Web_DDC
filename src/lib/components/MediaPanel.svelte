@@ -25,8 +25,24 @@
 			/>
 
 			<div id="mediaPanelAudioShell" class="media-audio-shell" hidden>
-				<div class="media-waveform" aria-hidden="true"></div>
-				<audio id="mediaPanelAudio" class="media-audio-player" controls></audio>
+				<div class="media-waveform" aria-hidden="true">
+					<span></span><span></span><span></span><span></span><span></span>
+					<span></span><span></span><span></span><span></span><span></span>
+					<span></span><span></span><span></span><span></span><span></span>
+					<span></span><span></span><span></span><span></span><span></span>
+				</div>
+
+				<div class="media-audio-controls">
+					<button id="mediaAudioToggle" class="media-audio-toggle" type="button" aria-label="Play audio">
+						▶
+					</button>
+
+					<button id="mediaAudioProgress" class="media-audio-progress" type="button" aria-label="Seek audio"></button>
+
+					<div id="mediaAudioTime" class="media-audio-time">0:00 / 0:00</div>
+				</div>
+
+				<audio id="mediaPanelAudio" class="media-audio-player" preload="metadata"></audio>
 			</div>
 		</section>
 	</div>

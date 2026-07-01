@@ -148,13 +148,14 @@ function generateNodeLayout(interviews, categoryKey) {
 	const total = interviews.length;
 	const placed = [];
 
+	const isFew = total <= 15;
 	const isMany = total > 45;
 	const isMedium = total > 22 && total <= 45;
 
-	const minSize = isMany ? 34 : isMedium ? 40 : 46;
-	const maxSize = isMany ? 46 : isMedium ? 58 : 74;
+	const minSize = isFew ? 42 : isMany ? 34 : isMedium ? 40 : 44;
+	const maxSize = isFew ? 74 : isMany ? 46 : isMedium ? 58 : 68;
 
-	const virtualWidthVw = isMany ? 190 : isMedium ? 150 : 118;
+	const virtualWidthVw = isFew ? 100 : isMany ? 190 : isMedium ? 150 : 118;
 	const virtualHeightVh = 72;
 
 	const virtualWidthPx = window.innerWidth * (virtualWidthVw / 100);
@@ -171,16 +172,46 @@ function generateNodeLayout(interviews, categoryKey) {
 		const maxY = 78;
 
 		const isInsideHoverTextZone = (x, y) => {
-			return x > 38 && x < 62 && y > 34 && y < 62;
-		};
+			return x > 30 && x < 70 && y > 34 && y < 66;
+				};
+
+				const fewNodeZones = [
+			{ xMin: 12, xMax: 30, yMin: 18, yMax: 36 },
+			{ xMin: 70, xMax: 88, yMin: 18, yMax: 36 },
+			{ xMin: 10, xMax: 28, yMin: 62, yMax: 80 },
+			{ xMin: 72, xMax: 90, yMin: 62, yMax: 80 },
+			{ xMin: 12, xMax: 28, yMin: 42, yMax: 58 },
+			{ xMin: 72, xMax: 88, yMin: 42, yMax: 58 },
+			{ xMin: 34, xMax: 44, yMin: 18, yMax: 30 },
+			{ xMin: 56, xMax: 66, yMin: 18, yMax: 30 },
+			{ xMin: 34, xMax: 44, yMin: 70, yMax: 82 },
+			{ xMin: 56, xMax: 66, yMin: 70, yMax: 82 }
+		];
+
+		function getCandidatePosition(index, rand) {
+			if (isFew) {
+				const zone = fewNodeZones[index % fewNodeZones.length];
+
+				return {
+					x: zone.xMin + rand() * (zone.xMax - zone.xMin),
+					y: zone.yMin + rand() * (zone.yMax - zone.yMin)
+				};
+			}
+
+			return {
+				x: minX + rand() * (maxX - minX),
+				y: minY + rand() * (maxY - minY)
+			};
+		}
 
 		let x = 50;
 		let y = 45;
 		let found = false;
 
 		for (let attempt = 0; attempt < 260; attempt++) {
-			const tryX = minX + rand() * (maxX - minX);
-			const tryY = minY + rand() * (maxY - minY);
+			const candidate = getCandidatePosition(index + attempt, rand);
+			const tryX = candidate.x;
+			const tryY = candidate.y;
 
 			if (isInsideHoverTextZone(tryX, tryY)) {
 				continue;
@@ -208,19 +239,25 @@ function generateNodeLayout(interviews, categoryKey) {
 		}
 
 		if (!found) {
-			const cols = isMany ? 13 : isMedium ? 9 : 6;
-			const row = Math.floor(index / cols);
-			const col = index % cols;
+			if (isFew) {
+				const fallback = getCandidatePosition(index, rand);
+				x = fallback.x;
+				y = fallback.y;
+			} else {
+				const cols = isMany ? 13 : isMedium ? 9 : 6;
+				const row = Math.floor(index / cols);
+				const col = index % cols;
 
-			x = 6 + (col / Math.max(cols - 1, 1)) * 88;
-			y = 20 + row * (isMany ? 12 : 15);
+				x = 6 + (col / Math.max(cols - 1, 1)) * 88;
+				y = 20 + row * (isMany ? 12 : 15);
 
-			x += Math.sin(index * 1.7) * 2.8;
-			y += Math.cos(index * 1.3) * 2.4;
+				x += Math.sin(index * 1.7) * 2.8;
+				y += Math.cos(index * 1.3) * 2.4;
+			}
 
 			if (isInsideHoverTextZone(x, y)) {
-				y = y < 50 ? 28 + rand() * 6 : 66 + rand() * 8;
-				x += x < 50 ? -6 : 6;
+				y = y < 50 ? 24 + rand() * 8 : 70 + rand() * 8;
+				x += x < 50 ? -8 : 8;
 			}
 		}
 
@@ -325,7 +362,7 @@ export function updateInterviewPan(current, target) {
 
 	if (!container) return current;
 
-	const next = current + (target - current) * 0.04;
+	const next = current + (target - current) * 0.02;
 	container.style.setProperty("--pan-x", `${next}px`);
 
 	return next;
