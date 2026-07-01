@@ -221,25 +221,3 @@ body:not(.intro-active) .top-right .about-btn:hover {
 		0 0 26px rgba(242, 245, 247, 0.08);
 	transform: none;
 }
-
-/* Always keep ABOUT visible on ritual / summit / chapter pages */
-body.ritual-active .top-right,
-body.chapter-active .top-right,
-body.summit-title-active .top-right,
-body.chapter-nodes-active .top-right,
-body.chapter-nodes-preenter .top-right {
-	display: flex !important;
-	opacity: 1 !important;
-	pointer-events: auto !important;
-	visibility: visible !important;
-}
-
-body.ritual-active .top-right .about-btn,
-body.chapter-active .top-right .about-btn,
-body.summit-title-active .top-right .about-btn,
-body.chapter-nodes-active .top-right .about-btn,
-body.chapter-nodes-preenter .top-right .about-btn {
-	display: block !important;
-	pointer-events: auto !important;
-	cursor: pointer !important;
-}
