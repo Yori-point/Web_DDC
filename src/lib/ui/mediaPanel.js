@@ -256,29 +256,33 @@ export function closeMediaPanel() {
 }
 
 export function bindMediaPanelClose() {
-	const closeMediaPanelButton = document.getElementById("closeMediaPanel");
 	const mediaPanel = document.getElementById("mediaPanel");
 	const audio = document.getElementById("mediaPanelAudio");
 	const audioToggle = document.getElementById("mediaAudioToggle");
 	const audioProgress = document.getElementById("mediaAudioProgress");
 
-	function handleClose(event) {
-		event?.preventDefault();
-		event?.stopPropagation();
-
-		closeMediaPanel();
-	}
-
-	function handleOutsideClick(event) {
+	function handlePanelPointerDown(event) {
 		const panel = document.getElementById("mediaPanel");
 
 		if (!panel || panel.classList.contains("hidden")) return;
 
-		const clickedInsidePanel = event.target.closest("#mediaPanel");
+		const clickedClose = event.target.closest("#closeMediaPanel");
+		const clickedContent = event.target.closest(".media-detail-inner");
 		const clickedNode = event.target.closest(".interview-node");
 
-		if (clickedInsidePanel || clickedNode) return;
+		if (clickedNode) return;
 
+		if (clickedClose) {
+			event.preventDefault();
+			event.stopPropagation();
+			closeMediaPanel();
+			return;
+		}
+
+		// 点文字、图片、视频、音频播放器区域，不关闭
+		if (clickedContent) return;
+
+		// 点 media panel 的空白区域，关闭
 		closeMediaPanel();
 	}
 
@@ -301,7 +305,7 @@ export function bindMediaPanelClose() {
 		event?.preventDefault();
 		event?.stopPropagation();
 
-		if (!audio || !audio.duration) return;
+		if (!audio || !audio.duration || !audioProgress) return;
 
 		const rect = audioProgress.getBoundingClientRect();
 		const ratio = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1);
@@ -310,10 +314,7 @@ export function bindMediaPanelClose() {
 		updateAudioUI();
 	}
 
-	closeMediaPanelButton?.addEventListener("click", handleClose);
-	mediaPanel?.addEventListener("click", (event) => event.stopPropagation());
-
-	window.addEventListener("pointerdown", handleOutsideClick);
+	mediaPanel?.addEventListener("pointerdown", handlePanelPointerDown);
 
 	audioToggle?.addEventListener("click", handleAudioToggle);
 	audioProgress?.addEventListener("pointerdown", handleAudioProgress);
@@ -325,8 +326,7 @@ export function bindMediaPanelClose() {
 	audio?.addEventListener("ended", updateAudioUI);
 
 	return () => {
-		closeMediaPanelButton?.removeEventListener("click", handleClose);
-		window.removeEventListener("pointerdown", handleOutsideClick);
+		mediaPanel?.removeEventListener("pointerdown", handlePanelPointerDown);
 
 		audioToggle?.removeEventListener("click", handleAudioToggle);
 		audioProgress?.removeEventListener("pointerdown", handleAudioProgress);

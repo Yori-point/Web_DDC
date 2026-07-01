@@ -3,28 +3,281 @@
 
 	import { onMount } from "svelte";
 	import * as THREE from "three";
+	import { goto } from "$app/navigation";
 
 	let canvas;
 
+	let activeAbout = $state(null);
+
+	const defaultAbout = {
+		title: "Tracce",
+		paragraphs: [
+			["Dopo un grande evento,", "qualcosa resta."],
+			[
+				"Non solo strutture,",
+				"numeri o immagini ufficiali,",
+				"ma frammenti più piccoli:",
+				"una voce, uno sguardo,",
+				"un incontro, una sensazione."
+			],
+			[
+				"Milano Cortina 2026",
+				"diventa qui un paesaggio",
+				"da attraversare lentamente."
+			],
+			[
+				"Ogni testimonianza",
+				"si deposita come una particella.",
+				"Ogni particella",
+				"lascia una traccia."
+			],
+			[
+				"Il sito raccoglie ciò",
+				"che continua a muoversi",
+				"nella memoria quotidiana."
+			],
+			[
+				"Non una mappa da leggere,",
+				"ma uno spazio da attraversare."
+			]
+		]
+	};
+
 	const people = [
-		{ name: "名字1", x: 43, y: 45 },
-		{ name: "名字2", x: 55, y: 31 },
-		{ name: "名字3", x: 66, y: 55 },
-		{ name: "名字4", x: 73, y: 17 },
-		{ name: "名字5", x: 88, y: 49 },
-		{ name: "名字6", x: 76, y: 67 }
+		{
+			name: "Jiaying Hu",
+			x: 43,
+			y: 45,
+			title: "Jiaying Hu",
+			paragraphs: [
+				[
+					"Dopo un grande evento sportivo,",
+					"quello che resta",
+					"non è solo il risultato."
+				],
+				[
+					"Restano le voci,",
+					"i gesti,",
+					"le immagini che continuano",
+					"a muoversi nella memoria."
+				],
+				[
+					"Tifare per il proprio paese",
+					"porta con sé un orgoglio forte."
+				],
+				[
+					"Ma le Olimpiadi",
+					"mi hanno fatto sentire altro:",
+					"emozionarsi per una fatica,",
+					"per un gesto,",
+					"per un traguardo condiviso."
+				],
+				[
+					"Nel progetto ho curato",
+					"la direzione visiva,",
+					"l’interfaccia",
+					"e l’esperienza narrativa."
+				]
+			]
+		},
+		{
+			name: "Yunwei Zhang",
+			x: 55,
+			y: 31,
+			title: "Yunwei Zhang",
+			paragraphs: [
+				[
+					"Dopo un grande evento sportivo,",
+					"quello che resta",
+					"non è solo il risultato."
+				],
+				[
+					"Restano le voci,",
+					"i gesti,",
+					"le immagini che continuano",
+					"a muoversi nella memoria."
+				],
+				[
+					"Tifare per il proprio paese",
+					"porta con sé un orgoglio forte."
+				],
+				[
+					"Ma le Olimpiadi",
+					"mi hanno fatto sentire altro:",
+					"emozionarsi per una fatica,",
+					"per un gesto,",
+					"per un traguardo condiviso."
+				],
+				[
+					"Nel progetto ho curato",
+					"la direzione visiva,",
+					"l’interfaccia",
+					"e l’esperienza narrativa."
+				]
+			]
+		},
+		{
+			name: "Isabella lena",
+			x: 66,
+			y: 55,
+			title: "Isabella lena",
+			paragraphs: [
+				[
+					"Dopo un grande evento sportivo,",
+					"quello che resta",
+					"non è solo il risultato."
+				],
+				[
+					"Restano le voci,",
+					"i gesti,",
+					"le immagini che continuano",
+					"a muoversi nella memoria."
+				],
+				[
+					"Tifare per il proprio paese",
+					"porta con sé un orgoglio forte."
+				],
+				[
+					"Ma le Olimpiadi",
+					"mi hanno fatto sentire altro:",
+					"emozionarsi per una fatica,",
+					"per un gesto,",
+					"per un traguardo condiviso."
+				],
+				[
+					"Nel progetto ho curato",
+					"la direzione visiva,",
+					"l’interfaccia",
+					"e l’esperienza narrativa."
+				]
+			]
+		},
+		{
+			name: "Laura Facchinetti",
+			x: 73,
+			y: 17,
+			title: "Laura Facchinetti",
+			paragraphs: [
+				[
+					"Dopo un grande evento sportivo,",
+					"quello che resta",
+					"non è solo il risultato."
+				],
+				[
+					"Restano le voci,",
+					"i gesti,",
+					"le immagini che continuano",
+					"a muoversi nella memoria."
+				],
+				[
+					"Tifare per il proprio paese",
+					"porta con sé un orgoglio forte."
+				],
+				[
+					"Ma le Olimpiadi",
+					"mi hanno fatto sentire altro:",
+					"emozionarsi per una fatica,",
+					"per un gesto,",
+					"per un traguardo condiviso."
+				],
+				[
+					"Nel progetto ho curato",
+					"la direzione visiva,",
+					"l’interfaccia",
+					"e l’esperienza narrativa."
+				]
+			]
+		},
+		{
+			name: "Matilde Pinarello",
+			x: 88,
+			y: 49,
+			title: "Matilde Pinarello",
+			paragraphs: [
+				[
+					"Dopo un grande evento sportivo,",
+					"quello che resta",
+					"non è solo il risultato."
+				],
+				[
+					"Restano le voci,",
+					"i gesti,",
+					"le immagini che continuano",
+					"a muoversi nella memoria."
+				],
+				[
+					"Tifare per il proprio paese",
+					"porta con sé un orgoglio forte."
+				],
+				[
+					"Ma le Olimpiadi",
+					"mi hanno fatto sentire altro:",
+					"emozionarsi per una fatica,",
+					"per un gesto,",
+					"per un traguardo condiviso."
+				],
+				[
+					"Nel progetto ho curato",
+					"la direzione visiva,",
+					"l’interfaccia",
+					"e l’esperienza narrativa."
+				]
+			]
+		},
+		{
+			name: "Giulia Croci",
+			x: 76,
+			y: 67,
+			title: "Giulia Croci",
+			paragraphs: [
+				[
+					"Dopo un grande evento sportivo,",
+					"quello che resta",
+					"non è solo il risultato."
+				],
+				[
+					"Restano le voci,",
+					"i gesti,",
+					"le immagini che continuano",
+					"a muoversi nella memoria."
+				],
+				[
+					"Tifare per il proprio paese",
+					"porta con sé un orgoglio forte."
+				],
+				[
+					"Ma le Olimpiadi",
+					"mi hanno fatto sentire altro:",
+					"emozionarsi per una fatica,",
+					"per un gesto,",
+					"per un traguardo condiviso."
+				],
+				[
+					"Nel progetto ho curato",
+					"la direzione visiva,",
+					"l’interfaccia",
+					"e l’esperienza narrativa."
+				]
+			]
+		}
 	];
 
-    function goBackToMap(event) {
-        event.preventDefault();
+	const aboutContent = $derived(activeAbout || defaultAbout);
 
-        sessionStorage.setItem("tracce-open-map", "1");
-        window.location.href = "/";
-    }
+    async function goBackToMap(event) {
+		event.preventDefault();
 
-	const MODEL_URL = "/about.glb";
+		sessionStorage.setItem("tracce-open-map", "1");
+		document.documentElement.classList.add("tracce-returning-map");
 
-	const MODEL_TARGET_WIDTH = 108;
+		await goto("/", {
+			noScroll: true
+		});
+	}
+
+	const MODEL_URL = "/about-meshopt.glb";
+
+	const MODEL_TARGET_WIDTH = 96;
     const PARTICLE_COUNT = 180000;
     const PARTICLE_SIZE = 0.34;
 
@@ -241,12 +494,16 @@
 		model.position.set(-center.x, -box.min.y, -center.z);
 
 		root.add(model);
-		root.scale.setScalar(scale);
+		root.scale.set(
+			scale,
+			scale * 1.18,
+			scale
+		);
 
-		root.position.set(24, -5, 0); //山的位置
+		root.position.set(48, -5, 0); //山的位置
         root.rotation.set(
-            THREE.MathUtils.degToRad(-2),
-            THREE.MathUtils.degToRad(24),
+            THREE.MathUtils.degToRad(7),
+            THREE.MathUtils.degToRad(-10),
             0
         );
 
@@ -256,9 +513,12 @@
 	onMount(async () => {
 		document.body.classList.add("about-page-active");
 
-        const { GLTFLoader } = await import(
-            "three/examples/jsm/loaders/GLTFLoader.js"
-        );
+        const [{ GLTFLoader }, { MeshoptDecoder }] = await Promise.all([
+			import("three/examples/jsm/loaders/GLTFLoader.js"),
+			import("three/examples/jsm/libs/meshopt_decoder.module.js")
+		]);
+
+		await MeshoptDecoder.ready;
 
 		const renderer = new THREE.WebGLRenderer({
 			canvas,
@@ -280,8 +540,8 @@
 			2000
 		);
 
-		camera.position.set(18, 18, 82);
-		camera.lookAt(20, 4, 0);
+		camera.position.set(70, 7, 58);
+		camera.lookAt(28, 5, 0);
 
 		const ambient = new THREE.AmbientLight(0xc7d9ec, 1.2);
 		scene.add(ambient);
@@ -295,6 +555,7 @@
 		scene.add(backLight);
 
 		const loader = new GLTFLoader();
+		loader.setMeshoptDecoder(MeshoptDecoder);
 
 		let mountainParticles = null;
 		let disposed = false;
@@ -386,45 +647,16 @@
 	</a>
 
 	<div class="about-copy">
-		<h1>Tracce</h1>
+		<h1>{aboutContent.title}</h1>
 
 		<div class="about-text">
-			<p>
-				Dopo un grande evento,<br />
-				qualcosa resta.
-			</p>
-
-			<p>
-				Non solo strutture,<br />
-				numeri o immagini ufficiali,<br />
-				ma frammenti più piccoli:<br />
-				una voce, uno sguardo,<br />
-				un incontro, una sensazione.
-			</p>
-
-			<p>
-				Milano Cortina 2026<br />
-				diventa qui un paesaggio<br />
-				da attraversare lentamente.
-			</p>
-
-			<p>
-				Ogni testimonianza<br />
-				si deposita come una particella.<br />
-				Ogni particella<br />
-				lascia una traccia.
-			</p>
-
-			<p>
-				Il sito raccoglie ciò<br />
-				che continua a muoversi<br />
-				nella memoria quotidiana.
-			</p>
-
-			<p>
-				Non una mappa da leggere,<br />
-				ma uno spazio da attraversare.
-			</p>
+			{#each aboutContent.paragraphs as paragraph}
+				<p>
+					{#each paragraph as line, index}
+						{line}{#if index < paragraph.length - 1}<br />{/if}
+					{/each}
+				</p>
+			{/each}
 		</div>
 	</div>
 
@@ -438,10 +670,13 @@
 					type="button"
 					style={`left: ${person.x}%; top: ${person.y}%;`}
 					aria-label={person.name}
+					onmouseenter={() => (activeAbout = person)}
+					onmouseleave={() => (activeAbout = null)}
+					onfocus={() => (activeAbout = person)}
+					onblur={() => (activeAbout = null)}
 				>
 					<span class="about-dot-core"></span>
 					<span class="about-dot-ring"></span>
-					<span class="about-person-name">{person.name}</span>
 				</button>
 			{/each}
 		</div>
@@ -684,30 +919,6 @@
 			border-color 0.28s ease;
 	}
 
-	.about-person-name {
-		position: absolute;
-		left: 50%;
-		top: -8px;
-		transform: translate(-50%, 10px);
-		padding: 5px 10px 6px;
-		border: 1px solid rgba(242, 245, 247, 0.2);
-		border-radius: 999px;
-		background: rgba(7, 14, 23, 0.36);
-		backdrop-filter: blur(8px);
-		-webkit-backdrop-filter: blur(8px);
-		font-family: var(--font-light);
-		font-size: 15px;
-		font-weight: 200;
-		letter-spacing: 0.04em;
-		color: rgba(242, 245, 247, 0.94);
-		white-space: nowrap;
-		opacity: 0;
-		pointer-events: none;
-		transition:
-			opacity 0.22s ease,
-			transform 0.22s ease;
-	}
-
 	.about-person-dot:hover,
 	.about-person-dot:focus-visible {
 		transform: none;
@@ -718,12 +929,6 @@
 		transform: translate(-50%, -50%) scale(1.14);
 		opacity: 0.96;
 		border-color: rgba(242, 245, 247, 0.58);
-	}
-
-	.about-person-dot:hover .about-person-name,
-	.about-person-dot:focus-visible .about-person-name {
-		opacity: 1;
-		transform: translate(-50%, -10px);
 	}
 
 	@keyframes about-dot-float {

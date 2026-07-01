@@ -114,14 +114,26 @@ export function initScene() {
 	console.log("Olympic Tracce scene started");
 
 	const BG_COLOR = 0x070e17;
-	document.body.classList.add("intro-active");
-  document.body.classList.remove(
-    "overview-active",
-    "chapter-active",
-    "ritual-active",
-    "is-transitioning",
-    "category-menu-open"
-  );
+
+	const shouldOpenMapFromAbout =
+		sessionStorage.getItem("tracce-open-map") === "1";
+
+	sessionStorage.removeItem("tracce-open-map");
+
+	document.body.classList.remove(
+		"intro-active",
+		"overview-active",
+		"chapter-active",
+		"ritual-active",
+		"is-transitioning",
+		"category-menu-open"
+	);
+
+	if (shouldOpenMapFromAbout) {
+		document.body.classList.add("overview-active");
+	} else {
+		document.body.classList.add("intro-active");
+	}
 
   const canvas = document.getElementById('scene');
 
@@ -594,14 +606,8 @@ const RITUAL_CAMERA = {
 
   createWorld();
 
-  const shouldOpenMapFromAbout =
-    sessionStorage.getItem("tracce-open-map") === "1";
-
-  sessionStorage.removeItem("tracce-open-map");
-
   if (shouldOpenMapFromAbout) {
     document.getElementById("intro")?.classList.add("hidden");
-
     returnToOverview();
   }
 
@@ -1345,6 +1351,8 @@ const RITUAL_CAMERA = {
   }
 
   function returnToOverview() {
+    document.documentElement.classList.remove("tracce-returning-map");
+    
     appState.view = 'overview';
     appState.targetChapter = null;
 

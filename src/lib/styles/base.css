@@ -50,3 +50,11 @@ body,
 button {
 	color: var(--color-cream);
 }
+
+html.tracce-returning-map #intro {
+	display: none !important;
+}
+
+html.tracce-returning-map body {
+	background: #070e17;
+}
