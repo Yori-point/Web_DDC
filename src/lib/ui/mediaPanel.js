@@ -203,8 +203,6 @@ export function openMediaPanel(item) {
 	resetMediaElements();
 	pauseBackgroundMusicForMedia(type);
 
-	resetMediaElements();
-
 	mediaPanel.classList.remove("is-text", "is-image", "is-audio", "is-video");
 	mediaPanel.classList.add(`is-${type}`);
 
