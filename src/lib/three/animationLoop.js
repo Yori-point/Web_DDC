@@ -114,7 +114,7 @@ export function startAnimationLoop({
 
 			camera.lookAt(orbit.target);
 
-			if (progress >= 1 && appState.targetChapter) {
+			if (progress >= 0.52 && appState.targetChapter) {
 				enterSummitImmerse(appState.targetChapter);
 			}
 		}

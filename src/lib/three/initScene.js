@@ -212,6 +212,10 @@ export function initScene() {
     overviewPointerY: 0,
     overviewPointerTargetX: 0,
     overviewPointerTargetY: 0,
+
+    // 进入 overview 后，先挡住第一次鼠标移动，避免一进地图就立刻触发 hover
+    overviewHoverReady: false,
+
     summitPanCurrent: 0,
     summitPanTarget: 0,
 
@@ -931,7 +935,7 @@ const RITUAL_CAMERA = {
 
     appState.view = 'transition';
     appState.transitionStart = clock.getElapsedTime();
-    appState.transitionDuration = 3.4;
+    appState.transitionDuration = 2.2;
     appState.hoverHookObject = null;
     window.hideCategoryHoverText?.();
     document.body.classList.remove("category-hover-active");
@@ -1048,7 +1052,7 @@ const RITUAL_CAMERA = {
       1
     );
 
-    const mapFade = 1 - smoothstep(0.58, 0.9, progress);
+    const mapFade = 1 - smoothstep(0.28, 0.52, progress);
     setMapSceneOpacity(mapFade);
 
     updateSummitParticlesTransition({
@@ -1281,6 +1285,12 @@ const RITUAL_CAMERA = {
     appState.overviewPointerTargetX = 0;
     appState.overviewPointerTargetY = 0;
 
+    appState.overviewHoverReady = false;
+    appState.hoverHookObject = null;
+    window.hideCategoryHoverText?.();
+    document.body.classList.remove("category-hover-active");
+    syncCategoryHoverUI();
+
     const intro = document.getElementById("intro");
     const ritualHint = document.getElementById("ritualHint");
 
@@ -1298,6 +1308,7 @@ const RITUAL_CAMERA = {
     document.getElementById("panel")?.classList.add("hidden");
     document.getElementById("infoPanel")?.classList.add("hidden");
     document.getElementById("mediaPanel")?.classList.add("hidden");
+    document.body.classList.remove("media-detail-open");
 
     document.querySelector(".chapter-media-map")?.classList.remove("has-open");
 
@@ -1352,7 +1363,7 @@ const RITUAL_CAMERA = {
 
   function returnToOverview() {
     document.documentElement.classList.remove("tracce-returning-map");
-    
+
     appState.view = 'overview';
     appState.targetChapter = null;
 
@@ -1380,7 +1391,7 @@ const RITUAL_CAMERA = {
     document.body.classList.remove('intro-active');
     document.body.classList.remove('ritual-active');
     document.body.classList.add('overview-active');
-    document.body.classList.remove("category-menu-open");
+    document.body.classList.add("category-menu-open");
 
     window.dispatchEvent(
       new CustomEvent("tracce:music-track", {
@@ -1532,6 +1543,8 @@ const RITUAL_CAMERA = {
       hotspotLayer,
       findHookByKey,
       onHover: (key) => {
+        if (!appState.overviewHoverReady) return;
+
         appState.hoverHookObject = findHookByKey(key);
         window.showCategoryHoverByKey?.(key);
         syncCategoryHoverUI();
@@ -1626,31 +1639,54 @@ const RITUAL_CAMERA = {
       return;
     }
 
-    if (!isOverHotspot) {
-      const pickedHook = pickMountainByPointer(e);
+    // 刚进入 overview 后，第一次鼠标移动只用来“激活 hover”，不显示效果。
+    // 第二次移动才真正显示 hover。
+    if (!appState.overviewHoverReady && !isOverCategory) {
+      appState.overviewHoverReady = true;
 
-      if (pickedHook) {
-        appState.hoverHookObject = pickedHook;
+      appState.hoverHookObject = null;
+      window.hideCategoryHoverText?.();
+      document.body.classList.remove("category-hover-active");
+      syncCategoryHoverUI();
 
-        // 山体 hover：只保留山体变色 + 底部 category 亮起
-        // 不显示中间文字，也不让背景变暗
-        window.hideCategoryHoverText?.();
-        document.body.classList.remove("category-hover-active");
+      appState.overviewPointerTargetX = 0;
+      appState.overviewPointerTargetY = 0;
+      return;
+    }
 
-        syncCategoryHoverUI();
+    // hover 在 hotspot 上：显示和 category bar 一样的暗背景 + 中间文字
+    if (isOverHotspot) {
+      const key = isOverHotspot.dataset.key;
 
-        appState.overviewPointerTargetX = 0;
-        appState.overviewPointerTargetY = 0;
-        return;
-      } else {
-        appState.hoverHookObject = null;
-
-        // 离开山体后，也清掉可能残留的 hover overlay
-        window.hideCategoryHoverText?.();
-        document.body.classList.remove("category-hover-active");
-
+      if (key) {
+        appState.hoverHookObject = findHookByKey(key);
+        window.showCategoryHoverByKey?.(key);
         syncCategoryHoverUI();
       }
+
+      appState.overviewPointerTargetX = 0;
+      appState.overviewPointerTargetY = 0;
+      return;
+    }
+
+    // hover 在山体粒子上：恢复暗背景 + 中间文字
+    const pickedHook = pickMountainByPointer(e);
+
+    if (pickedHook) {
+      const key = pickedHook.userData.key;
+
+      appState.hoverHookObject = pickedHook;
+      window.showCategoryHoverByKey?.(key);
+      syncCategoryHoverUI();
+
+      appState.overviewPointerTargetX = 0;
+      appState.overviewPointerTargetY = 0;
+      return;
+    } else {
+      appState.hoverHookObject = null;
+      window.hideCategoryHoverText?.();
+      document.body.classList.remove("category-hover-active");
+      syncCategoryHoverUI();
     }
 
     // 如果正在 hover hotspot，不要移动相机
@@ -1742,8 +1778,16 @@ const RITUAL_CAMERA = {
         document.body.classList.remove('intro-active');
         document.body.classList.remove('ritual-active');
         document.body.classList.add('overview-active');
+        document.body.classList.add('category-menu-open');
 
         appState.view = 'overview';
+
+        // 刚进入地图时，先不要立刻触发 hover
+        appState.overviewHoverReady = false;
+        appState.hoverHookObject = null;
+        window.hideCategoryHoverText?.();
+        document.body.classList.remove("category-hover-active");
+        syncCategoryHoverUI();
 
         if (ritualHint) {
           ritualHint.classList.add('hidden');

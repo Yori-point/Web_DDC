@@ -80,8 +80,8 @@
 	position: absolute;
 	left: 50%;
 	top: 50%;
-	width: calc(var(--node-size, 70px) * 2.45);
-	height: calc(var(--node-size, 70px) * 2.45);
+	width: calc(var(--node-size, 70px) * 2.05);
+	height: calc(var(--node-size, 70px) * 2.05);
 	border-radius: 50%;
 	transform: translate(-50%, -50%);
 
@@ -94,7 +94,7 @@
 			transparent 76%
 		);
 
-	filter: blur(18px);
+	filter: blur(6px);
 	opacity: 0;
 	pointer-events: none;
 	z-index: 0;

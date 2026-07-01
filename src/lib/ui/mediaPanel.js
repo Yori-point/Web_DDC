@@ -247,6 +247,9 @@ export function openMediaPanel(item) {
 		stage?.classList.add("is-hidden");
 	}
 
+	document.body.classList.add("media-detail-open");
+	document.body.classList.remove("category-menu-open");
+
 	mediaPanel.classList.remove("hidden");
 	mediaPanel.setAttribute("aria-hidden", "false");
 }
@@ -257,6 +260,8 @@ export function closeMediaPanel() {
 
 	resetMediaElements();
 	resumeBackgroundMusicAfterMedia();
+
+	document.body.classList.remove("media-detail-open");
 
 	if (mediaPanel) {
 		mediaPanel.classList.add("hidden");

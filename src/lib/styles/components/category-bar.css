@@ -412,3 +412,24 @@ body.chapter-active.chapter-nodes-preenter .category-bar {
 	visibility: hidden !important;
 	pointer-events: none !important;
 }
+
+/* Hide category menu and category bar when interview detail is open */
+body.media-detail-open .category-menu-btn,
+body.media-detail-open .category-bar,
+body.media-detail-open .category-hover-overlay {
+	opacity: 0 !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
+
+/* Hide category menu and category bar when interview detail is open */
+body.media-detail-open.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-menu-btn,
+body.media-detail-open.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-bar,
+body.media-detail-open.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-hover-overlay,
+body.media-detail-open.category-menu-open.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-menu-btn,
+body.media-detail-open.category-menu-open.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-bar,
+body.media-detail-open.category-menu-open.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-hover-overlay {
+	opacity: 0 !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}

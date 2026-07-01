@@ -379,3 +379,9 @@ body.summit-title-active .summit-title-canvas {
 	mix-blend-mode: normal !important;
 	image-rendering: auto;
 }
+
+body.media-detail-open .chapter-back {
+	opacity: 0 !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
