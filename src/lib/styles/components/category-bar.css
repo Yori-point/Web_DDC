@@ -279,129 +279,6 @@ body.chapter-active.chapter-nodes-preenter:not(.intro-active):not(.ritual-active
 	pointer-events: none !important;
 }
 
-.category-menu-btn {
-	all: unset;
-
-	position: fixed;
-	left: var(--ui-padding-x);
-	bottom: var(--ui-bottom-icon-offset);
-
-	width: var(--icon-button-size);
-	height: var(--icon-button-size);
-
-	z-index: 96;
-
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 6px;
-
-	cursor: pointer;
-	pointer-events: auto;
-
-	border: none !important;
-	background: transparent !important;
-	box-shadow: none !important;
-	outline: none !important;
-	border-radius: 0 !important;
-	-webkit-appearance: none;
-	appearance: none;
-	-webkit-tap-highlight-color: transparent;
-
-	opacity: 0;
-	visibility: hidden;
-
-	transition:
-		opacity 0.35s ease,
-		visibility 0.35s ease;
-}
-
-.category-menu-btn span {
-	display: block;
-	width: 16px;
-	height: 1.5px;
-	border-radius: 999px;
-
-	/* 和 category bar 悬浮前颜色一致 */
-	background: rgba(255, 255, 255, 0.56);
-
-	box-shadow: none;
-
-	transition:
-		background 0.32s ease,
-		box-shadow 0.32s ease,
-		opacity 0.32s ease;
-}
-
-.category-menu-btn:hover,
-.category-menu-btn:focus,
-.category-menu-btn:focus-visible,
-.category-menu-btn:active,
-body.category-menu-open .category-menu-btn {
-	border: none !important;
-	background: transparent !important;
-	box-shadow: none !important;
-	outline: none !important;
-	filter: none !important;
-}
-
-.category-menu-btn:hover span,
-.category-menu-btn:focus-visible span,
-body.category-menu-open .category-menu-btn span {
-	/* 和 category item hover 一样：变亮 */
-	background: rgba(255, 255, 255, 1);
-	box-shadow: 0 0 12px rgba(255, 255, 255, 0.12);
-}
-
-.category-menu-btn:hover span,
-body.category-menu-open .category-menu-btn span {
-	background: rgba(255, 255, 255, 1);
-	box-shadow: 0 0 12px rgba(255, 255, 255, 0.12);
-}
-
-/* Show menu button only on map and real interview-node page */
-body.overview-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-menu-btn,
-body.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-menu-btn {
-	opacity: 1 !important;
-	visibility: visible !important;
-	pointer-events: auto !important;
-}
-
-/* Hide menu button during intro / ritual / transition / summit title */
-body.intro-active .category-menu-btn,
-body.ritual-active .category-menu-btn,
-body.is-transitioning .category-menu-btn,
-body.chapter-active.summit-title-active .category-menu-btn,
-body.chapter-active.chapter-nodes-preenter .category-menu-btn {
-	opacity: 0 !important;
-	visibility: hidden !important;
-	pointer-events: none !important;
-}
-
-/* By default, category bar is collapsed */
-body.overview-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-bar,
-body.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-bar {
-	opacity: 0 !important;
-	visibility: hidden !important;
-	pointer-events: none !important;
-	transform: translateX(-50%) translateY(8px) !important;
-
-	transition:
-		opacity 0.32s ease,
-		visibility 0.32s ease,
-		transform 0.32s ease;
-}
-
-/* Open category bar when menu is clicked */
-body.category-menu-open.overview-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-bar,
-body.category-menu-open.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-bar {
-	opacity: 1 !important;
-	visibility: visible !important;
-	pointer-events: auto !important;
-	transform: translateX(-50%) translateY(0) !important;
-}
-
 /* Make sure hidden states always win */
 body.intro-active .category-bar,
 body.ritual-active .category-bar,
@@ -413,23 +290,16 @@ body.chapter-active.chapter-nodes-preenter .category-bar {
 	pointer-events: none !important;
 }
 
-/* Hide category menu and category bar when interview detail is open */
-body.media-detail-open .category-menu-btn,
-body.media-detail-open .category-bar,
-body.media-detail-open .category-hover-overlay {
-	opacity: 0 !important;
-	visibility: hidden !important;
-	pointer-events: none !important;
+/* Category bar is always visible on overview and interview-node pages */
+body.overview-active:not(.intro-active):not(.ritual-active):not(.is-transitioning):not(.media-detail-open) .category-bar,
+body.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning):not(.media-detail-open) .category-bar {
+	opacity: 1 !important;
+	visibility: visible !important;
+	pointer-events: auto !important;
+	transform: translateX(-50%) translateY(0) !important;
 }
 
-/* Hide category menu and category bar when interview detail is open */
-body.media-detail-open.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-menu-btn,
-body.media-detail-open.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-bar,
-body.media-detail-open.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-hover-overlay,
-body.media-detail-open.category-menu-open.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-menu-btn,
-body.media-detail-open.category-menu-open.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-bar,
-body.media-detail-open.category-menu-open.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-hover-overlay {
-	opacity: 0 !important;
-	visibility: hidden !important;
-	pointer-events: none !important;
+/* No hamburger menu */
+.category-menu-btn {
+	display: none !important;
 }

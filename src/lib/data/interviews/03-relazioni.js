@@ -150,7 +150,11 @@ export const relazioni = [
 		hoverCredit: "Valentino",
 
 		detailText: `Per me lo scambio di spille può essere una possibilità per conoscere persone diverse. 
-        Anche senza partecipare direttamente, riconosco il suo potenziale relazionale.`,
+        Osservando le dinamiche del villaggio olimpico, ho capito subito che questo piccolo gesto si trasforma in un vero e proprio linguaggio universale.
+		Funziona come un perfetto rompighiaccio, capace di abbattere istantaneamente le barriere linguistiche, culturali e persino quelle gerarchiche che spesso caratterizzano i grandi eventi internazionali.
+		Anche senza partecipare direttamente, riconosco il suo potenziale relazionale.
+		È affascinante notare come un semplice pezzo di metallo smaltato possa fermare per un attimo la frenesia della giornata, costringendo due perfetti sconosciuti a guardarsi negli occhi, a sorridersi e a iniziare una conversazione spontanea. 
+		Le relazioni più autentiche, in contesti così vasti e dispersivi, nascono spesso proprio da queste minuscole e inaspettate interazioni quotidiane.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -168,7 +172,12 @@ export const relazioni = [
 		hoverCredit: "Sara",
 
 		detailText: `Collego le Olimpiadi all’idea di pace, unione e incontro tra persone. 
-        L’evento può diventare uno spazio simbolico di connessione globale.`,
+        L’evento può diventare uno spazio simbolico di connessione globale.
+		Per me, il cuore pulsante di questa manifestazione non risiede esclusivamente nelle grandi competizioni sportive o nelle medaglie vinte, ma si trova soprattutto nella straordinaria fitta rete di relazioni umane che si crea spontaneamente ogni singolo giorno. 
+		Le Olimpiadi offrono un’occasione unica per intrecciare legami autentici con individui provenienti da ogni angolo del pianeta. 
+		Condividere le stesse emozioni, tifare insieme o semplicemente scambiare un sorriso universale abbatte istantaneamente le barriere linguistiche e culturali. 
+		Sono fermamente convinta che le relazioni nate in questo contesto abbiano un potere trasformativo reale. 
+		Ogni breve conversazione con un volontario, un atleta o un semplice spettatore arricchisce il nostro personale bagaglio umano, insegnandoci l’empatia e l’ascolto attivo.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -225,7 +234,11 @@ export const relazioni = [
 		hoverCredit: "Giovanni",
 
 		detailText: `Le Olimpiadi sono state una bella esperienza, le seguo da sempre, per me è una tradizione, quest’anno poi ho anche avuto il piacere di vedere un mio collega partecipare. 
-        Mi è capitato di interagire con persone nuove seguendo qualche partita.`,
+        Questo evento straordinario ha creato un collante umano speciale, rafforzando in modo incredibile i legami quotidiani all'interno del nostro normale ambiente lavorativo.
+		Mi è capitato di interagire con persone nuove seguendo qualche partita.
+		Condividere la tensione di una gara, esultare per una vittoria o commentare un risultato si trasforma in un formidabile acceleratore sociale. 
+		Le barriere cadono all'istante e ci si ritrova a chiacchierare con perfetti sconosciuti come se si fosse amici da sempre. 
+		La forza più grande delle Olimpiadi risiede proprio in questa meravigliosa rete di relazioni, capace di avvicinare davvero tutte le persone.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -243,7 +256,10 @@ export const relazioni = [
 		hoverCredit: "Salvatore",
 
 		detailText: `Le Olimpiadi Milano-Cortina 2026 sono state un evento unico e incredibile, la città splendeva. 
-        Le ho seguite in TV e in presenza negli stadi perché ho lavorato come volontario, grazie a questa esperienza mi è capitato spesso di interagire con nuove persone.`,
+        Le ho seguite in TV e in presenza negli stadi perché ho lavorato come volontario, grazie a questa esperienza mi è capitato spesso di interagire con nuove persone.
+		Questa immersione totale dietro le quinte si è rivelata una formidabile opportunità umana, ben oltre l'aspetto sportivo. 
+		Il volontariato crea un microcosmo dove la collaborazione diventa il vero motore di tutto. 
+		Le relazioni che si formano in queste occasioni sono intense e immediate, nate dalla necessità di fare squadra per gestire la grande complessità dell'evento. `,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -299,7 +315,8 @@ export const relazioni = [
 		hoverCredit: "Viola",
 
 		detailText: `Ho vissuto veramente attivamente questo evento globale, è stata un’esperienza indimenticabile. 
-        Ciò che più mi è rimasto è stata l’esperienza come volontaria, grazie alla quale ho avuto la possibilità di partecipare attivamente allo scambio delle spille: un’iniziativa che ha aiutato molto a creare interazione tra le persone.`,
+        Ciò che più mi è rimasto è stata l’esperienza come volontaria, grazie alla quale ho avuto la possibilità di partecipare attivamente allo scambio delle spille: un’iniziativa che ha aiutato molto a creare interazione tra le persone.
+		Lavorare dietro le quinte mi ha permesso non solo di supportare la complessa macchina organizzativa, ma soprattutto di immergermi in un tessuto sociale incredibilmente ricco.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -376,7 +393,11 @@ export const relazioni = [
 		hoverCredit: "Omar",
 
 		detailText: `Le Olimpiadi Milano-Cortina 2026 sono state una bella esperienza. 
-        Mi è capitato qualche volta di interagire con persone nuove grazie alle Olimpiadi e mi hanno lasciato curiosità verso altri paesi e culture.`,
+        Mi è capitato qualche volta di interagire con persone nuove grazie alle Olimpiadi e mi hanno lasciato curiosità verso altri paesi e culture.
+		Al di là del grande spettacolo sportivo, ciò che ha reso davvero speciale questo evento è stata la dimensione umana. 
+		Condividere gli spazi urbani o le gradinate con tifosi e turisti internazionali ha facilitato la nascita di legami spontanei e inaspettati. 
+		Bastava una semplice indicazione stradale o un commento su una gara per abbattere ogni distanza e dare il via a una piacevole conversazione. 
+		Queste interazioni, seppur brevi, hanno creato una bellissima rete di relazioni, trasformando la città in un vero e proprio crocevia umano.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -393,7 +414,12 @@ export const relazioni = [
 		hoverText: "Passione e unità.",
 		hoverCredit: "Olga",
 
-		detailText: `Le Olimpiadi Milano-Cortina 2026 mi hanno trasmesso passione e senso di unità.`,
+		detailText: `Le Olimpiadi Milano-Cortina 2026 mi hanno trasmesso passione e senso di unità.
+		Vivere da vicino questo evento ha significato immergersi in un clima dove le distanze sembravano improvvisamente annullate. 
+		Non si è trattato solo di assistere a delle competizioni sportive, ma di partecipare a un grandissimo rito collettivo basato sull'incontro. 
+		Trovarsi a esultare fianco a fianco con persone sconosciute, provenienti da nazioni lontanissime, ha generato un legame invisibile ma incredibilmente reale. 
+		In questo contesto, ogni singolo scambio di sguardi, ogni sorriso condiviso e ogni momento di festa si sono trasformati in preziose occasioni per costruire ponti tra storie e culture molto diverse fra loro. 
+		Questa meravigliosa e fitta rete di connessioni resterà per sempre la nostra eredità olimpica.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -410,7 +436,10 @@ export const relazioni = [
 		hoverText: "Lo sport crea unità.",
 		hoverCredit: "Osvaldo",
 
-		detailText: `Le Olimpiadi invernali 2026 mi hanno fatto comprendere quanto lo sport crei unità.`,
+		detailText: `Le Olimpiadi invernali 2026 mi hanno fatto comprendere quanto lo sport crei unità.
+		Durante queste indimenticabili giornate, ho visto persone di ogni età e provenienza mescolarsi, parlarsi e condividere emozioni autentiche. 
+		L'agonismo sul campo di ghiaccio o sulla neve si è trasformato magicamente in un collante sociale potentissimo fuori dalle piste. 
+		Queste interazioni, seppur nate per caso, hanno dimostrato che il vero trionfo dei Giochi risiede nella bellissima capacità di avvicinare gli individui.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -427,7 +456,11 @@ export const relazioni = [
 		hoverText: "Condiviso con amici e famiglia.",
 		hoverCredit: "Paolo",
 
-		detailText: `Ho guardato solo pochi momenti delle Olimpiadi insieme ad amici e famiglia.`,
+		detailText: `Ho guardato solo pochi momenti delle Olimpiadi insieme ad amici e famiglia.
+		Tuttavia, lo sport ha funzionato come perfetto catalizzatore per le nostre relazioni. 
+		Riunirsi comodamente sul divano, ordinare una pizza e commentare insieme una discesa libera ha generato un'atmosfera magica, calda e rilassata. 
+		In quei momenti, la televisione diventava un piacevole rumore di fondo che favoriva il dialogo, le risate e la condivisione pura. 
+		Alla fine, la vera vittoria più bella e duratura è stata ritrovare questa preziosa intimità con i miei veri affetti quotidiani.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -444,7 +477,12 @@ export const relazioni = [
 		hoverText: "Interazione sul pullman.",
 		hoverCredit: "Pamela",
 
-		detailText: `Mi è capitato qualche volta di interagire con persone nuove sul pullman grazie alle Olimpiadi.`,
+		detailText: `Mi è capitato qualche volta di interagire con persone nuove sul pullman grazie alle Olimpiadi.
+		Spesso, nella routine cittadina, i mezzi pubblici sono spazi freddi e anonimi, dove ogni passeggero resta isolato nel proprio mondo, fissando lo schermo del telefono in totale silenzio. 
+		Eppure, durante questo incredibile evento, l'atmosfera a bordo era magicamente cambiata. 
+		Un semplice gadget colorato, il logo su una giacca sportiva o persino l'entusiasmo condiviso per una gara appena conclusa diventavano immediatamente il pretesto perfetto per rompere il ghiaccio. 
+		Queste brevi interazioni, seppur nate per puro caso tra perfetti sconosciuti, hanno trasformato un banale e noioso tragitto urbano in una vera opportunità di incontro. 
+		Le Olimpiadi hanno avuto il potere di abbattere le solite barriere sociali, favorendo la nascita di relazioni inaspettate ma molto autentiche.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -461,7 +499,13 @@ export const relazioni = [
 		hoverText: "Interazione sui social.",
 		hoverCredit: "Marialaura",
 
-		detailText: `Mi è capitato di interagire con persone nuove grazie alle Olimpiadi attraverso contatti indiretti commentando sui social.`,
+		detailText: `Mi è capitato di interagire con persone nuove grazie alle Olimpiadi attraverso contatti indiretti commentando sui social.
+		Le piattaforme virtuali si sono trasformate in gigantesche piazze senza confini. 
+		Leggere le opinioni degli altri, rispondere a una riflessione su una gara o condividere l'emozione per una medaglia ha permesso di superare ogni barriera geografica. 
+		Anche se si trattava di connessioni a distanza, nate dietro uno schermo, l'empatia e l'entusiasmo erano assolutamente reali e palpabili. 
+		Ho scoperto che una passione comune può trasformare dei perfetti sconosciuti in una vera e propria community affiatata. 
+		Questi scambi spontanei mi hanno fatto capire che le relazioni autentiche non necessitano sempre di una presenza fisica. 
+		A volte, basta un semplice commento per sentirsi profondamente uniti.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -478,7 +522,12 @@ export const relazioni = [
 		hoverText: "Momento condiviso.",
 		hoverCredit: "Andrea",
 
-		detailText: `Ho seguito le Olimpiadi sulla TV e sui social media, con amici e famiglia, è diventato un momento condiviso.`,
+		detailText: `Ho seguito le Olimpiadi sulla TV e sui social media, con amici e famiglia, è diventato un momento condiviso.
+		Invece di vivere l'evento sportivo in solitudine, la competizione si è trasformata in una splendida occasione per stare insieme a chi amo. 
+		Radunarsi davanti allo schermo, scambiarsi opinioni su una gara appena conclusa o scorrere i vari post per commentare le notizie più curiose ha rafforzato enormemente la nostra sintonia. 
+		In quei giorni frenetici, il televisore acceso non era una distrazione, ma un punto di ritrovo naturale che stimolava il dialogo e le risate. 
+		Anche la sfera digitale ha giocato un ruolo fondamentale: inviarsi meme divertenti o brevi video delle premiazioni nelle chat di gruppo ha mantenuto vivo il filo del discorso per tutta la giornata. 
+		Questa esperienza mi ha ricordato quanto sia prezioso ritagliarsi del tempo di qualità insieme alle mie persone del cuore ogni singolo giorno.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -495,7 +544,11 @@ export const relazioni = [
 		hoverText: "Creare interazione tra le persone.",
 		hoverCredit: "Erika",
 
-		detailText: `Ho sentito parlare dello scambio di spille e penso che abbia in parte aiutato a creare interazione tra le persone.`,
+		detailText: `Ho sentito parlare dello scambio di spille e penso che abbia in parte aiutato a creare interazione tra le persone.
+		Ritrovarsi a confrontare piccoli oggetti colorati diventa una scusa perfetta per rompere il ghiaccio senza alcuno sforzo. 
+		È affascinante notare come la ricerca di un pezzo mancante alla propria collezione si trasformi nel pretesto ideale per iniziare una chiacchierata, scoprire da dove viene l'interlocutore e condividere aneddoti divertenti. 
+		Alla fine, l'oggetto in sé passa in secondo piano, lasciando spazio a un genuino senso di appartenenza. 
+		Questa dinamica così leggera e festosa ha sicuramente contribuito a rendere l'atmosfera molto più accogliente e familiare.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -512,7 +565,11 @@ export const relazioni = [
 		hoverText: "Hanno creato unità e curiosità.",
 		hoverCredit: "Enrico",
 
-		detailText: `Le Olimpiadi invernali 2026 sono state un’esperienza bella da seguire, ha creato unità e curiosità in me e nelle persone intorno a me.`,
+		detailText: `Le Olimpiadi invernali 2026 sono state un’esperienza bella da seguire, ha creato unità e curiosità in me e nelle persone intorno a me.
+		Assistere a queste giornate di sport ha generato un calore inaspettato nei nostri rapporti quotidiani, trasformando la normale routine in un continuo scambio reciproco. 
+		Trovarsi a fare il tifo davanti allo schermo o commentare i risultati del giorno ha risvegliato un forte spirito di gruppo, avvicinando amici e parenti in un clima di grande intesa. 
+		Questa manifestazione ha stimolato la nostra voglia di stare vicini, rendendo ogni vittoria un successo collettivo da festeggiare insieme. 
+		La bellezza di questo momento storico non si è limitata alle piste innevate, ma si è riflessa direttamente nella qualità del nostro tempo condiviso.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -530,7 +587,9 @@ export const relazioni = [
 		hoverCredit: "Massimo",
 
 		detailText: `Le Olimpiadi invernali 2026 sono state molto partecipate e coinvolgenti. 
-        Ciò che più mi è rimasto sono state le imprese delle nostre campionesse olimpiche.`,
+        Ciò che più mi è rimasto sono state le imprese delle nostre campionesse olimpiche.
+		Vedere queste straordinarie atlete trionfare ha scatenato un'ondata di solidarietà meravigliosa tra tutte le persone con cui ho vissuto queste indimenticabili giornate. 
+		Ogni medaglia vinta diventava l'occasione perfetta per abbracciarsi, scambiarsi sguardi fieri e alimentare discussioni appassionate sul coraggio e sulla determinazione.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -547,7 +606,12 @@ export const relazioni = [
 		hoverText: "Evento internazionale condiviso con amici e parenti.",
 		hoverCredit: "Michela",
 
-		detailText: `Le Olimpiadi Milano-Cortina 2026 per me hanno rappresentato un estemporaneo interesse per un evento internazionale condiviso con amici e parenti.`,
+		detailText: `Le Olimpiadi Milano-Cortina 2026 per me hanno rappresentato un estemporaneo interesse per un evento internazionale condiviso con amici e parenti.
+		Non essendo un fanatico delle discipline invernali, la vera magia si è manifestata nel salotto di casa, trasformato per l'occasione in un rifugio accogliente. 
+		Guardare le discese sulla neve è stato il pretesto ideale per organizzare serate diverse dal solito, riempiendo la stanza di chiacchierate spontanee e risate. 
+		Questo appuntamento televisivo ha interrotto la monotonia settimanale, regalando a tutti noi la gioia della compagnia pura. 
+		Ritrovarsi sul divano, gustando qualcosa di buono, ha risvegliato una dolce intesa tra noi, favorendo confidenze inaspettate durante le pause pubblicitarie. 
+		Il risultato sportivo passava rapidamente in secondo piano di fronte al piacere di ascoltarci e trascorrere ore spensierate.`,
 
 		text: `Testo lungo completo...`,
 		visible: true

@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from "svelte";
+	import ParticleTitle from "$lib/components/ParticleTitle.svelte";
 
 	onMount(() => {
 		document.body.classList.add("intro-active");
@@ -99,7 +100,7 @@
 			MILANO CORTINA 2026 | LEGACY OLIMPICHE
 		</div>
 
-		<h1 class="intro-title">Tracce</h1>
+		<ParticleTitle text="Tracce" variant="intro" ariaLabel="Tracce" />
 
 		<p class="intro-text">
 			Un viaggio tra frammenti e memorie. <br />Attraversa una mappa di voci e testimonianze per scoprire ciò che resta<br /> dell’esperienza olimpica.

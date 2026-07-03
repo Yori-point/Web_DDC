@@ -2,19 +2,6 @@
 	<p id="categoryHoverText" class="category-hover-text"></p>
 </div>
 
-<button
-	id="categoryMenuBtn"
-	class="category-menu-btn"
-	type="button"
-	aria-label="Open category menu"
-	aria-controls="categoryBar"
-	aria-expanded="false"
->
-	<span></span>
-	<span></span>
-	<span></span>
-</button>
-
 <div id="categoryBar" class="category-bar">
 	<button
 		class="category-item"

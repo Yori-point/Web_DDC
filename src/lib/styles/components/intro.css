@@ -225,21 +225,33 @@ body.model-loaded .intro-rings {
 	top: 22px;
 }
 
-.intro-title {
+.particle-title--intro {
 	position: absolute;
 	left: 50%;
 	top: 47%;
 	transform: translate(-50%, -50%);
-	margin: 0;
+
 	width: min(980px, calc(100vw - 48px));
-	max-width: none;
+	height: clamp(128px, 15vw, 220px);
+
 	font-family: var(--font-title);
 	font-size: clamp(124px, 13.2vw, 198px);
+	font-weight: 400;
 	line-height: 0.88;
-	font-weight: 300;
 	letter-spacing: 0.08em;
-	color: #f2f5f7;
-	text-shadow: 0 0 22px rgba(242, 245, 247, 0.06);
+	text-transform: none;
+
+	z-index: 3;
+	background: transparent !important;
+
+	--particle-title-rgb: 255,255,255;
+	--particle-title-density: 3;
+	--particle-title-radius: 82;
+	--particle-title-push: 0.42;
+	--particle-title-return: 0.09;
+	--particle-title-friction: 0.86;
+	--particle-title-dot-size: 1.02;
+	--particle-title-opacity: 0.99;
 }
 
 .intro-text {

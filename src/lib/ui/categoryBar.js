@@ -11,7 +11,6 @@ export function bindCategoryBar({
 	const hoverOverlay = document.getElementById("categoryHoverOverlay");
 	const hoverText = document.getElementById("categoryHoverText");
 	const categoryBar = document.getElementById("categoryBar");
-	const menuBtn = document.getElementById("categoryMenuBtn");
 
 	function getAreaByKey(key) {
 		return legacyAreas.find((area) => area.key === key);
@@ -89,43 +88,6 @@ window.hideCategoryHoverText = hideCategoryHoverText;
 window.setActiveCategoryByKey = setActiveCategoryByKey;
 window.clearActiveCategory = clearActiveCategory;
 
-function setCategoryMenuOpen(isOpen) {
-	document.body.classList.toggle("category-menu-open", isOpen);
-
-	if (menuBtn) {
-		menuBtn.setAttribute("aria-expanded", String(isOpen));
-	}
-}
-
-function toggleCategoryMenu(event) {
-	event.stopPropagation();
-
-	const isOpen = document.body.classList.contains("category-menu-open");
-	setCategoryMenuOpen(!isOpen);
-}
-
-function closeCategoryMenu() {
-	setCategoryMenuOpen(false);
-}
-
-function handleDocumentClick(event) {
-	if (!document.body.classList.contains("category-menu-open")) return;
-
-	const target = event.target;
-
-	if (menuBtn?.contains(target) || categoryBar?.contains(target)) return;
-
-	closeCategoryMenu();
-}
-
-function handleDocumentKeydown(event) {
-	if (event.key === "Escape") {
-		closeCategoryMenu();
-	}
-}
-
-window.closeCategoryMenu = closeCategoryMenu;
-
 	function handleCategoryClick(event) {
 		const item = event.currentTarget;
 		const key = item.dataset.key;
@@ -149,7 +111,6 @@ window.closeCategoryMenu = closeCategoryMenu;
 		});
 
 		hideCategoryHoverText();
-		closeCategoryMenu();
 	}
 
 	function handleCategoryEnter(event) {
@@ -183,23 +144,13 @@ window.closeCategoryMenu = closeCategoryMenu;
 		item.addEventListener("mouseleave", handleCategoryLeave);
 	});
 
-	menuBtn?.addEventListener("click", toggleCategoryMenu);
-	document.addEventListener("click", handleDocumentClick);
-	document.addEventListener("keydown", handleDocumentKeydown);
-
 	return () => {
 		hideCategoryHoverText();
-		closeCategoryMenu();
 
 		delete window.showCategoryHoverByKey;
 		delete window.hideCategoryHoverText;
 		delete window.setActiveCategoryByKey;
 		delete window.clearActiveCategory;
-		delete window.closeCategoryMenu;
-
-		menuBtn?.removeEventListener("click", toggleCategoryMenu);
-		document.removeEventListener("click", handleDocumentClick);
-		document.removeEventListener("keydown", handleDocumentKeydown);
 
 		categoryItems.forEach((item) => {
 			item.removeEventListener("click", handleCategoryClick);

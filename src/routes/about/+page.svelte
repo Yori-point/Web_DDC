@@ -4,6 +4,7 @@
 	import { onMount } from "svelte";
 	import * as THREE from "three";
 	import { goto } from "$app/navigation";
+	import ParticleTitle from "$lib/components/ParticleTitle.svelte";
 
 	let canvas;
 
@@ -263,6 +264,7 @@
 	];
 
 	const aboutContent = $derived(activeAbout || defaultAbout);
+	const aboutTitleVariant = $derived(activeAbout ? "about-name" : "about");
 
     async function goBackToMap(event) {
 		event.preventDefault();
@@ -647,7 +649,11 @@
 	</a>
 
 	<div class="about-copy">
-		<h1>{aboutContent.title}</h1>
+		<ParticleTitle
+			text={aboutContent.title}
+			variant={aboutTitleVariant}
+			ariaLabel={aboutContent.title}
+		/>
 
 		<div class="about-text">
 			{#each aboutContent.paragraphs as paragraph}
@@ -795,21 +801,60 @@
 		pointer-events: auto;
 	}
 
-	.about-copy h1 {
+	.about-copy :global(.particle-title--about) {
 		margin: 0 0 7vh;
+
+		width: 520px;
+		height: 150px;
+
 		font-family: var(--font-title);
-		font-size: clamp(54px, 6.4vw, 94px);
+		font-size: 112px;
 		font-weight: 400;
-		line-height: 0.86;
-		letter-spacing: -0.055em;
-		color: rgba(242, 245, 247, 0.96);
-		text-shadow:
-			0 0 18px rgba(242, 245, 247, 0.08),
-			0 0 44px rgba(169, 199, 230, 0.08);
+		line-height: 0.88;
+		letter-spacing: 0.08em;
+		text-transform: none;
+
+		--particle-title-align: left;
+		--particle-title-padding-x: 0;
+
+		--particle-title-rgb: 255,255,255;
+		--particle-title-density: 3;
+		--particle-title-radius: 82;
+		--particle-title-push: 0.42;
+		--particle-title-return: 0.09;
+		--particle-title-friction: 0.86;
+		--particle-title-dot-size: 1.02;
+		--particle-title-opacity: 1;
+	}
+
+	.about-copy :global(.particle-title--about-name) {
+		margin: 0 0 7vh;
+
+		width: 760px;
+		height: 132px;
+
+		font-family: var(--font-title);
+		font-size: 48px;
+		font-weight: 400;
+		line-height: 0.88;
+		letter-spacing: 0.05em;
+		text-transform: none;
+
+		--particle-title-align: left;
+		--particle-title-padding-x: 0;
+
+		--particle-title-rgb: 255,255,255;
+		--particle-title-density: 3;
+		--particle-title-radius: 82;
+		--particle-title-push: 0.42;
+		--particle-title-return: 0.09;
+		--particle-title-friction: 0.86;
+		--particle-title-dot-size: 0.98;
+		--particle-title-opacity: 1;
 	}
 
 	.about-text {
-		font-family: var(--font-quote);
+		font-family: var(--font-medium);
         font-weight: 400;
         font-style: italic;
         font-size: clamp(18px, 1.45vw, 25px);
@@ -947,10 +992,6 @@
 			width: min(72vw, 420px);
 			padding-left: 32px;
 			padding-top: 96px;
-		}
-
-		.about-copy h1 {
-			margin-bottom: 42px;
 		}
 
 		.about-text {
