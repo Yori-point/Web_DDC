@@ -49,3 +49,30 @@
 	visibility: hidden;
 	pointer-events: none;
 }
+
+.duomo-hover-btn {
+	position: absolute;
+	left: 0;
+	top: 0;
+
+	width: 240px;
+	height: 150px;
+	padding: 0;
+
+	border: none;
+	border-radius: 999px;
+	background: transparent;
+	box-shadow: none;
+
+	pointer-events: auto;
+	cursor: pointer;
+
+	transform: translate(-50%, -50%);
+	opacity: 0;
+}
+
+.duomo-hover-btn.is-hidden {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}

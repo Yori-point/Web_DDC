@@ -25,7 +25,6 @@ export function startAnimationLoop({
 	updateHotspotButtons,
 	updateInterviewPan,
 
-	enterSummitImmerse,
 	enterChapter,
 	easeInOutCubic,
 
@@ -114,14 +113,7 @@ export function startAnimationLoop({
 
 			camera.lookAt(orbit.target);
 
-			if (progress >= 0.52 && appState.targetChapter) {
-				enterSummitImmerse(appState.targetChapter);
-			}
-		}
-
-		if (appState.view === 'summit-immerse') {
-			const immerseElapsed = t - appState.summitImmerseStart;
-			if (immerseElapsed >= appState.summitImmerseDuration && appState.targetChapter) {
+			if (progress >= 1 && appState.targetChapter) {
 				enterChapter(appState.targetChapter);
 			}
 		}

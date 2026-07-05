@@ -7,7 +7,10 @@ export function createHotspotButtons({
 	findHookByKey,
 	onHover,
 	onLeave,
-	onSelect
+	onSelect,
+	onDuomoHover,
+	onDuomoLeave,
+	onDuomoClick
 }) {
 	if (!hotspotLayer) return [];
 
@@ -72,6 +75,27 @@ export function createHotspotButtons({
 		};
 	});
 
+		const duomoButton = document.createElement("button");
+
+		duomoButton.type = "button";
+		duomoButton.className = "duomo-hover-btn";
+		duomoButton.setAttribute("aria-label", "Duomo hover area");
+
+		duomoButton.addEventListener("pointerdown", (event) => {
+			event.stopPropagation();
+		});
+
+		duomoButton.addEventListener("pointerup", (event) => {
+			event.stopPropagation();
+		});
+
+		duomoButton.addEventListener("click", (event) => {
+			event.stopPropagation();
+			onDuomoClick?.();
+		});
+
+		hotspotLayer.appendChild(duomoButton);
+
 	return hotspotButtons;
 }
 
@@ -82,6 +106,7 @@ export function updateHotspotButtonPositions({
 	camera,
 	hookHeightByKey,
 	findHookByKey,
+	duomoObject,
 	THREE
 }) {
 	if (!hotspotLayer) return;
@@ -118,4 +143,29 @@ export function updateHotspotButtonPositions({
 		button.style.top = `${screenY}px`;
 		button.classList.toggle("is-hidden", isBehindCamera);
 	});
+
+		const duomoButton = hotspotLayer.querySelector(".duomo-hover-btn");
+
+		if (duomoButton) {
+			if (!duomoObject) {
+				duomoButton.classList.add("is-hidden");
+				return;
+			}
+
+			duomoObject.getWorldPosition(worldPosition);
+
+			// Duomo hover 区域稍微往上提一点，更贴近建筑视觉中心
+			worldPosition.y += 2.2;
+
+			worldPosition.project(camera);
+
+			const screenX = (worldPosition.x * 0.5 + 0.5) * window.innerWidth;
+			const screenY = (-worldPosition.y * 0.5 + 0.5) * window.innerHeight;
+
+			const isBehindCamera = worldPosition.z > 1;
+
+			duomoButton.style.left = `${screenX}px`;
+			duomoButton.style.top = `${screenY}px`;
+			duomoButton.classList.toggle("is-hidden", isBehindCamera);
+		}
 }

@@ -161,6 +161,7 @@ export function initScene() {
       });
     },
     onHoverCategory: (key) => {
+      clearDuomoHoverState();
       appState.hoverHookObject = findHookByKey(key);
       window.showCategoryHoverByKey?.(key);
       syncCategoryHoverUI();
@@ -215,6 +216,7 @@ export function initScene() {
 
     // 进入 overview 后，先挡住第一次鼠标移动，避免一进地图就立刻触发 hover
     overviewHoverReady: false,
+    duomoRoadsActive: false,
 
     summitPanCurrent: 0,
     summitPanTarget: 0,
@@ -388,6 +390,11 @@ const RITUAL_CAMERA = {
     terrainPhase: null,
     terrainAmp: null,
     mountainParticles: [],
+    duomoObject: null,
+    duomoParticles: [],
+    duomoGlowParticles: [],
+    mapLineParticles: [],
+    mapLineGlowParticles: [],
     snow: null,
     snowBase: null,
     snowPhase: null,
@@ -531,14 +538,68 @@ const RITUAL_CAMERA = {
     });
   }
 
+  function createParticleGlowLayer(sourcePoints, {
+    name,
+    size = 0.5,
+    opacity = 0,
+    renderOrder = 16,
+    depthTest = false
+  } = {}) {
+    if (!sourcePoints?.geometry || !sourcePoints?.material) return null;
+
+    const glowMaterial = sourcePoints.material.clone();
+
+    glowMaterial.transparent = true;
+    glowMaterial.opacity = opacity;
+    glowMaterial.size = size;
+    glowMaterial.depthWrite = false;
+    glowMaterial.depthTest = depthTest;
+    glowMaterial.blending = THREE.AdditiveBlending;
+    glowMaterial.needsUpdate = true;
+
+    const glow = new THREE.Points(sourcePoints.geometry, glowMaterial);
+
+    glow.name = name || `${sourcePoints.name}-glow`;
+    glow.renderOrder = renderOrder;
+    glow.visible = false;
+
+    glow.userData = {
+      isDuomoRoadGlow: true,
+      baseOpacity: 0,
+      baseSize: size
+    };
+
+    mapSceneGroup.add(glow);
+
+    return glow;
+  }
+
   function createDenseMapPointsFromMesh(mesh, count = 32000) {
-    return createDenseMapPointsFromMeshModule({
+    const points = createDenseMapPointsFromMeshModule({
       THREE,
       mesh,
       count,
       mapSceneGroup,
       createSoftMistTexture
     });
+
+    if (points) {
+      animatedObjects.mapLineParticles.push(points);
+
+      const glow = createParticleGlowLayer(points, {
+        name: `${points.name}-glow`,
+        size: 0.36,
+        opacity: 0,
+        renderOrder: 13,
+        depthTest: false
+      });
+
+      if (glow) {
+        animatedObjects.mapLineGlowParticles.push(glow);
+      }
+    }
+
+    return points;
   }
 
   function createTerrainBaseParticlesFromMesh(mesh, count = 90000) {
@@ -552,14 +613,204 @@ const RITUAL_CAMERA = {
   }
 
   function createDuomoParticlesFromMesh(mesh, count = 18000) {
-    return createDuomoParticlesFromMeshModule({
+    const points = createDuomoParticlesFromMeshModule({
       THREE,
       mesh,
       count,
       mapSceneGroup,
       createSoftMistTexture
     });
+
+    if (points) {
+      animatedObjects.duomoParticles.push(points);
+
+      const glow = createParticleGlowLayer(points, {
+        name: `${points.name}-glow`,
+        size: 0.68,
+        opacity: 0,
+        renderOrder: 41,
+        depthTest: false
+      });
+
+      if (glow) {
+        animatedObjects.duomoGlowParticles.push(glow);
+      }
+    }
+
+    return points;
   }
+
+  function registerDuomoObject(object) {
+    animatedObjects.duomoObject = object;
+  }
+
+  const DUOMO_HOVER_TEXT = "Da qui, le memorie iniziano a muoversi.";
+
+  let duomoHoverHideTimer = null;
+
+  function cancelDuomoHoverHideTimer() {
+    if (duomoHoverHideTimer) {
+      window.clearTimeout(duomoHoverHideTimer);
+      duomoHoverHideTimer = null;
+    }
+  }
+
+  function showDuomoHoverText() {
+    if (appState.view !== "overview") return;
+
+    cancelDuomoHoverHideTimer();
+
+    appState.hoverHookObject = null;
+
+    const textEl = document.querySelector(".category-hover-text");
+
+    if (textEl) {
+      textEl.textContent = DUOMO_HOVER_TEXT;
+    }
+
+    document.body.classList.add("category-hover-active");
+    document.body.classList.add("duomo-hover-active");
+
+    syncCategoryHoverUI();
+
+    appState.overviewPointerTargetX = 0;
+    appState.overviewPointerTargetY = 0;
+  }
+
+  function hideDuomoHoverText() {
+    cancelDuomoHoverHideTimer();
+
+    duomoHoverHideTimer = window.setTimeout(() => {
+      document.body.classList.remove("duomo-hover-active");
+      window.hideCategoryHoverText?.();
+      document.body.classList.remove("category-hover-active");
+
+      syncCategoryHoverUI();
+
+      duomoHoverHideTimer = null;
+    }, 120);
+  }
+
+  function clearDuomoHoverState() {
+    cancelDuomoHoverHideTimer();
+    document.body.classList.remove("duomo-hover-active");
+  }
+
+  function setDuomoRoadsActive(active) {
+    appState.duomoRoadsActive = active;
+    document.body.classList.toggle("duomo-roads-active", active);
+  }
+
+  function toggleDuomoRoadsActive() {
+    setDuomoRoadsActive(!appState.duomoRoadsActive);
+  }
+
+  function animateDuomoRoadsHighlight(t) {
+    const active = appState.view === "overview" && appState.duomoRoadsActive;
+
+    const pulse = active
+      ? 0.5 + 0.5 * Math.sin(t * 1.35)
+      : 0;
+
+    // 1. 原始道路：active 时稍微压暗，不要让白线抢过山体
+    animatedObjects.mapLineParticles.forEach((points) => {
+      if (!points?.material) return;
+
+      const baseOpacity = points.userData?.baseOpacity ?? 0.82;
+      const baseSize = points.userData?.baseSize ?? 0.18;
+
+      const targetOpacity = active ? baseOpacity * 0.55 : baseOpacity;
+      const targetSize = baseSize;
+
+      points.material.opacity = THREE.MathUtils.lerp(
+        points.material.opacity,
+        targetOpacity,
+        0.08
+      );
+
+      points.material.size = THREE.MathUtils.lerp(
+        points.material.size,
+        targetSize,
+        0.08
+      );
+
+      points.renderOrder = active ? 12 : 30;
+    });
+
+    // 2. 道路 glow：只是一层淡淡的光，不要变成白色主线
+    animatedObjects.mapLineGlowParticles.forEach((glow) => {
+      if (!glow?.material) return;
+
+      const targetOpacity = active ? 0.11 + pulse * 0.03 : 0;
+      const targetSize = active ? 0.38 + pulse * 0.04 : 0.34;
+
+      glow.visible = active || glow.material.opacity > 0.01;
+
+      glow.material.opacity = THREE.MathUtils.lerp(
+        glow.material.opacity,
+        targetOpacity,
+        0.1
+      );
+
+      glow.material.size = THREE.MathUtils.lerp(
+        glow.material.size,
+        targetSize,
+        0.1
+      );
+
+      glow.renderOrder = 13;
+    });
+
+    // 3. Duomo 本体：稍微亮一点，但不要糊成一块白
+    animatedObjects.duomoParticles.forEach((points) => {
+      if (!points?.material) return;
+
+      const baseOpacity = points.userData?.baseOpacity ?? 0.95;
+      const baseSize = points.userData?.baseSize ?? 0.32;
+
+      const targetOpacity = active ? 1.0 : baseOpacity;
+      const targetSize = active ? baseSize * 1.04 : baseSize;
+
+      points.material.opacity = THREE.MathUtils.lerp(
+        points.material.opacity,
+        targetOpacity,
+        0.08
+      );
+
+      points.material.size = THREE.MathUtils.lerp(
+        points.material.size,
+        targetSize,
+        0.08
+      );
+
+      points.renderOrder = active ? 42 : 32;
+    });
+
+    // 4. Duomo glow：保留点击反馈，但压低强度
+    animatedObjects.duomoGlowParticles.forEach((glow) => {
+      if (!glow?.material) return;
+
+      const targetOpacity = active ? 0.28 + pulse * 0.06 : 0;
+      const targetSize = active ? 0.82 + pulse * 0.06 : 0.68;
+
+      glow.visible = active || glow.material.opacity > 0.01;
+
+      glow.material.opacity = THREE.MathUtils.lerp(
+        glow.material.opacity,
+        targetOpacity,
+        0.1
+      );
+
+      glow.material.size = THREE.MathUtils.lerp(
+        glow.material.size,
+        targetSize,
+        0.1
+      );
+
+      glow.renderOrder = 41;
+    });
+  }
+
 
   function createMountainParticlesFromMesh(mesh, count = 18000, categoryKey = null) {
     return createMountainParticlesFromMeshModule({
@@ -588,6 +839,7 @@ const RITUAL_CAMERA = {
       onCreateDenseMapPointsFromMesh: createDenseMapPointsFromMesh,
       onCreateTerrainBaseParticlesFromMesh: createTerrainBaseParticlesFromMesh,
       onCreateDuomoParticlesFromMesh: createDuomoParticlesFromMesh,
+      onRegisterDuomoObject: registerDuomoObject,
       getKeyFromName
     });
   }
@@ -627,300 +879,6 @@ const RITUAL_CAMERA = {
 
   const INTERVIEWS_BY_CATEGORY = createInterviewsByCategory(CHAPTERS);
 
-  const SUMMIT_TITLE_LABELS = {
-    festa: "Celebrazioni",
-    opportunita: "Opportunità",
-    trasformazione: "Cambiamento",
-    criticita: "Problemi",
-    relazioni: "Relazioni"
-  };
-
-  const summitTitleParticles = {
-    canvas: null,
-    ctx: null,
-    text: "",
-    particles: [],
-    mouseX: -9999,
-    mouseY: -9999,
-    active: false,
-    raf: null,
-    dpr: 1,
-    sprite: null
-  };
-
-  function getSummitDisplayTitle(chapter) {
-    return SUMMIT_TITLE_LABELS[chapter.key] || chapter.title || chapter.key || "";
-  }
-
-  function createSummitTitleParticleSprite() {
-    const sprite = document.createElement("canvas");
-    sprite.width = 64;
-    sprite.height = 64;
-
-    const ctx = sprite.getContext("2d");
-    if (!ctx) return null;
-
-    const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-
-    gradient.addColorStop(0.0, "rgba(242,245,247,0.82)");
-    gradient.addColorStop(0.22, "rgba(210,226,238,0.36)");
-    gradient.addColorStop(0.52, "rgba(170,198,220,0.10)");
-    gradient.addColorStop(1.0, "rgba(170,198,220,0)");
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 64, 64);
-
-    return sprite;
-  }
-
-  function randSpread(value) {
-    return (Math.random() - 0.5) * value;
-  }
-
-  function setupSummitParticleTitle(text) {
-    const canvas = document.getElementById("summitTitleCanvas");
-    const title = document.getElementById("summitTitleText");
-
-    if (!canvas || !title) return;
-
-    title.textContent = text;
-    title.dataset.text = text;
-
-    const rect = canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    canvas.width = Math.floor(rect.width * dpr);
-    canvas.height = Math.floor(rect.height * dpr);
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    summitTitleParticles.canvas = canvas;
-    summitTitleParticles.ctx = ctx;
-    summitTitleParticles.text = text;
-    summitTitleParticles.particles = [];
-    summitTitleParticles.dpr = dpr;
-    summitTitleParticles.sprite = null;
-
-    const offscreen = document.createElement("canvas");
-    offscreen.width = canvas.width;
-    offscreen.height = canvas.height;
-
-    const offCtx = offscreen.getContext("2d");
-    if (!offCtx) return;
-
-    const fontSize = Math.min(canvas.width * 0.12, canvas.height * 0.54);
-
-    offCtx.clearRect(0, 0, offscreen.width, offscreen.height);
-    offCtx.fillStyle = "white";
-    offCtx.textAlign = "center";
-    offCtx.textBaseline = "middle";
-
-    // 如果你的 @font-face 名字叫 Americana，就把 Americano 改成 Americana
-    offCtx.font = `400 ${fontSize}px Americano, sans-serif`;
-
-    if ("letterSpacing" in offCtx) {
-      offCtx.letterSpacing = "0.085em";
-    }
-
-    offCtx.fillText(
-      text.toUpperCase(),
-      offscreen.width / 2,
-      offscreen.height / 2
-    );
-
-    const imageData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height);
-    const data = imageData.data;
-
-    const candidates = [];
-    const scanGap = Math.max(2, Math.floor(1.8 * dpr));
-
-    for (let y = 0; y < offscreen.height; y += scanGap) {
-      for (let x = 0; x < offscreen.width; x += scanGap) {
-        const index = (y * offscreen.width + x) * 4;
-        const alpha = data[index + 3];
-
-        if (alpha > 55) {
-          candidates.push({ x, y, alpha });
-        }
-      }
-    }
-
-    const particleCount = Math.min(15000, candidates.length);
-
-    for (let i = 0; i < particleCount; i++) {
-      const point = candidates[Math.floor(Math.random() * candidates.length)];
-      if (!point) continue;
-
-      const baseX = point.x + randSpread(scanGap * 0.25);
-      const baseY = point.y + randSpread(scanGap * 0.25);
-
-      summitTitleParticles.particles.push({
-        x: baseX + randSpread(1.2 * dpr),
-        y: baseY + randSpread(1.0 * dpr),
-        baseX,
-        baseY,
-        vx: 0,
-        vy: 0,
-        radius: (Math.random() * 0.75 + 0.65) * dpr,
-        alpha: (point.alpha / 255) * (Math.random() * 0.18 + 0.62),
-        phase: Math.random() * Math.PI * 2
-      });
-    }
-  }
-
-  function animateSummitParticleTitle() {
-    const state = summitTitleParticles;
-    const { canvas, ctx, sprite } = state;
-
-    if (!canvas || !ctx || !state.active) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.globalCompositeOperation = "source-over";
-
-    const time = performance.now() * 0.001;
-    const repelRadius = 86 * state.dpr;
-    const repelStrength = 2.7 * state.dpr;
-
-    state.particles.forEach((p) => {
-      const dx = p.x - state.mouseX;
-      const dy = p.y - state.mouseY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist < repelRadius) {
-        const force = Math.pow(1 - dist / repelRadius, 1.8) * repelStrength;
-        const angle = Math.atan2(dy, dx);
-
-        p.vx += Math.cos(angle) * force;
-        p.vy += Math.sin(angle) * force;
-      }
-
-      const floatX = Math.sin(time * 0.55 + p.phase) * 0.24 * state.dpr;
-      const floatY = Math.cos(time * 0.48 + p.phase) * 0.22 * state.dpr;
-
-      p.vx += (p.baseX + floatX - p.x) * 0.014;
-      p.vy += (p.baseY + floatY - p.y) * 0.014;
-
-      p.vx *= 0.88;
-      p.vy *= 0.88;
-
-      p.x += p.vx;
-      p.y += p.vy;
-
-      const movement = Math.min(Math.abs(p.vx) + Math.abs(p.vy), 7) / 7;
-      const radius = p.radius * (1 + movement * 0.12);
-      const alpha = Math.min(1, p.alpha + movement * 0.08);
-
-      ctx.globalAlpha = alpha;
-
-      if (sprite) {
-        ctx.drawImage(
-          sprite,
-          p.x - radius,
-          p.y - radius,
-          radius * 2,
-          radius * 2
-        );
-      } else {
-        ctx.beginPath();
-        ctx.fillStyle = "rgba(242,245,247,0.95)";
-        ctx.arc(p.x, p.y, radius * 0.85, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    });
-
-    ctx.globalAlpha = 1;
-    ctx.globalCompositeOperation = "source-over";
-
-    state.raf = requestAnimationFrame(animateSummitParticleTitle);
-  }
-
-  function startSummitParticleTitle() {
-    if (summitTitleParticles.raf) {
-      cancelAnimationFrame(summitTitleParticles.raf);
-    }
-
-    summitTitleParticles.active = true;
-    animateSummitParticleTitle();
-  }
-
-  function stopSummitParticleTitle() {
-    summitTitleParticles.active = false;
-
-    if (summitTitleParticles.raf) {
-      cancelAnimationFrame(summitTitleParticles.raf);
-      summitTitleParticles.raf = null;
-    }
-
-    const { canvas, ctx } = summitTitleParticles;
-    if (canvas && ctx) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-  }
-
-  function updateSummitTitleParticlesPointer(event) {
-    const canvas = summitTitleParticles.canvas;
-    if (!canvas || !summitTitleParticles.active) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const dpr = summitTitleParticles.dpr || 1;
-
-    summitTitleParticles.mouseX = (event.clientX - rect.left) * dpr;
-    summitTitleParticles.mouseY = (event.clientY - rect.top) * dpr;
-  }
-
-  function resetSummitTitleParticlesPointer() {
-    summitTitleParticles.mouseX = -9999;
-    summitTitleParticles.mouseY = -9999;
-  }
-
-  function showSummitTitle(chapter) {
-    const overlay = document.getElementById("summitTitleOverlay");
-    const title = document.getElementById("summitTitleText");
-
-    if (!overlay || !title) return;
-
-    const displayTitle = getSummitDisplayTitle(chapter);
-
-    setupSummitParticleTitle(displayTitle);
-    startSummitParticleTitle();
-
-    overlay.classList.remove("hidden");
-    overlay.setAttribute("aria-hidden", "false");
-
-    document.body.classList.add("chapter-active");
-    document.body.classList.add("summit-title-active");
-    document.body.classList.remove("chapter-nodes-active");
-    document.body.classList.remove("chapter-nodes-preenter");
-  }
-
-  function hideSummitTitle() {
-    const overlay = document.getElementById("summitTitleOverlay");
-
-    stopSummitParticleTitle();
-    resetSummitTitleParticlesPointer();
-
-    overlay?.classList.add("hidden");
-    overlay?.setAttribute("aria-hidden", "true");
-
-    document.body.classList.remove("summit-title-active");
-  }
-
-  function clearSummitEntranceState() {
-    hideSummitTitle();
-
-    document.body.classList.remove("summit-title-active");
-    document.body.classList.remove("chapter-nodes-active");
-    document.body.classList.remove("chapter-nodes-preenter");
-
-    const interviewNodes = document.getElementById("interviewNodes");
-    if (interviewNodes) {
-      interviewNodes.innerHTML = "";
-    }
-
-    document.querySelector(".chapter-media-map")?.classList.remove("has-open");
-  }
-
   const exploredByCategory = {
     festa: new Set(),
     opportunita: new Set(),
@@ -936,6 +894,7 @@ const RITUAL_CAMERA = {
     appState.view = 'transition';
     appState.transitionStart = clock.getElapsedTime();
     appState.transitionDuration = 2.2;
+    setDuomoRoadsActive(false);
     appState.hoverHookObject = null;
     window.hideCategoryHoverText?.();
     document.body.classList.remove("category-hover-active");
@@ -1065,6 +1024,7 @@ const RITUAL_CAMERA = {
 
   function focusChapterScene(activeKey) {
     mapSceneGroup.traverse((obj) => {
+      if (obj.userData?.isDuomoRoadGlow) return;
       const material = obj.material;
       if (!material) return;
 
@@ -1174,41 +1134,19 @@ const RITUAL_CAMERA = {
     });
   }
 
-  function enterSummitImmerse(chapter) {
-    appState.view = 'summit-immerse';
-    appState.summitImmerseStart = clock.getElapsedTime();
-
-    mapSceneGroup.visible = false;
-
-    if (animatedObjects.summitScene) {
-      animatedObjects.summitScene.visible = true;
-    }
-  }
-
   function enterChapter(chapter) {
-    appState.view = "summit-title";
+    appState.view = "chapter-pending";
 
     document.body.classList.add("chapter-active");
     document.body.classList.remove("chapter-nodes-active");
     document.body.classList.remove("chapter-nodes-preenter");
+    document.body.classList.remove("summit-title-active");
 
-    // Hide the original map. Keep the GLB summit scene as the background.
     mapSceneGroup.visible = false;
 
     if (animatedObjects.summitScene) {
       animatedObjects.summitScene.visible = true;
     }
-
-    console.log("SUMMIT TITLE DEBUG", {
-      sceneVisible: animatedObjects.summitScene?.visible,
-      modelReady: animatedObjects.summitModelReady,
-      modelVisible: animatedObjects.summitModelRoot?.visible,
-      materialCount: animatedObjects.summitModelMaterials?.length || 0,
-      groupPosition: animatedObjects.summitScene?.position?.toArray(),
-      cameraPosition: camera.position.toArray(),
-      cameraEnd: appState.cameraEnd?.toArray?.() || null,
-      targetEnd: appState.targetEnd?.toArray?.() || null
-    });
 
     if (animatedObjects.chapterCloud) {
       animatedObjects.chapterCloud.visible = false;
@@ -1223,10 +1161,14 @@ const RITUAL_CAMERA = {
       interviewNodes.innerHTML = "";
     }
 
-    showSummitTitle(chapter);
     updateCategoryProgress();
 
     document.body.classList.remove("is-transitioning");
+
+    window.setTimeout(() => {
+      if (appState.view !== "chapter-pending") return;
+      enterChapterNodes();
+    }, 520);
   }
 
   function enterChapterNodes() {
@@ -1238,10 +1180,8 @@ const RITUAL_CAMERA = {
     appState.summitPanCurrent = 0;
     appState.summitPanTarget = 0;
 
-    hideSummitTitle();
-
     document.body.classList.add("chapter-active");
-    document.body.classList.add("chapter-nodes-preenter");
+    document.body.classList.remove("chapter-nodes-preenter");
     document.body.classList.remove("chapter-nodes-active");
 
     document.querySelector(".chapter-media-map")?.classList.remove("has-open");
@@ -1259,10 +1199,7 @@ const RITUAL_CAMERA = {
     mediaMap?.getBoundingClientRect();
 
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.body.classList.add("chapter-nodes-active");
-        document.body.classList.remove("chapter-nodes-preenter");
-      });
+      document.body.classList.add("chapter-nodes-active");
     });
   }
 
@@ -1314,7 +1251,15 @@ const RITUAL_CAMERA = {
 
     hideChapterContainer();
     clearChapterState();
-    clearSummitEntranceState();
+
+    document.body.classList.remove("summit-title-active");
+    document.body.classList.remove("chapter-nodes-active");
+    document.body.classList.remove("chapter-nodes-preenter");
+
+    const interviewNodes = document.getElementById("interviewNodes");
+    if (interviewNodes) {
+      interviewNodes.innerHTML = "";
+    }
 
     window.hideCategoryHoverText?.();
     syncCategoryHoverUI();
@@ -1544,6 +1489,7 @@ const RITUAL_CAMERA = {
       findHookByKey,
       onHover: (key) => {
         if (!appState.overviewHoverReady) return;
+        clearDuomoHoverState();
 
         appState.hoverHookObject = findHookByKey(key);
         window.showCategoryHoverByKey?.(key);
@@ -1552,6 +1498,7 @@ const RITUAL_CAMERA = {
       onLeave: () => {
         appState.hoverHookObject = null;
         window.hideCategoryHoverText?.();
+        document.body.classList.remove("duomo-hover-active");
         syncCategoryHoverUI();
       },
       onSelect: (area) => {
@@ -1568,6 +1515,18 @@ const RITUAL_CAMERA = {
           text: area.text,
           pos
         });
+      },
+      onDuomoHover: () => {
+        appState.overviewHoverReady = true;
+        showDuomoHoverText();
+      },
+      onDuomoLeave: () => {
+        hideDuomoHoverText();
+      },
+      onDuomoClick: () => {
+        appState.overviewHoverReady = true;
+        toggleDuomoRoadsActive();
+        showDuomoHoverText();
       }
     });
   }
@@ -1580,6 +1539,7 @@ const RITUAL_CAMERA = {
       camera,
       hookHeightByKey,
       findHookByKey,
+      duomoObject: animatedObjects.duomoObject,
       THREE
     });
 
@@ -1596,20 +1556,6 @@ const RITUAL_CAMERA = {
   updateCategoryProgress();
 
   window.addEventListener('pointermove', e => {
-    if (appState.view === "summit-title") {
-      updateSummitTitleParticlesPointer(e);
-    }
-
-    emitCursorSnowTrail({
-      THREE,
-      camera,
-      animatedObjects,
-      event: e
-    });
-
-	window.addEventListener("pointerleave", () => {
-    resetSummitTitleParticlesPointer();
-  });
 
     emitCursorSnowTrail({
       THREE,
@@ -1632,8 +1578,42 @@ const RITUAL_CAMERA = {
 
     const isOverHotspot = e.target.closest && e.target.closest('.hotspot-btn');
     const isOverCategory = e.target.closest && e.target.closest('.category-item');
+    const isOverDuomo = e.target.closest && e.target.closest('.duomo-hover-btn');
 
     if (isOverCategory) {
+      appState.overviewPointerTargetX = 0;
+      appState.overviewPointerTargetY = 0;
+      return;
+    }
+
+    if (isOverDuomo) {
+      appState.overviewHoverReady = true;
+      showDuomoHoverText();
+
+      appState.overviewPointerTargetX = 0;
+      appState.overviewPointerTargetY = 0;
+      return;
+    }
+
+    // 刚进入 overview 后，第一次鼠标移动只用来“激活 hover”，不显示效果。
+    // 第二次移动才真正显示 hover。
+    if (!appState.overviewHoverReady && !isOverCategory) {
+      appState.overviewHoverReady = true;
+
+      appState.hoverHookObject = null;
+      window.hideCategoryHoverText?.();
+      document.body.classList.remove("category-hover-active");
+      syncCategoryHoverUI();
+
+      appState.overviewPointerTargetX = 0;
+      appState.overviewPointerTargetY = 0;
+      return;
+    }
+
+    if (isOverDuomo) {
+      appState.overviewHoverReady = true;
+      showDuomoHoverText();
+
       appState.overviewPointerTargetX = 0;
       appState.overviewPointerTargetY = 0;
       return;
@@ -1674,6 +1654,7 @@ const RITUAL_CAMERA = {
 
     if (pickedHook) {
       const key = pickedHook.userData.key;
+      clearDuomoHoverState();
 
       appState.hoverHookObject = pickedHook;
       window.showCategoryHoverByKey?.(key);
@@ -1686,6 +1667,7 @@ const RITUAL_CAMERA = {
       appState.hoverHookObject = null;
       window.hideCategoryHoverText?.();
       document.body.classList.remove("category-hover-active");
+      document.body.classList.remove("duomo-hover-active");
       syncCategoryHoverUI();
     }
 
@@ -1726,9 +1708,10 @@ const RITUAL_CAMERA = {
   window.addEventListener('click', event => {
     if (appState.view !== 'overview') return;
 
-    // 点 DOM hotspot 时已经有自己的 click，不要重复触发
     const isOverHotspot = event.target.closest && event.target.closest('.hotspot-btn');
-    if (isOverHotspot) return;
+    const isOverDuomo = event.target.closest && event.target.closest('.duomo-hover-btn');
+
+    if (isOverHotspot || isOverDuomo) return;
 
     const pickedHook = pickMountainByPointer(event);
     if (!pickedHook) return;
@@ -1801,14 +1784,6 @@ const RITUAL_CAMERA = {
 
       return;
     }
-
-    	if (appState.view === "summit-title") {
-        if (e.deltaY > 0) {
-          enterChapterNodes();
-        }
-
-        return;
-      }
 
     if (appState.view === 'overview') {
       return;
@@ -2104,6 +2079,8 @@ const RITUAL_CAMERA = {
         line.material.opacity = 0.38 + Math.sin(t * 0.72 + index * 0.65) * 0.07;
       }
     });
+
+    animateDuomoRoadsHighlight(t);
   }
 
   function animateRitualSnow(t) {
@@ -2140,7 +2117,6 @@ const RITUAL_CAMERA = {
     updateHotspotButtons,
     updateInterviewPan,
 
-    enterSummitImmerse,
     enterChapter,
     easeInOutCubic,
 

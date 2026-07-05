@@ -2,6 +2,10 @@
 	<p id="categoryHoverText" class="category-hover-text"></p>
 </div>
 
+<div class="corner-copyright" aria-hidden="true">
+	<div>© 2026 TRACCE</div>
+</div>
+
 <div id="categoryBar" class="category-bar">
 	<button
 		class="category-item"

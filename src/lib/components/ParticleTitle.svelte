@@ -39,7 +39,12 @@
 		friction: 0.86,
 		dotSize: 0.95,
 		opacity: 0.95,
-		density: 3
+		density: 3,
+
+        cursorRadius: 92,
+        cursorPush: 1.35,
+        ringOpacity: 0.72,
+        ringWidth: 1.4
 	};
 
 	function readNumber(value, fallback) {
@@ -171,7 +176,12 @@
 			returnForce: readStyleNumber(style, "--particle-title-return", 0.09),
 			friction: readStyleNumber(style, "--particle-title-friction", 0.86),
 			dotSize: readStyleNumber(style, "--particle-title-dot-size", 0.95),
-			opacity: readStyleNumber(style, "--particle-title-opacity", 0.95)
+			opacity: readStyleNumber(style, "--particle-title-opacity", 0.95),
+
+            cursorRadius: readStyleNumber(style, "--particle-title-cursor-radius", 92),
+            cursorPush: readStyleNumber(style, "--particle-title-cursor-push", 1.35),
+            ringOpacity: readStyleNumber(style, "--particle-title-ring-opacity", 0.72),
+            ringWidth: readStyleNumber(style, "--particle-title-ring-width", 1.4)
 		};
 
 		await waitForFont(style);
@@ -242,13 +252,15 @@
 				const dx = p.x - pointer.x;
 				const dy = p.y - pointer.y;
 				const distance = Math.sqrt(dx * dx + dy * dy);
-				const radius = settings.radius;
+				const radius = settings.cursorRadius;
 
 				if (distance < radius && distance > 0.001) {
-					const force = (1 - distance / radius) * settings.push;
+					const force =
+                        Math.pow(1 - distance / radius, 2) *
+                        settings.cursorPush;
 
-					p.vx += (dx / distance) * force;
-					p.vy += (dy / distance) * force;
+                    p.vx += (dx / distance) * force;
+                    p.vy += (dy / distance) * force;
 				}
 			}
 

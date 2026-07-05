@@ -825,6 +825,10 @@
 		--particle-title-friction: 0.86;
 		--particle-title-dot-size: 1.02;
 		--particle-title-opacity: 1;
+		--particle-title-cursor-radius: 96;
+		--particle-title-cursor-push: 1.35;
+		--particle-title-ring-opacity: 0.72;
+		--particle-title-ring-width: 1.4;
 	}
 
 	.about-copy :global(.particle-title--about-name) {
@@ -851,6 +855,10 @@
 		--particle-title-friction: 0.86;
 		--particle-title-dot-size: 0.98;
 		--particle-title-opacity: 1;
+		--particle-title-cursor-radius: 96;
+		--particle-title-cursor-push: 1.35;
+		--particle-title-ring-opacity: 0.72;
+		--particle-title-ring-width: 1.4;
 	}
 
 	.about-text {

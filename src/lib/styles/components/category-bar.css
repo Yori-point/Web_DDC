@@ -16,7 +16,7 @@
 .category-hover-text {
 	position: absolute;
 	left: 50%;
-	top: 52%;
+	top: 50%;
 	transform: translate(-50%, -50%);
 
 	width: min(640px, calc(100vw - 64px));
@@ -302,4 +302,56 @@ body.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):
 /* No hamburger menu */
 .category-menu-btn {
 	display: none !important;
+}
+
+.corner-copyright {
+	position: fixed;
+	left: var(--ui-padding-x);
+	bottom: var(--ui-bottom-icon-offset);
+
+	height: var(--icon-button-size);
+
+	z-index: 96;
+	pointer-events: none;
+
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+
+	font-family: var(--font-medium);
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 1;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+
+	color: rgba(255, 255, 255, 0.46);
+
+	-webkit-font-smoothing: antialiased;
+	font-synthesis: none;
+
+	opacity: 0;
+	visibility: hidden;
+
+	transition:
+		opacity 0.35s ease,
+		visibility 0.35s ease;
+}
+
+/* show copyright on map and interview nodes */
+body.overview-active:not(.intro-active):not(.ritual-active):not(.is-transitioning):not(.media-detail-open) .corner-copyright,
+body.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning):not(.media-detail-open) .corner-copyright {
+	opacity: 1 !important;
+	visibility: visible !important;
+}
+
+/* hide copyright in hidden UI states */
+body.intro-active .corner-copyright,
+body.ritual-active .corner-copyright,
+body.is-transitioning .corner-copyright,
+body.media-detail-open .corner-copyright,
+body.chapter-active.summit-title-active .corner-copyright,
+body.chapter-active.chapter-nodes-preenter .corner-copyright {
+	opacity: 0 !important;
+	visibility: hidden !important;
 }

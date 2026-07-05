@@ -13,6 +13,7 @@ export function loadUnifiedMapModel({
 	onCreateDenseMapPointsFromMesh,
 	onCreateTerrainBaseParticlesFromMesh,
 	onCreateDuomoParticlesFromMesh,
+	onRegisterDuomoObject,
 	getKeyFromName
 }) {
 	const loader = new GLTFLoader();
@@ -139,6 +140,7 @@ export function loadUnifiedMapModel({
 						Math.max(16000, Math.floor(vertexCount * 10))
 					);
 
+					onRegisterDuomoObject?.(child);
 					onCreateDuomoParticlesFromMesh?.(child, duomoPointCount);
 
 					child.visible = false;

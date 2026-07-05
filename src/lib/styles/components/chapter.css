@@ -190,131 +190,6 @@
 	visibility: hidden;
 }
 
-/* =========================
-   Summit title entrance
-   ========================= */
-
-.summit-title-overlay {
-	position: fixed;
-	inset: 0;
-	z-index: 29;
-	pointer-events: none;
-
-	opacity: 1;
-	visibility: visible;
-
-	transition:
-		opacity 0.75s ease,
-		visibility 0.75s ease;
-}
-
-.summit-title-overlay.hidden {
-	opacity: 0;
-	visibility: hidden;
-}
-
-.summit-title-text {
-	position: absolute;
-	right: 8.5vw;
-	top: 40vh;
-
-	margin: 0;
-
-	font-family: "Americano", var(--font-primary);
-	font-size: clamp(48px, 7.2vw, 112px);
-	font-weight: 400;
-	line-height: 0.92;
-	letter-spacing: 0.09em;
-	text-transform: uppercase;
-
-	color: transparent;
-	text-shadow: none;
-	z-index: 1;
-
-	opacity: 0;
-	pointer-events: none;
-
-	width: max-content;
-	white-space: nowrap;
-}
-
-body.summit-title-active .summit-title-text {
-	opacity: 1;
-	transform: translateY(0);
-	filter: blur(0);
-}
-
-.summit-title-canvas {
-	position: absolute;
-	right: 8.5vw;
-	top: 40vh;
-
-	width: min(74vw, 920px);
-	height: 150px;
-
-	pointer-events: auto;
-	background: transparent !important;
-
-	opacity: 0;
-
-	mix-blend-mode: normal;
-
-	transition: opacity 0.9s ease;
-
-	z-index: 1;
-}
-
-body.summit-title-active .summit-title-canvas {
-	opacity: 1;
-}
-
-.summit-scroll-hint {
-	position: fixed;
-	left: 50%;
-	bottom: 72px;
-	transform: translateX(-50%);
-
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 8px;
-
-	font-family: var(--font-primary);
-	font-size: 11px;
-	font-weight: 400;
-	letter-spacing: 0.26em;
-	text-transform: uppercase;
-
-	color: rgba(242, 231, 218, 0.48);
-
-	opacity: 0;
-	transition: opacity 0.75s ease 0.35s;
-}
-
-body.summit-title-active .summit-scroll-hint {
-	opacity: 1;
-}
-
-.summit-scroll-arrow {
-	font-size: 18px;
-	line-height: 1;
-	opacity: 0.56;
-	animation: summit-scroll-arrow-float 1.55s ease-in-out infinite;
-}
-
-@keyframes summit-scroll-arrow-float {
-	0%,
-	100% {
-		transform: translateY(0);
-		opacity: 0.42;
-	}
-
-	50% {
-		transform: translateY(6px);
-		opacity: 0.8;
-	}
-}
-
 .chapter-media-map {
 	position: absolute;
 	inset: 0;
@@ -323,33 +198,15 @@ body.summit-title-active .summit-scroll-hint {
 	opacity: 0;
 	pointer-events: none;
 
-	transform: translate3d(0, -56vh, 0);
-	will-change: transform, opacity;
+	transform: translate3d(0, 0, 0);
+	will-change: opacity;
+	transition: opacity 0.7s ease;
 }
 
-/* title 阶段：nodes 保持在画面上方，不显示 */
-body.chapter-active.summit-title-active .chapter-media-map {
-	opacity: 0;
-	pointer-events: none;
-	transform: translate3d(0, -56vh, 0);
-}
-
-/* nodes 刚 render 出来时：先放在上面 */
-body.chapter-active.chapter-nodes-preenter .chapter-media-map {
-	opacity: 0;
-	pointer-events: none;
-	transform: translate3d(0, -56vh, 0); /* 掉落高度 */
-}
-
-/* nodes active：从上面掉下来 */
 body.chapter-active.chapter-nodes-active .chapter-media-map {
 	opacity: 1;
 	pointer-events: auto;
 	transform: translate3d(0, 0, 0);
-
-	transition:
-		transform 0.7s cubic-bezier(0.16, 0.88, 0.2, 1), /* 速度 */
-		opacity 0.72s ease;
 }
 
 body.summit-title-active .summit-title-text {
