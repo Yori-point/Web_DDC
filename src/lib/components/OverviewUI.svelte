@@ -1,13 +1,17 @@
 <script>
-	function returnToIntro() {
-		window.dispatchEvent(new CustomEvent("tracce:return-intro"));
+	function returnToMap() {
+		const backButton = document.getElementById("backToMap");
+
+		if (backButton) {
+			backButton.click();
+		}
 	}
 </script>
 
 <div class="ui top-left">
 	<div class="kicker">MILANO CORTINA 2026 / LEGACY OLIMPICHE</div>
 
-	<button class="brand-link" type="button" onclick={returnToIntro}>
+	<button class="brand-link" type="button" onclick={returnToMap}>
 		<h1>Tracce</h1>
 	</button>
 

@@ -3,7 +3,9 @@
 </script>
 
 <div id="chapterContainer" class="chapter-container hidden">
-	<button id="backToMap" class="chapter-back" type="button" aria-label="Back to map"></button>
+	<button id="backToMap" class="chapter-back" type="button" aria-label="Back to map">
+		Tracce
+	</button>
 
 	<div id="chapterHoverIntro" class="chapter-hover-intro" aria-hidden="true">
 		<div id="chapterHoverTitle" class="chapter-hover-title"></div>

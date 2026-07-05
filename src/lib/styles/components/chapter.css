@@ -20,24 +20,29 @@
 	all: unset;
 	position: absolute;
 	left: var(--ui-padding-x);
-	top: calc((var(--ui-header-height) - 28px) / 2);
+	top: 0;
+	height: var(--ui-header-height);
 	z-index: 30;
-
-	width: 28px;
-	height: 28px;
 
 	display: flex;
 	align-items: center;
-	justify-content: center;
 
 	cursor: pointer;
 	pointer-events: auto;
 
-	opacity: 1;
+	font-family: var(--font-title);
+	font-size: 32px;
+	line-height: 0.9;
+	font-weight: 300;
+	letter-spacing: 0.08em;
+	text-transform: none;
 
-	transition:
-		opacity 0.25s ease,
-		transform 0.25s ease;
+	color: #f2f5f7;
+	opacity: 1;
+	text-shadow: 0 0 22px rgba(242, 245, 247, 0.06);
+
+	-webkit-font-smoothing: antialiased;
+	font-synthesis: none;
 
 	background: transparent !important;
 	box-shadow: none !important;
@@ -45,54 +50,32 @@
 	outline: none;
 	-webkit-appearance: none;
 	appearance: none;
+
+	transition:
+		opacity 0.25s ease,
+		text-shadow 0.25s ease;
 }
 
-.chapter-back::before {
-	content: "";
-	position: absolute;
-	left: 3px;
-	width: 24px;
-	height: 2px;
-	background: rgba(242, 245, 247, 0.60);
-	border-radius: 999px;
-}
-
+.chapter-back::before,
 .chapter-back::after {
-	content: "";
-	position: absolute;
-	left: 2px;
-
-	width: 13px;
-	height: 13px;
-
-	border-left: 2px solid rgba(242, 245, 247, 0.60);
-	border-bottom: 2px solid rgba(242, 245, 247, 0.60);
-
-	transform: rotate(45deg);
-	border-radius: 1px;
+	content: none !important;
+	display: none !important;
 }
 
 .chapter-back:hover {
-	opacity: 0.95;
-	transform: translateX(-2px);
-
-	.chapter-back:hover,
-	.chapter-back:focus,
-	.chapter-back:active {
-		background: transparent !important;
-		box-shadow: none !important;
-		border: none !important;
-		outline: none;
-	}
+	opacity: 0.68;
+	transform: none;
+	text-shadow:
+		0 0 10px rgba(242, 245, 247, 0.18),
+		0 0 28px rgba(242, 245, 247, 0.08);
 }
 
-.chapter-back:hover::before {
-	background: var(--Color-Content, #F2F5F7);
-}
-
-.chapter-back:hover::after {
-	border-left-color: var(--Color-Content, #F2F5F7);
-	border-bottom-color: var(--Color-Content, #F2F5F7);
+.chapter-back:focus,
+.chapter-back:active {
+	background: transparent !important;
+	box-shadow: none !important;
+	border: none !important;
+	outline: none;
 }
 
 .chapter-back:focus-visible {
