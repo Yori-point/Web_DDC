@@ -158,6 +158,7 @@
 	class="music-control-btn"
 	class:is-playing={isPlaying}
 	class:is-paused={!isPlaying}
+	style:display={mediaPaused ? "none" : undefined}
 	type="button"
 	aria-label={isPlaying ? "Pause music" : "Play music"}
 	aria-pressed={isPlaying}
@@ -268,6 +269,7 @@
 	:global(body.intro-active) .music-control-btn,
 	:global(body.ritual-active) .music-control-btn,
 	:global(body.is-transitioning) .music-control-btn,
+	:global(body.media-av-open) .music-control-btn,
 	:global(body.chapter-active.summit-title-active) .music-control-btn,
 	:global(body.chapter-active.chapter-nodes-preenter) .music-control-btn {
 		opacity: 0 !important;

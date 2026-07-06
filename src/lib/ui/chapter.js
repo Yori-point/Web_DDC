@@ -31,11 +31,74 @@ export function hideChapterContainer() {
 export function clearChapterState() {
 	const mediaPanel = document.getElementById("mediaPanel");
 	const mediaMap = document.querySelector(".chapter-media-map");
+	const interviewNodes = document.getElementById("interviewNodes");
+	const hoverIntro = document.getElementById("chapterHoverIntro");
 
-	if (mediaPanel) mediaPanel.classList.add("hidden");
-	if (mediaMap) mediaMap.classList.remove("has-open");
+	if (mediaPanel) {
+		mediaPanel.classList.add("hidden");
+		mediaPanel.setAttribute("aria-hidden", "true");
+	}
 
-	document.querySelectorAll(".interview-node").forEach((node) => {
-		node.classList.remove("is-active");
-	});
+	if (mediaMap) {
+		mediaMap.classList.remove("has-open");
+	}
+
+	if (interviewNodes) {
+		interviewNodes.innerHTML = "";
+		interviewNodes.style.removeProperty("--pan-x");
+		interviewNodes.style.removeProperty("--interview-width");
+	}
+
+	if (hoverIntro) {
+		hoverIntro.classList.remove("is-visible");
+		hoverIntro.setAttribute("aria-hidden", "true");
+	}
+
+	document.body.classList.remove(
+		"media-detail-open",
+		"media-av-open",
+		"category-hover-active",
+		"summit-title-active",
+		"chapter-nodes-preenter",
+		"chapter-nodes-active"
+	);
+}
+
+export function prepareChapterSwitch() {
+	const mediaPanel = document.getElementById("mediaPanel");
+	const mediaMap = document.querySelector(".chapter-media-map");
+	const interviewNodes = document.getElementById("interviewNodes");
+	const hoverIntro = document.getElementById("chapterHoverIntro");
+
+	if (mediaPanel) {
+		mediaPanel.classList.add("hidden");
+		mediaPanel.setAttribute("aria-hidden", "true");
+	}
+
+	if (mediaMap) {
+		mediaMap.classList.remove("has-open");
+	}
+
+	if (interviewNodes) {
+		interviewNodes.innerHTML = "";
+		interviewNodes.style.removeProperty("--pan-x");
+		interviewNodes.style.removeProperty("--interview-width");
+	}
+
+	if (hoverIntro) {
+		hoverIntro.classList.remove("is-visible");
+		hoverIntro.setAttribute("aria-hidden", "true");
+	}
+
+	document.body.classList.remove(
+		"media-detail-open",
+		"media-av-open",
+		"category-hover-active",
+		"summit-title-active",
+		"chapter-nodes-active"
+	);
+
+	if (document.body.classList.contains("chapter-active")) {
+		document.body.classList.add("chapter-nodes-preenter");
+	}
 }

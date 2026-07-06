@@ -248,6 +248,7 @@ export function openMediaPanel(item) {
 	}
 
 	document.body.classList.add("media-detail-open");
+	document.body.classList.toggle("media-av-open", type === "audio" || type === "video");
 	document.body.classList.remove("category-menu-open");
 
 	mediaPanel.classList.remove("hidden");
@@ -262,6 +263,7 @@ export function closeMediaPanel() {
 	resumeBackgroundMusicAfterMedia();
 
 	document.body.classList.remove("media-detail-open");
+	document.body.classList.remove("media-av-open");
 
 	if (mediaPanel) {
 		mediaPanel.classList.add("hidden");

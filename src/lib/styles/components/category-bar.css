@@ -355,3 +355,23 @@ body.chapter-active.chapter-nodes-preenter .corner-copyright {
 	opacity: 0 !important;
 	visibility: hidden !important;
 }
+
+/* Hide category bar when any media node detail is open */
+body.overview-active.media-detail-open:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-bar,
+body.chapter-active.chapter-nodes-active.media-detail-open:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-bar {
+	display: none !important;
+	opacity: 0 !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+	transform: translateX(-50%) translateY(8px) !important;
+}
+
+/* Hide category hover overlay when media detail is open */
+body.media-detail-open .category-hover-overlay,
+body.category-hover-active.media-detail-open .category-hover-overlay,
+body.category-hover-active.overview-active.media-detail-open:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-hover-overlay,
+body.category-hover-active.chapter-active.media-detail-open:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-hover-overlay {
+	opacity: 0 !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}

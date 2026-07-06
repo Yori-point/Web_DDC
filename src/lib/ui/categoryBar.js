@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import { prepareChapterSwitch } from "$lib/ui/chapter.js";
+
 export function bindCategoryBar({
 	legacyAreas,
 	hookHeightByKey,
@@ -95,6 +97,10 @@ window.clearActiveCategory = clearActiveCategory;
 		const area = getAreaByKey(key);
 
 		if (!area) return;
+
+		if (document.body.classList.contains("chapter-active")) {
+			prepareChapterSwitch();
+		}
 
 		setActiveCategoryByKey(key);
 
