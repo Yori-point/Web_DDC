@@ -5,6 +5,7 @@
 	import * as THREE from "three";
 	import { goto } from "$app/navigation";
 	import ParticleTitle from "$lib/components/ParticleTitle.svelte";
+	import { createSnowFlakeTexture } from "$lib/three/textures.js";
 
 	let canvas;
 
@@ -120,7 +121,7 @@
 		{
 			name: "Isabella lena",
 			x: 60,
-			y: 65,
+			y: 70,
 			title: "Isabella lena",
 			paragraphs: [
 				[
@@ -159,35 +160,25 @@
 			y: 30,
 			title: "Laura Facchinetti",
 			paragraphs: [
-				[
-					"Dopo un grande evento sportivo,",
-					"quello che resta",
-					"non è solo il risultato."
-				],
-				[
-					"Restano le voci,",
-					"i gesti,",
-					"le immagini che continuano",
-					"a muoversi nella memoria."
-				],
-				[
-					"Tifare per il proprio paese",
-					"porta con sé un orgoglio forte."
-				],
-				[
-					"Ma le Olimpiadi",
-					"mi hanno fatto sentire altro:",
-					"emozionarsi per una fatica,",
-					"per un gesto,",
-					"per un traguardo condiviso."
-				],
-				[
-					"Nel progetto ho curato",
-					"la direzione visiva,",
-					"l’interfaccia",
-					"e l’esperienza narrativa."
-				]
-			]
+                [
+                    "Scoprire quante prospettive diverse",
+                    "convivono attorno a uno stesso evento,",
+                    "è stata la parte più sorprendente",
+                    "di questo percorso."
+                ],
+                [
+                    "Ogni testimonianza raccontava",
+                    "gli stessi Giochi",
+                    "in un modo",
+                    "completamente diverso."
+                ],
+                [
+                    "Mi sono occupata",
+                    "dell'organizzazione del gruppo,",
+                    "e della gestione dello stile",
+                    "del progetto."
+                ]
+            ]
 		},
 		{
 			name: "Matilde Pinarello",
@@ -282,6 +273,191 @@
 	const MODEL_TARGET_WIDTH = 96;
     const PARTICLE_COUNT = 180000;
     const PARTICLE_SIZE = 0.30;
+	const ABOUT_SNOW_LAYERS = {
+		far: {
+			name: "about-far-snow",
+			kind: "background",
+			count: 3000,
+			size: 0.28,
+			opacity: 0.28,
+			alphaTest: 0.012,
+			speedScale: 0.35,
+			minX: -80,
+			maxX: 58,
+			minZ: -78,
+			maxZ: -30,
+			wrapMinY: 1.2,
+			wrapMaxY: 72,
+			renderOrder: 22
+		},
+		mid: {
+			name: "about-mid-snow",
+			kind: "background",
+			count: 3500,
+			size: 0.42,
+			opacity: 0.52,
+			alphaTest: 0.008,
+			speedScale: 0.65,
+			minX: -25,
+			maxX: 103,
+			minZ: -36,
+			maxZ: 10,
+			wrapMinY: 1.2,
+			wrapMaxY: 72,
+			renderOrder: 23
+		},
+		near: {
+			name: "about-near-fine-snow",
+			kind: "background",
+			count: 1900,
+			size: 0.62,
+			opacity: 0.42,
+			alphaTest: 0.012,
+			speedScale: 1,
+			minX: 25,
+			maxX: 115,
+			minZ: 4,
+			maxZ: 42,
+			wrapMinY: 1.2,
+			wrapMaxY: 72,
+			renderOrder: 24
+		},
+		foreground: {
+			name: "about-foreground-snow",
+			kind: "foreground",
+			count: 260,
+			size: 0.9,
+			opacity: 0.34,
+			alphaTest: 0.015,
+			minX: -48,
+			maxX: 117,
+			minZ: -73,
+			maxZ: 33,
+			wrapMinY: 1.2,
+			wrapMaxY: 64,
+			renderOrder: 25
+		}
+	};
+
+	function wrapAboutSnow(value, min, max) {
+		const range = max - min;
+		return ((((value - min) % range) + range) % range) + min;
+	}
+
+	function createAboutSnow(config) {
+		const positions = new Float32Array(config.count * 3);
+		const base = new Float32Array(config.count * 3);
+		const phases = new Float32Array(config.count);
+		const amplitudes = new Float32Array(config.count);
+		const lowLayers = new Uint8Array(config.count);
+
+		for (let i = 0; i < config.count; i++) {
+			const offset = i * 3;
+			const x = THREE.MathUtils.randFloat(config.minX, config.maxX);
+			const z = THREE.MathUtils.randFloat(config.minZ, config.maxZ);
+			let y;
+
+			if (config.kind === "background") {
+				const lowLayer = Math.random() < 0.62;
+				lowLayers[i] = lowLayer ? 1 : 0;
+				y = lowLayer
+					? THREE.MathUtils.randFloat(1.8, 18)
+					: THREE.MathUtils.randFloat(18, 68);
+				amplitudes[i] = lowLayer
+					? 0.18 + Math.random() * 0.52
+					: 0.06 + Math.random() * 0.34;
+			} else {
+				y = THREE.MathUtils.randFloat(3, 62);
+				amplitudes[i] = 0.18 + Math.random() * 0.55;
+			}
+
+			positions[offset] = base[offset] = x;
+			positions[offset + 1] = base[offset + 1] = y;
+			positions[offset + 2] = base[offset + 2] = z;
+			phases[i] = Math.random() * Math.PI * 2;
+		}
+
+		const geometry = new THREE.BufferGeometry();
+		geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+		const material = new THREE.PointsMaterial({
+			map: createSnowFlakeTexture(THREE),
+			alphaTest: config.alphaTest,
+			color: 0xffffff,
+			size: config.size,
+			sizeAttenuation: true,
+			transparent: true,
+			opacity: config.opacity,
+			depthWrite: false,
+			depthTest: false,
+			fog: false,
+			blending: THREE.NormalBlending
+		});
+
+		const points = new THREE.Points(geometry, material);
+		points.name = config.name;
+		points.frustumCulled = false;
+		points.renderOrder = config.renderOrder;
+
+		return {
+			points,
+			kind: config.kind,
+			count: config.count,
+			base,
+			phases,
+			amplitudes,
+			lowLayers,
+			speedScale: config.speedScale ?? 1,
+			wrapMinY: config.wrapMinY,
+			wrapMaxY: config.wrapMaxY
+		};
+	}
+
+	function updateAboutSnow(snow, t) {
+		const positions = snow.points.geometry.attributes.position.array;
+
+		for (let i = 0; i < snow.count; i++) {
+			const offset = i * 3;
+			const phase = snow.phases[i];
+			const amplitude = snow.amplitudes[i];
+
+			if (snow.kind === "background") {
+				const layerTime = t * snow.speedScale;
+				const fallSpeed = snow.lowLayers[i] ? 0.795 : 0.468;
+				const driftA = Math.sin(layerTime * 0.32 + phase) * amplitude * 1.15;
+				const driftB = Math.sin(layerTime * 0.17 + phase * 1.7) * amplitude * 0.75;
+				const swayZ = Math.cos(layerTime * 0.24 + phase * 1.3) * amplitude * 0.7;
+
+				positions[offset] = snow.base[offset] + driftA + driftB;
+				positions[offset + 1] = wrapAboutSnow(
+					snow.base[offset + 1] -
+						layerTime * fallSpeed -
+						Math.sin(layerTime * 0.2 + phase) * 0.45,
+					snow.wrapMinY,
+					snow.wrapMaxY
+				);
+				positions[offset + 2] = snow.base[offset + 2] + swayZ;
+			} else {
+				const swayX =
+					Math.sin(t * 0.22 + phase) * amplitude * 1.25 +
+					Math.cos(t * 0.11 + phase * 1.9) * amplitude * 0.8;
+				const swayZ =
+					Math.cos(t * 0.18 + phase) * amplitude * 0.7 +
+					Math.sin(t * 0.09 + phase * 1.4) * amplitude * 0.45;
+				const fall = 0.575 + Math.sin(phase) * 0.23;
+
+				positions[offset] = snow.base[offset] + swayX;
+				positions[offset + 1] = wrapAboutSnow(
+					snow.base[offset + 1] - t * fall,
+					snow.wrapMinY,
+					snow.wrapMaxY
+				);
+				positions[offset + 2] = snow.base[offset + 2] + swayZ;
+			}
+		}
+
+		snow.points.geometry.attributes.position.needsUpdate = true;
+	}
 
 	function createParticleTexture() {
 		const textureCanvas = document.createElement("canvas");
@@ -505,7 +681,7 @@
             sizeAttenuation: true,
             vertexColors: true,
             transparent: true,
-	            opacity: 1.5,
+	            opacity: 1.8, //山透明度
             depthWrite: false,
             depthTest: false,
             blending: THREE.AdditiveBlending
@@ -595,6 +771,15 @@
 		backLight.position.set(-30, 18, -30);
 		scene.add(backLight);
 
+		const aboutFarSnow = createAboutSnow(ABOUT_SNOW_LAYERS.far);
+		const aboutMidSnow = createAboutSnow(ABOUT_SNOW_LAYERS.mid);
+		const aboutNearSnow = createAboutSnow(ABOUT_SNOW_LAYERS.near);
+		const aboutForegroundSnow = createAboutSnow(ABOUT_SNOW_LAYERS.foreground);
+		scene.add(aboutFarSnow.points);
+		scene.add(aboutMidSnow.points);
+		scene.add(aboutNearSnow.points);
+		scene.add(aboutForegroundSnow.points);
+
 		const loader = new GLTFLoader();
 		loader.setMeshoptDecoder(MeshoptDecoder);
 
@@ -643,6 +828,10 @@
 			if (disposed) return;
 
 			const t = performance.now() * 0.001;
+			updateAboutSnow(aboutFarSnow, t);
+			updateAboutSnow(aboutMidSnow, t);
+			updateAboutSnow(aboutNearSnow, t);
+			updateAboutSnow(aboutForegroundSnow, t);
 
 			if (mountainParticles) {
 				mountainParticles.rotation.y = Math.sin(t * 0.08) * 0.012;
