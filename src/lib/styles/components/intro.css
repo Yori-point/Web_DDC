@@ -303,7 +303,11 @@ body.model-loaded .intro-rings {
 	transition: transform 0.35s ease, filter 0.35s ease;
 }
 
-.enter-btn::before {
+.enter-btn:hover {
+	transform: translate(-50%, -50%);
+}
+
+.glow-orb::before {
 	content: "";
 	position: absolute;
 	left: 50%;
@@ -332,9 +336,13 @@ body.model-loaded .intro-rings {
 	filter: blur(0.4px);
 	opacity: 0.92;
 	pointer-events: none;
+	transition:
+		transform 0.35s ease,
+		filter 0.35s ease,
+		opacity 0.35s ease;
 }
 
-.enter-btn::after {
+.glow-orb::after {
 	content: "";
 	position: absolute;
 	left: 50%;
@@ -357,22 +365,24 @@ body.model-loaded .intro-rings {
 	opacity: 0.9;
 	pointer-events: none;
 	z-index: -1;
+	transition:
+		transform 0.35s ease,
+		filter 0.35s ease,
+		opacity 0.35s ease;
 }
 
-.enter-btn:hover {
+.glow-orb:hover::before,
+.glow-orb:focus-visible::before {
 	transform: translate(-50%, -50%) scale(1.08);
-	filter: brightness(1.18);
-}
-
-.enter-btn:hover::before {
+	filter: blur(0.4px) brightness(1.18);
 	opacity: 1;
 }
 
-.enter-btn:hover::after {
-	width: 180px;
-	height: 180px;
+.glow-orb:hover::after,
+.glow-orb:focus-visible::after {
+	transform: translate(-50%, -50%) scale(1.125);
 	opacity: 1;
-	filter: blur(20px);
+	filter: blur(20px) brightness(1.18);
 }
 
 .intro-enter-hint {

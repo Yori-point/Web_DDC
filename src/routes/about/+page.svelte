@@ -672,7 +672,7 @@
 		<div class="about-people">
 			{#each people as person}
 				<button
-					class="about-person-dot"
+					class="about-person-dot glow-orb"
 					type="button"
 					style={`left: ${person.x}%; top: ${person.y}%;`}
 					aria-label={person.name}
@@ -681,8 +681,6 @@
 					onfocus={() => (activeAbout = person)}
 					onblur={() => (activeAbout = null)}
 				>
-					<span class="about-dot-core"></span>
-					<span class="about-dot-ring"></span>
 				</button>
 			{/each}
 		</div>
@@ -936,52 +934,6 @@
 
 	.about-person-dot:nth-child(6) {
 		animation-delay: -3.4s;
-	}
-
-	.about-dot-core {
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		width: 38px;
-		height: 38px;
-		border-radius: 999px;
-		transform: translate(-50%, -50%);
-		background: rgba(255, 255, 255, 0.96);
-		box-shadow:
-			0 0 18px rgba(255, 255, 255, 0.82),
-			0 0 44px rgba(220, 238, 255, 0.42),
-			0 0 88px rgba(180, 210, 236, 0.22);
-	}
-
-	.about-dot-ring {
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		width: 76px;
-		height: 76px;
-		border-radius: 999px;
-		transform: translate(-50%, -50%);
-		border: 1px solid rgba(242, 245, 247, 0.34);
-		box-shadow:
-			0 0 20px rgba(242, 245, 247, 0.12),
-			inset 0 0 18px rgba(242, 245, 247, 0.08);
-		opacity: 0.68;
-		transition:
-			transform 0.28s ease,
-			opacity 0.28s ease,
-			border-color 0.28s ease;
-	}
-
-	.about-person-dot:hover,
-	.about-person-dot:focus-visible {
-		transform: none;
-	}
-
-	.about-person-dot:hover .about-dot-ring,
-	.about-person-dot:focus-visible .about-dot-ring {
-		transform: translate(-50%, -50%) scale(1.14);
-		opacity: 0.96;
-		border-color: rgba(242, 245, 247, 0.58);
 	}
 
 	@keyframes about-dot-float {
