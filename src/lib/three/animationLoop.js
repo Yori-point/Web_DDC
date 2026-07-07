@@ -47,7 +47,9 @@ export function startAnimationLoop({
 		if (
 			appState.view === "overview" ||
 			appState.view === "transition" ||
-			appState.view === "particle-ritual"
+			appState.view === "particle-ritual" ||
+			appState.view === "chapter-pending" ||
+			appState.view === "chapter"
 		) {
 			animateSnow(t);
 			animateForegroundSnow(t);
