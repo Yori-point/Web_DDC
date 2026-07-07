@@ -281,7 +281,7 @@
 
 	const MODEL_TARGET_WIDTH = 96;
     const PARTICLE_COUNT = 180000;
-    const PARTICLE_SIZE = 0.34;
+    const PARTICLE_SIZE = 0.30;
 
 	function createParticleTexture() {
 		const textureCanvas = document.createElement("canvas");
@@ -291,9 +291,9 @@
 		const ctx = textureCanvas.getContext("2d");
 		const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
 
-		gradient.addColorStop(0.0, "rgba(255,255,255,0.95)");
-		gradient.addColorStop(0.22, "rgba(255,255,255,0.48)");
-		gradient.addColorStop(0.55, "rgba(180,210,230,0.10)");
+		gradient.addColorStop(0.0, "rgba(255,255,255,0.82)");
+		gradient.addColorStop(0.22, "rgba(255,255,255,0.34)");
+		gradient.addColorStop(0.55, "rgba(180,210,230,0.06)");
 		gradient.addColorStop(1.0, "rgba(180,210,230,0)");
 
 		ctx.fillStyle = gradient;
@@ -401,18 +401,28 @@
 			return null;
 		}
 
-		const positions = [];
-		const colors = [];
+			const positions = [];
+			const colors = [];
 
-		let minY = Infinity;
-		let maxY = -Infinity;
+			let minX = Infinity;
+			let maxX = -Infinity;
+			let minY = Infinity;
+			let maxY = -Infinity;
+			let minZ = Infinity;
+			let maxZ = -Infinity;
 
-		triangles.forEach((tri) => {
-			minY = Math.min(minY, tri.a.y, tri.b.y, tri.c.y);
-			maxY = Math.max(maxY, tri.a.y, tri.b.y, tri.c.y);
-		});
+			triangles.forEach((tri) => {
+				minX = Math.min(minX, tri.a.x, tri.b.x, tri.c.x);
+				maxX = Math.max(maxX, tri.a.x, tri.b.x, tri.c.x);
+				minY = Math.min(minY, tri.a.y, tri.b.y, tri.c.y);
+				maxY = Math.max(maxY, tri.a.y, tri.b.y, tri.c.y);
+				minZ = Math.min(minZ, tri.a.z, tri.b.z, tri.c.z);
+				maxZ = Math.max(maxZ, tri.a.z, tri.b.z, tri.c.z);
+			});
 
-		const yRange = Math.max(maxY - minY, 0.0001);
+			const xRange = Math.max(maxX - minX, 0.0001);
+			const yRange = Math.max(maxY - minY, 0.0001);
+			const zRange = Math.max(maxZ - minZ, 0.0001);
 
 		for (let i = 0; i < PARTICLE_COUNT; i++) {
 			const p = sampleTriangle(triangles, totalArea);
@@ -431,14 +441,43 @@
                     Math.sin(p.x * 0.18 + p.y * 0.28) *
                     Math.cos(p.z * 0.16 - p.x * 0.08);
 
-            const sparkle = Math.random() < 0.08 ? 0.28 : 0;
+	            const sparkle = Math.random() < 0.025 ? 0.14 : 0;
 
-            const brightness =
-                0.78 +
-                height * 0.32 +
-                ridge * 0.22 +
-                Math.random() * 0.16 +
-                sparkle;
+	            const middleTerrain = THREE.MathUtils.smoothstep(height, 0.14, 0.50);
+	            const highRidges = THREE.MathUtils.smoothstep(height, 0.54, 0.84);
+	            const ridgeDetail = ridge * (0.06 + highRidges * 0.16);
+
+	            const xNormalized = THREE.MathUtils.clamp((p.x - minX) / xRange, 0, 1);
+	            const zNormalized = THREE.MathUtils.clamp((p.z - minZ) / zRange, 0, 1);
+	            const edgeDistance = Math.min(xNormalized, 1 - xNormalized) * 2;
+	            const depthMiddle = 1 - Math.abs(zNormalized - 0.5) * 2;
+
+	            const bottomFade = THREE.MathUtils.lerp(
+	                0.18,
+	                1,
+	                THREE.MathUtils.smoothstep(height, 0.04, 0.34)
+	            );
+	            const sideFade = THREE.MathUtils.lerp(
+	                0.72,
+	                1,
+	                THREE.MathUtils.smoothstep(edgeDistance, 0.03, 0.28)
+	            );
+	            const depthFade = THREE.MathUtils.lerp(
+	                0.82,
+	                1,
+	                THREE.MathUtils.smoothstep(depthMiddle, 0.05, 0.70)
+	            );
+
+	            const brightness =
+	                (0.24 +
+	                    middleTerrain * 0.28 +
+	                    highRidges * 0.46 +
+	                    ridgeDetail +
+	                    Math.random() * 0.025 +
+	                    sparkle * (0.25 + highRidges * 0.75)) *
+	                bottomFade *
+	                sideFade *
+	                depthFade;
 
             colors.push(
                 Math.min(1, 0.9 * brightness),
@@ -461,12 +500,12 @@
 
 		const material = new THREE.PointsMaterial({
             map: createParticleTexture(),
-            alphaTest: 0.002,
+	            alphaTest: 0.008,
             size: PARTICLE_SIZE,
             sizeAttenuation: true,
             vertexColors: true,
             transparent: true,
-            opacity: 1,
+	            opacity: 1.5,
             depthWrite: false,
             depthTest: false,
             blending: THREE.AdditiveBlending
