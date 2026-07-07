@@ -617,11 +617,9 @@
                     Math.sin(p.x * 0.18 + p.y * 0.28) *
                     Math.cos(p.z * 0.16 - p.x * 0.08);
 
-	            const sparkle = Math.random() < 0.025 ? 0.14 : 0;
-
-	            const middleTerrain = THREE.MathUtils.smoothstep(height, 0.14, 0.50);
-	            const highRidges = THREE.MathUtils.smoothstep(height, 0.54, 0.84);
-	            const ridgeDetail = ridge * (0.06 + highRidges * 0.16);
+	            const middleTerrain = THREE.MathUtils.smoothstep(height, 0.20, 0.58);
+	            const highRidges = THREE.MathUtils.smoothstep(height, 0.56, 0.82);
+	            const ridgeDetail = ridge * (0.02 + highRidges * 0.15);
 
 	            const xNormalized = THREE.MathUtils.clamp((p.x - minX) / xRange, 0, 1);
 	            const zNormalized = THREE.MathUtils.clamp((p.z - minZ) / zRange, 0, 1);
@@ -629,28 +627,27 @@
 	            const depthMiddle = 1 - Math.abs(zNormalized - 0.5) * 2;
 
 	            const bottomFade = THREE.MathUtils.lerp(
-	                0.18,
+	                0.03,
 	                1,
-	                THREE.MathUtils.smoothstep(height, 0.04, 0.34)
+	                THREE.MathUtils.smoothstep(height, 0.10, 0.50)
 	            );
 	            const sideFade = THREE.MathUtils.lerp(
-	                0.72,
+	                0.35,
 	                1,
-	                THREE.MathUtils.smoothstep(edgeDistance, 0.03, 0.28)
+	                THREE.MathUtils.smoothstep(edgeDistance, 0.04, 0.36)
 	            );
 	            const depthFade = THREE.MathUtils.lerp(
-	                0.82,
+	                0.75,
 	                1,
 	                THREE.MathUtils.smoothstep(depthMiddle, 0.05, 0.70)
 	            );
 
 	            const brightness =
-	                (0.24 +
-	                    middleTerrain * 0.28 +
-	                    highRidges * 0.46 +
+	                (0.10 +
+	                    middleTerrain * 0.18 +
+	                    highRidges * 0.45 +
 	                    ridgeDetail +
-	                    Math.random() * 0.025 +
-	                    sparkle * (0.25 + highRidges * 0.75)) *
+	                    Math.random() * 0.006) *
 	                bottomFade *
 	                sideFade *
 	                depthFade;
@@ -681,7 +678,7 @@
             sizeAttenuation: true,
             vertexColors: true,
             transparent: true,
-	            opacity: 1.8, //山透明度
+	            opacity: 1.7, //山透明度
             depthWrite: false,
             depthTest: false,
             blending: THREE.AdditiveBlending
@@ -928,7 +925,12 @@
 		overflow: hidden;
 		background:
 			radial-gradient(circle at 76% 28%, rgba(130, 158, 184, 0.12), transparent 24%),
-			radial-gradient(circle at 64% 82%, rgba(61, 113, 145, 0.16), transparent 28%),
+			linear-gradient(
+				to top,
+				rgba(7, 14, 23, 0.48) 0%,
+				rgba(7, 14, 23, 0.12) 22%,
+				transparent 46%
+			),
 			#070e17;
 		color: #f2f5f7;
 		font-family: var(--font-light);
@@ -1027,6 +1029,24 @@
 		pointer-events: auto;
 	}
 
+	.about-copy::before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		top: -4vh;
+		right: -9vw;
+		bottom: -5vh;
+		left: -5vw;
+		pointer-events: none;
+		background: linear-gradient(
+			90deg,
+			rgba(7, 14, 23, 0.38) 0%,
+			rgba(7, 14, 23, 0.16) 62%,
+			rgba(7, 14, 23, 0) 100%
+		);
+		filter: blur(16px);
+	}
+
 	.about-copy :global(.particle-title--about) {
 		margin: 0 0 7vh;
 
@@ -1096,8 +1116,11 @@
         letter-spacing: 0.01em;
         color: rgba(242, 245, 247, 0.88);
         -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        font-synthesis: none;
+		-moz-osx-font-smoothing: grayscale;
+		font-synthesis: none;
+		word-break: normal;
+		overflow-wrap: normal;
+		hyphens: none;
 	}
 
 	.about-text p {
