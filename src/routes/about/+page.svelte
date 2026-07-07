@@ -119,8 +119,8 @@
 		},
 		{
 			name: "Isabella lena",
-			x: 66,
-			y: 60,
+			x: 60,
+			y: 65,
 			title: "Isabella lena",
 			paragraphs: [
 				[
@@ -502,7 +502,7 @@
 			scale
 		);
 
-		root.position.set(48, -5, 0); //山的位置
+		root.position.set(55, -5, 0); //山的位置
         root.rotation.set(
             THREE.MathUtils.degToRad(7),
             THREE.MathUtils.degToRad(-10),
