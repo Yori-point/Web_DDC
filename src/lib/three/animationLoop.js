@@ -32,6 +32,10 @@ export function startAnimationLoop({
 	setInterviewPanCurrent,
 	getInterviewPanTarget
 }) {
+	let lastSnowFrameTime = null;
+	let backgroundSnowTime = 0;
+	let foregroundSnowTime = 0;
+
 	function animate() {
 		const t = clock.getElapsedTime();
 
@@ -44,15 +48,66 @@ export function startAnimationLoop({
 
 		animateCursorSnow(t);
 
-		if (
+		const isIntroSnow = appState.view === "intro";
+		const shouldAnimateSnow =
+			isIntroSnow ||
 			appState.view === "overview" ||
 			appState.view === "transition" ||
 			appState.view === "particle-ritual" ||
 			appState.view === "chapter-pending" ||
-			appState.view === "chapter"
-		) {
-			animateSnow(t);
-			animateForegroundSnow(t);
+			appState.view === "chapter";
+
+		if (shouldAnimateSnow) {
+			const delta = lastSnowFrameTime === null
+				? 0
+				: Math.min(Math.max(t - lastSnowFrameTime, 0), 0.1);
+
+			backgroundSnowTime += delta * (isIntroSnow ? 0.55 : 1);
+			foregroundSnowTime += delta * (isIntroSnow ? 0.42 : 1);
+			lastSnowFrameTime = t;
+
+			if (animatedObjects.snow) {
+				const snow = animatedObjects.snow;
+				const material = snow.material;
+				const particleCount = snow.geometry.attributes.position.count;
+
+				material.opacity = isIntroSnow
+					? material.userData.introOpacity
+					: material.userData.baseOpacity;
+				material.size = isIntroSnow
+					? material.userData.introSize
+					: material.userData.baseSize;
+				snow.geometry.setDrawRange(
+					0,
+					isIntroSnow
+						? Math.floor(particleCount * material.userData.introDrawRatio)
+						: particleCount
+				);
+			}
+
+			if (animatedObjects.foregroundSnow) {
+				const snow = animatedObjects.foregroundSnow;
+				const material = snow.material;
+				const particleCount = snow.geometry.attributes.position.count;
+
+				material.opacity = isIntroSnow
+					? material.userData.introOpacity
+					: material.userData.baseOpacity;
+				material.size = isIntroSnow
+					? material.userData.introSize
+					: material.userData.baseSize;
+				snow.geometry.setDrawRange(
+					0,
+					isIntroSnow
+						? Math.floor(particleCount * material.userData.introDrawRatio)
+						: particleCount
+				);
+			}
+
+			animateSnow(backgroundSnowTime);
+			animateForegroundSnow(foregroundSnowTime);
+		} else {
+			lastSnowFrameTime = t;
 		}
 
 		if (appState.view === "overview" || appState.view === "transition") {

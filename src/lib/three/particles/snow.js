@@ -53,6 +53,11 @@ export function createSnowParticles({
 		depthTest: false,
 		blending: THREE.NormalBlending
 	});
+	snowMaterial.userData.baseOpacity = snowMaterial.opacity;
+	snowMaterial.userData.introOpacity = 0.31;
+	snowMaterial.userData.baseSize = snowMaterial.size;
+	snowMaterial.userData.introSize = 0.48;
+	snowMaterial.userData.introDrawRatio = 1;
 
 	const snowPoints = new THREE.Points(snowGeometry, snowMaterial);
 	snowPoints.name = "dense-floating-snow";
@@ -106,6 +111,11 @@ export function createForegroundSnowParticles({
 		depthTest: false,
 		blending: THREE.NormalBlending
 	});
+	mat.userData.baseOpacity = mat.opacity;
+	mat.userData.introOpacity = 0.20;
+	mat.userData.baseSize = mat.size;
+	mat.userData.introSize = 1.6;
+	mat.userData.introDrawRatio = 1;
 
 	const points = new THREE.Points(geo, mat);
 	points.name = "foreground-large-snow";
