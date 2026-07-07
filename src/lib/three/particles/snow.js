@@ -101,12 +101,12 @@ export function createForegroundSnowParticles({
 
 	const mat = new THREE.PointsMaterial({
 		map: createSnowFlakeTexture(THREE),
-		alphaTest: 0.001,
+		alphaTest: 0.015,
 		color: 0xffffff,
-		size: 1.6,
+		size: 0.9,
 		sizeAttenuation: true,
 		transparent: true,
-		opacity: 0.45, //前景雪透明度
+		opacity: 0.34, //前景雪透明度
 		depthWrite: false,
 		depthTest: false,
 		blending: THREE.NormalBlending
@@ -114,7 +114,7 @@ export function createForegroundSnowParticles({
 	mat.userData.baseOpacity = mat.opacity;
 	mat.userData.introOpacity = 0.20;
 	mat.userData.baseSize = mat.size;
-	mat.userData.introSize = 1.6;
+	mat.userData.introSize = 0.9;
 	mat.userData.introDrawRatio = 1;
 
 	const points = new THREE.Points(geo, mat);
