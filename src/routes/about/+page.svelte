@@ -47,8 +47,8 @@
 	const people = [
 		{
 			name: "Jiaying Hu",
-			x: 43,
-			y: 45,
+			x: 41,
+			y: 56,
 			title: "Jiaying Hu",
 			paragraphs: [
 				[
@@ -83,8 +83,8 @@
 		},
 		{
 			name: "Yunwei Zhang",
-			x: 55,
-			y: 31,
+			x: 54,
+			y: 42,
 			title: "Yunwei Zhang",
 			paragraphs: [
 				[
@@ -120,7 +120,7 @@
 		{
 			name: "Isabella lena",
 			x: 66,
-			y: 55,
+			y: 60,
 			title: "Isabella lena",
 			paragraphs: [
 				[
@@ -155,8 +155,8 @@
 		},
 		{
 			name: "Laura Facchinetti",
-			x: 73,
-			y: 17,
+			x: 75,
+			y: 30,
 			title: "Laura Facchinetti",
 			paragraphs: [
 				[
@@ -191,8 +191,8 @@
 		},
 		{
 			name: "Matilde Pinarello",
-			x: 88,
-			y: 49,
+			x: 90,
+			y: 46,
 			title: "Matilde Pinarello",
 			paragraphs: [
 				[
@@ -227,8 +227,8 @@
 		},
 		{
 			name: "Giulia Croci",
-			x: 76,
-			y: 67,
+			x: 81,
+			y: 70,
 			title: "Giulia Croci",
 			paragraphs: [
 				[
