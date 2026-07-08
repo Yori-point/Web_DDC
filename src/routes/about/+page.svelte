@@ -949,7 +949,7 @@
 	<div class="about-mountain-layer" aria-hidden="true">
 		<canvas bind:this={canvas} class="about-canvas"></canvas>
 
-		<div class="about-people" class:has-preview={hoveredPersonId !== null}>
+		<div class="about-people">
 			{#each people as person}
 				<button
 					class="about-person-dot glow-orb"
@@ -1255,38 +1255,37 @@
 		-webkit-backdrop-filter: none;
 		pointer-events: auto;
 		cursor: pointer;
+		transition: opacity 0.3s ease;
 	}
 
 	.about-person-dot:hover,
 	.about-person-dot:focus-visible,
 	.about-person-dot.is-preview-active {
-		transform: none;
-	}
-
-	.about-person-dot.is-preview-active {
 		z-index: 2;
+		transform: none !important;
+		background: transparent !important;
+		border-color: transparent !important;
+		box-shadow: none !important;
+		opacity: 1 !important;
+		animation: none !important;
 	}
 
+	.about-person-dot:hover::before,
+	.about-person-dot:focus-visible::before,
 	.about-person-dot.is-preview-active::before {
-		transform: translate(-50%, -50%) scale(1.18);
-		filter: blur(0.4px) brightness(1.8);
-		opacity: 1;
+		transform: translate(-50%, -50%) scale(1.15) !important;
+		filter: blur(0.4px) brightness(1.8) !important;
+		opacity: 1 !important;
+		animation: none !important;
 	}
 
+	.about-person-dot:hover::after,
+	.about-person-dot:focus-visible::after,
 	.about-person-dot.is-preview-active::after {
-		transform: translate(-50%, -50%) scale(1.28);
-		filter: blur(20px) brightness(1.6);
-		opacity: 0.95;
-	}
-
-	.about-people.has-preview .about-person-dot:not(.is-preview-active)::before {
-		filter: blur(0.4px) brightness(0.75);
-		opacity: 0.45;
-	}
-
-	.about-people.has-preview .about-person-dot:not(.is-preview-active)::after {
-		filter: blur(18px) brightness(0.65);
-		opacity: 0.22;
+		transform: translate(-50%, -50%) scale(1.25) !important;
+		filter: blur(20px) brightness(1.6) !important;
+		opacity: 0.95 !important;
+		animation: none !important;
 	}
 
 	@media (max-width: 900px) {
