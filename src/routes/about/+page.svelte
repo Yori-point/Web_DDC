@@ -10,6 +10,7 @@
 	let canvas;
 
 	let activeAbout = $state(null);
+	let hoveredPersonId = $state(null);
 
 	const defaultAbout = {
 		title: "Tracce",
@@ -47,6 +48,7 @@
 
 	const people = [
 		{
+			id: "jiaying-hu",
 			name: "Jiaying Hu",
 			x: 41,
 			y: 56,
@@ -83,6 +85,7 @@
 			]
 		},
 		{
+			id: "yunwei-zhang",
 			name: "Yunwei Zhang",
 			x: 54,
 			y: 42,
@@ -119,6 +122,7 @@
 			]
 		},
 		{
+			id: "isabella-lena",
 			name: "Isabella lena",
 			x: 60,
 			y: 70,
@@ -155,6 +159,7 @@
 			]
 		},
 		{
+			id: "laura-facchinetti",
 			name: "Laura Facchinetti",
 			x: 75,
 			y: 30,
@@ -181,6 +186,7 @@
             ]
 		},
 		{
+			id: "matilde-pinarello",
 			name: "Matilde Pinarello",
 			x: 90,
 			y: 46,
@@ -217,6 +223,7 @@
 			]
 		},
 		{
+			id: "giulia-croci",
 			name: "Giulia Croci",
 			x: 81,
 			y: 70,
@@ -256,6 +263,16 @@
 
 	const aboutContent = $derived(activeAbout || defaultAbout);
 	const aboutTitleVariant = $derived(activeAbout ? "about-name" : "about");
+
+	function showPersonPreview(person) {
+		activeAbout = person;
+		hoveredPersonId = person.id;
+	}
+
+	function clearPersonPreview() {
+		activeAbout = null;
+		hoveredPersonId = null;
+	}
 
     async function goBackToMap(event) {
 		event.preventDefault();
@@ -894,17 +911,18 @@
 	<div class="about-mountain-layer" aria-hidden="true">
 		<canvas bind:this={canvas} class="about-canvas"></canvas>
 
-		<div class="about-people">
+		<div class="about-people" class:has-preview={hoveredPersonId !== null}>
 			{#each people as person}
 				<button
 					class="about-person-dot glow-orb"
+					class:is-preview-active={hoveredPersonId === person.id}
 					type="button"
 					style={`left: ${person.x}%; top: ${person.y}%;`}
 					aria-label={person.name}
-					onmouseenter={() => (activeAbout = person)}
-					onmouseleave={() => (activeAbout = null)}
-					onfocus={() => (activeAbout = person)}
-					onblur={() => (activeAbout = null)}
+					onmouseenter={() => showPersonPreview(person)}
+					onmouseleave={clearPersonPreview}
+					onfocus={() => showPersonPreview(person)}
+					onblur={clearPersonPreview}
 				>
 				</button>
 			{/each}
@@ -1026,7 +1044,7 @@
 		width: min(34vw, 440px);
 		padding-left: 7vw;
 		padding-top: 13.5vh;
-		pointer-events: auto;
+		pointer-events: none;
 	}
 
 	.about-copy::before {
@@ -1164,38 +1182,38 @@
 		-webkit-backdrop-filter: none;
 		pointer-events: auto;
 		cursor: pointer;
-		animation: about-dot-float 4.8s ease-in-out infinite;
 	}
 
-	.about-person-dot:nth-child(2) {
-		animation-delay: -0.8s;
+	.about-person-dot:hover,
+	.about-person-dot:focus-visible,
+	.about-person-dot.is-preview-active {
+		transform: none;
 	}
 
-	.about-person-dot:nth-child(3) {
-		animation-delay: -1.4s;
+	.about-person-dot.is-preview-active {
+		z-index: 2;
 	}
 
-	.about-person-dot:nth-child(4) {
-		animation-delay: -2.1s;
+	.about-person-dot.is-preview-active::before {
+		transform: translate(-50%, -50%) scale(1.18);
+		filter: blur(0.4px) brightness(1.8);
+		opacity: 1;
 	}
 
-	.about-person-dot:nth-child(5) {
-		animation-delay: -2.8s;
+	.about-person-dot.is-preview-active::after {
+		transform: translate(-50%, -50%) scale(1.28);
+		filter: blur(20px) brightness(1.6);
+		opacity: 0.95;
 	}
 
-	.about-person-dot:nth-child(6) {
-		animation-delay: -3.4s;
+	.about-people.has-preview .about-person-dot:not(.is-preview-active)::before {
+		filter: blur(0.4px) brightness(0.75);
+		opacity: 0.45;
 	}
 
-	@keyframes about-dot-float {
-		0%,
-		100% {
-			translate: 0 0;
-		}
-
-		50% {
-			translate: 0 -8px;
-		}
+	.about-people.has-preview .about-person-dot:not(.is-preview-active)::after {
+		filter: blur(18px) brightness(0.65);
+		opacity: 0.22;
 	}
 
 	@media (max-width: 900px) {
