@@ -39,19 +39,25 @@ export function createSnowParticles({
 		"position",
 		new THREE.Float32BufferAttribute(positions, 3)
 	);
-
+    
+	//主雪粒子大小
 	const snowMaterial = new THREE.PointsMaterial({
 		map: createSnowFlakeTexture(THREE),
 		alphaTest: 0.001,
 		color: 0xffffff,
-		size: 0.42,
+		size: 0.45, //主雪粒子大小
 		sizeAttenuation: true,
 		transparent: true,
-		opacity: 0.28,
+		opacity: 0.65,  //主雪透明度
 		depthWrite: false,
 		depthTest: false,
 		blending: THREE.NormalBlending
 	});
+	snowMaterial.userData.baseOpacity = snowMaterial.opacity;
+	snowMaterial.userData.introOpacity = 0.31;
+	snowMaterial.userData.baseSize = snowMaterial.size;
+	snowMaterial.userData.introSize = 0.48;
+	snowMaterial.userData.introDrawRatio = 1;
 
 	const snowPoints = new THREE.Points(snowGeometry, snowMaterial);
 	snowPoints.name = "dense-floating-snow";
@@ -95,16 +101,21 @@ export function createForegroundSnowParticles({
 
 	const mat = new THREE.PointsMaterial({
 		map: createSnowFlakeTexture(THREE),
-		alphaTest: 0.001,
+		alphaTest: 0.015,
 		color: 0xffffff,
-		size: 1.2,
+		size: 0.9,
 		sizeAttenuation: true,
 		transparent: true,
-		opacity: 0.24,
+		opacity: 0.34, //前景雪透明度
 		depthWrite: false,
 		depthTest: false,
 		blending: THREE.NormalBlending
 	});
+	mat.userData.baseOpacity = mat.opacity;
+	mat.userData.introOpacity = 0.20;
+	mat.userData.baseSize = mat.size;
+	mat.userData.introSize = 0.9;
+	mat.userData.introDrawRatio = 1;
 
 	const points = new THREE.Points(geo, mat);
 	points.name = "foreground-large-snow";
@@ -134,7 +145,7 @@ export function animateSnowParticles({ animatedObjects, t }) {
 		const baseZ = base[i + 2];
 
 		const isLowLayer = baseY < 18;
-		const fallSpeed = isLowLayer ? 0.22 : 0.13;
+		const fallSpeed = isLowLayer ? 0.795 : 0.468;
 
 		const driftA = Math.sin(t * 0.32 + phase[p]) * amp[p] * 1.15;
 		const driftB = Math.sin(t * 0.17 + phase[p] * 1.7) * amp[p] * 0.75;
@@ -171,7 +182,7 @@ export function animateForegroundSnowParticles({ animatedObjects, t }) {
 			Math.cos(t * 0.18 + phase[p]) * amp[p] * 0.7 +
 			Math.sin(t * 0.09 + phase[p] * 1.4) * amp[p] * 0.45;
 
-		const fall = 0.2 + Math.sin(phase[p]) * 0.08;
+		const fall = 0.575 + Math.sin(phase[p]) * 0.23;
 
 		arr[i] = baseX + swayX;
 		arr[i + 1] = wrap(baseY - t * fall, 1.2, 64);

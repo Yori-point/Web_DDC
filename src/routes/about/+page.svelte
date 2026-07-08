@@ -5,6 +5,7 @@
 	import * as THREE from "three";
 	import { goto } from "$app/navigation";
 	import ParticleTitle from "$lib/components/ParticleTitle.svelte";
+	import { createSnowFlakeTexture } from "$lib/three/textures.js";
 
 	let canvas;
 
@@ -30,252 +31,243 @@
 
 	const defaultAbout = {
 		title: "Tracce",
+		meta: "PAESAGGIO DI MEMORIE · MILANO CORTINA 2026",
 		paragraphs: [
-			["Dopo un grande evento,", "qualcosa resta."],
 			[
-				"Non solo strutture,",
-				"numeri o immagini ufficiali,",
-				"ma frammenti più piccoli:",
-				"una voce, uno sguardo,",
-				"un incontro, una sensazione."
+				"Milano Cortina 2026 lascia una legacy fatta non solo di infrastrutture, ma di storie che continuano a circolare dopo la fine dei Giochi."
 			],
 			[
-				"Milano Cortina 2026",
-				"diventa qui un paesaggio",
-				"da attraversare lentamente."
+				"Per raccogliere queste voci abbiamo lavorato sul campo: interviste dirette, sondaggi online, questionari, ogni strumento utile ad ampliare il coro di chi ha attraversato i Giochi da prospettive diverse."
 			],
 			[
-				"Ogni testimonianza",
-				"si deposita come una particella.",
-				"Ogni particella",
-				"lascia una traccia."
+				"Il sito che ne è nato vuole rendere giustizia a questa moltitudine, trasformando chi lo visita in parte attiva del racconto, non solo in spettatore."
 			],
 			[
-				"Il sito raccoglie ciò",
-				"che continua a muoversi",
-				"nella memoria quotidiana."
-			],
-			[
-				"Non una mappa da leggere,",
-				"ma uno spazio da attraversare."
+				"Ogni voce lascia una traccia,",
+				"ogni traccia racconta un punto di vista."
 			]
 		]
 	};
 
 	const people = [
 		{
+			id: "jiaying-hu",
 			name: "Jiaying Hu",
-			x: 43,
-			y: 45,
+			meta: "DIREZIONE VISIVA · INTERFACCIA · ESPERIENZA NARRATIVA",
+			x: 41,
+			y: 56,
 			title: "Jiaying Hu",
 			paragraphs: [
 				[
-					"Dopo un grande evento sportivo,",
-					"quello che resta",
-					"non è solo il risultato."
+					"All’inizio vedevo le Olimpiadi",
+					"come qualcosa di grande,",
+					"quasi distante dalla vita quotidiana."
 				],
 				[
-					"Restano le voci,",
-					"i gesti,",
-					"le immagini che continuano",
-					"a muoversi nella memoria."
+					"Ascoltando le persone,",
+					"ho capito che un evento così",
+					"viene vissuto in modi molto diversi:",
+					"entusiasmo, orgoglio,",
+					"cambiamento o semplice curiosità."
 				],
 				[
-					"Tifare per il proprio paese",
-					"porta con sé un orgoglio forte."
+					"Questa varietà di sguardi",
+					"è stata la parte più interessante",
+					"del progetto per me."
 				],
 				[
-					"Ma le Olimpiadi",
-					"mi hanno fatto sentire altro:",
-					"emozionarsi per una fatica,",
-					"per un gesto,",
-					"per un traguardo condiviso."
+					"Mi ha fatto capire",
+					"che non esiste una sola memoria",
+					"di un evento collettivo."
 				],
 				[
-					"Nel progetto ho curato",
-					"la direzione visiva,",
-					"l’interfaccia",
-					"e l’esperienza narrativa."
+					"Ho curato la progettazione grafica",
+					"e visiva del sito,",
+					"lo sviluppo del prototipo su Figma",
+					"e l’implementazione dei contenuti",
+					"nel codice."
 				]
 			]
 		},
 		{
+			id: "yunwei-zhang",
 			name: "Yunwei Zhang",
-			x: 55,
-			y: 31,
+			meta: "DIREZIONE VISIVA · INTERFACCIA · ESPERIENZA NARRATIVA",
+			x: 54,
+			y: 42,
 			title: "Yunwei Zhang",
 			paragraphs: [
 				[
-					"Dopo un grande evento sportivo,",
-					"quello che resta",
-					"non è solo il risultato."
+					"Ho sempre visto le Olimpiadi",
+					"come qualcosa che va oltre",
+					"la competizione."
 				],
 				[
-					"Restano le voci,",
-					"i gesti,",
-					"le immagini che continuano",
-					"a muoversi nella memoria."
+					"Dopo un incidente,",
+					"il mio sguardo sullo sport",
+					"è cambiato:",
+					"tra entusiasmo, limite",
+					"e ostinazione."
 				],
 				[
-					"Tifare per il proprio paese",
-					"porta con sé un orgoglio forte."
+					"Per me raccontare lo sport",
+					"significa osservare",
+					"ciò che resta nei corpi,",
+					"nelle città e nella memoria."
 				],
 				[
-					"Ma le Olimpiadi",
-					"mi hanno fatto sentire altro:",
-					"emozionarsi per una fatica,",
-					"per un gesto,",
-					"per un traguardo condiviso."
-				],
-				[
-					"Nel progetto ho curato",
-					"la direzione visiva,",
-					"l’interfaccia",
-					"e l’esperienza narrativa."
+					"Ho curato lo sviluppo tecnico",
+					"del sito,",
+					"le funzionalità interattive,",
+					"parte della modellazione 3D,",
+					"la gestione della musica",
+					"e la realizzazione finale",
+					"del progetto."
 				]
 			]
 		},
 		{
+			id: "isabella-lena",
 			name: "Isabella lena",
-			x: 66,
-			y: 55,
+			meta: "DIREZIONE VISIVA · INTERFACCIA · ESPERIENZA NARRATIVA",
+			x: 60,
+			y: 70,
 			title: "Isabella lena",
 			paragraphs: [
 				[
-					"Dopo un grande evento sportivo,",
-					"quello che resta",
-					"non è solo il risultato."
+					"Le Olimpiadi invernali",
+					"hanno creato una sorta di",
+					"mondo sospeso, separato",
+					"dalla routine quotidiana."
 				],
 				[
-					"Restano le voci,",
-					"i gesti,",
-					"le immagini che continuano",
-					"a muoversi nella memoria."
+					"Guardare una gara era",
+					"un momento di condivisione,",
+					"capace di offrire sempre",
+					"nuovi spunti di conversazione."
 				],
 				[
-					"Tifare per il proprio paese",
-					"porta con sé un orgoglio forte."
+					"Questo progetto mi ha dato",
+					"l’opportunità di esplorare",
+					"prospettive distanti dalla mia",
+					"e di capire come le persone",
+					"hanno percepito questo evento."
 				],
 				[
-					"Ma le Olimpiadi",
-					"mi hanno fatto sentire altro:",
-					"emozionarsi per una fatica,",
-					"per un gesto,",
-					"per un traguardo condiviso."
-				],
-				[
-					"Nel progetto ho curato",
-					"la direzione visiva,",
-					"l’interfaccia",
-					"e l’esperienza narrativa."
+					"Ho curato l’organizzazione generale",
+					"del gruppo di lavoro",
+					"e lo sviluppo del prototipo su Figma,",
+					"contribuendo anche",
+					"a implementare i contenuti nel codice."
 				]
 			]
 		},
 		{
+			id: "laura-facchinetti",
 			name: "Laura Facchinetti",
-			x: 73,
-			y: 17,
+			meta: "ORGANIZZAZIONE DEL GRUPPO · GESTIONE DELLO STILE",
+			x: 75,
+			y: 30,
 			title: "Laura Facchinetti",
-			paragraphs: [
+            paragraphs: [
+                [
+                    "Scoprire quante prospettive diverse",
+					"convivono attorno a uno stesso evento",
+                    "è stata la parte più sorprendente",
+                    "di questo percorso."
+                ],
+                [
+                    "Ogni testimonianza raccontava",
+                    "gli stessi Giochi",
+					"in un modo completamente diverso,",
+					"mostrando quanto un evento collettivo",
+					"possa essere vissuto",
+					"attraverso sensibilità lontane."
+                ],
 				[
-					"Dopo un grande evento sportivo,",
-					"quello che resta",
-					"non è solo il risultato."
+					"Lavorare su queste voci",
+					"mi ha fatto capire quanto sia importante",
+					"dare spazio non solo al grande racconto,",
+					"ma anche alle percezioni più personali."
 				],
-				[
-					"Restano le voci,",
-					"i gesti,",
-					"le immagini che continuano",
-					"a muoversi nella memoria."
-				],
-				[
-					"Tifare per il proprio paese",
-					"porta con sé un orgoglio forte."
-				],
-				[
-					"Ma le Olimpiadi",
-					"mi hanno fatto sentire altro:",
-					"emozionarsi per una fatica,",
-					"per un gesto,",
-					"per un traguardo condiviso."
-				],
-				[
-					"Nel progetto ho curato",
-					"la direzione visiva,",
-					"l’interfaccia",
-					"e l’esperienza narrativa."
-				]
-			]
+                [
+					"Ho curato l’organizzazione",
+					"del gruppo di lavoro",
+					"e lo stile del progetto,",
+					"contribuendo anche",
+					"alla progettazione del modello su Figma."
+                ]
+            ]
 		},
 		{
+			id: "matilde-pinarello",
 			name: "Matilde Pinarello",
-			x: 88,
-			y: 49,
+			meta: "DIREZIONE VISIVA · INTERFACCIA · ESPERIENZA NARRATIVA",
+			x: 90,
+			y: 46,
 			title: "Matilde Pinarello",
 			paragraphs: [
 				[
-					"Dopo un grande evento sportivo,",
-					"quello che resta",
-					"non è solo il risultato."
+					"Avendo praticato sport",
+					"per tutta la vita,",
+					"considero le Olimpiadi",
+					"come un traguardo desiderato",
+					"da ogni atleta",
+					"e uno dei più grandi onori."
 				],
 				[
-					"Restano le voci,",
-					"i gesti,",
-					"le immagini che continuano",
-					"a muoversi nella memoria."
+					"Tifare per la propria nazionale",
+					"e assistere alle performance",
+					"delle ragazze e dei ragazzi",
+					"è sempre una grande emozione."
 				],
 				[
-					"Tifare per il proprio paese",
-					"porta con sé un orgoglio forte."
+					"Questo progetto mi ha dato",
+					"la possibilità di osservare",
+					"lo sport da una prospettiva nuova."
 				],
 				[
-					"Ma le Olimpiadi",
-					"mi hanno fatto sentire altro:",
-					"emozionarsi per una fatica,",
-					"per un gesto,",
-					"per un traguardo condiviso."
-				],
-				[
-					"Nel progetto ho curato",
-					"la direzione visiva,",
-					"l’interfaccia",
-					"e l’esperienza narrativa."
+					"Ho curato lo stile generale",
+					"del sito e la colonna sonora,",
+					"oltre allo sviluppo",
+					"del prototipo su Figma."
 				]
 			]
 		},
 		{
+			id: "giulia-croci",
 			name: "Giulia Croci",
-			x: 76,
-			y: 67,
+			meta: "DIREZIONE VISIVA · INTERFACCIA · ESPERIENZA NARRATIVA",
+			x: 81,
+			y: 70,
 			title: "Giulia Croci",
 			paragraphs: [
 				[
-					"Dopo un grande evento sportivo,",
-					"quello che resta",
-					"non è solo il risultato."
+					"Le Olimpiadi sono",
+					"un momento immancabile",
+					"nella mia famiglia",
+					"ormai da anni."
 				],
 				[
-					"Restano le voci,",
-					"i gesti,",
-					"le immagini che continuano",
-					"a muoversi nella memoria."
+					"Assistere a tutte le gare",
+					"ha reso l’inverno",
+					"qualcosa di magico."
 				],
 				[
-					"Tifare per il proprio paese",
-					"porta con sé un orgoglio forte."
+					"Mi piacerebbe riuscire",
+					"a diventare come i migliori",
+					"snowboarder al mondo,",
+					"ma quando ci ho provato",
+					"mi sono rotta un braccio:",
+					"sarà per la prossima!"
 				],
 				[
-					"Ma le Olimpiadi",
-					"mi hanno fatto sentire altro:",
-					"emozionarsi per una fatica,",
-					"per un gesto,",
-					"per un traguardo condiviso."
-				],
-				[
-					"Nel progetto ho curato",
-					"la direzione visiva,",
-					"l’interfaccia",
-					"e l’esperienza narrativa."
+					"Ho curato la modellazione 3D",
+					"su Blender",
+					"e contribuito alla progettazione",
+					"del modello su Figma,",
+					"supportando l’organizzazione",
+					"dei contenuti."
 				]
 			]
 		}
@@ -283,6 +275,25 @@
 
 	const aboutContent = $derived(activeAbout || defaultAbout);
 	const aboutTitleVariant = $derived(activeAbout ? "about-name" : "about");
+	const aboutLead = $derived(aboutContent.paragraphs[0] || []);
+	const aboutBody = $derived(
+		activeAbout
+			? aboutContent.paragraphs.slice(1, -1)
+			: aboutContent.paragraphs.slice(1)
+	);
+	const aboutContribution = $derived(
+		activeAbout
+			? aboutContent.paragraphs[aboutContent.paragraphs.length - 1]
+			: null
+	);
+
+	function showPersonPreview(person) {
+		activeAbout = person;
+	}
+
+	function clearPersonPreview() {
+		activeAbout = null;
+	}
 
     async function goBackToMap(event) {
 		event.preventDefault();
@@ -309,7 +320,192 @@
 
 	const MODEL_TARGET_WIDTH = 96;
     const PARTICLE_COUNT = 180000;
-    const PARTICLE_SIZE = 0.34;
+    const PARTICLE_SIZE = 0.38;
+	const ABOUT_SNOW_LAYERS = {
+		far: {
+			name: "about-far-snow",
+			kind: "background",
+			count: 3000,
+			size: 0.28,
+			opacity: 0.28,
+			alphaTest: 0.012,
+			speedScale: 0.35,
+			minX: -80,
+			maxX: 58,
+			minZ: -78,
+			maxZ: -30,
+			wrapMinY: 1.2,
+			wrapMaxY: 72,
+			renderOrder: 22
+		},
+		mid: {
+			name: "about-mid-snow",
+			kind: "background",
+			count: 3500,
+			size: 0.42,
+			opacity: 0.52,
+			alphaTest: 0.008,
+			speedScale: 0.65,
+			minX: -25,
+			maxX: 103,
+			minZ: -36,
+			maxZ: 10,
+			wrapMinY: 1.2,
+			wrapMaxY: 72,
+			renderOrder: 23
+		},
+		near: {
+			name: "about-near-fine-snow",
+			kind: "background",
+			count: 1900,
+			size: 0.62,
+			opacity: 0.42,
+			alphaTest: 0.012,
+			speedScale: 1,
+			minX: 25,
+			maxX: 115,
+			minZ: 4,
+			maxZ: 42,
+			wrapMinY: 1.2,
+			wrapMaxY: 72,
+			renderOrder: 24
+		},
+		foreground: {
+			name: "about-foreground-snow",
+			kind: "foreground",
+			count: 260,
+			size: 0.9,
+			opacity: 0.34,
+			alphaTest: 0.015,
+			minX: -48,
+			maxX: 117,
+			minZ: -73,
+			maxZ: 33,
+			wrapMinY: 1.2,
+			wrapMaxY: 64,
+			renderOrder: 25
+		}
+	};
+
+	function wrapAboutSnow(value, min, max) {
+		const range = max - min;
+		return ((((value - min) % range) + range) % range) + min;
+	}
+
+	function createAboutSnow(config) {
+		const positions = new Float32Array(config.count * 3);
+		const base = new Float32Array(config.count * 3);
+		const phases = new Float32Array(config.count);
+		const amplitudes = new Float32Array(config.count);
+		const lowLayers = new Uint8Array(config.count);
+
+		for (let i = 0; i < config.count; i++) {
+			const offset = i * 3;
+			const x = THREE.MathUtils.randFloat(config.minX, config.maxX);
+			const z = THREE.MathUtils.randFloat(config.minZ, config.maxZ);
+			let y;
+
+			if (config.kind === "background") {
+				const lowLayer = Math.random() < 0.62;
+				lowLayers[i] = lowLayer ? 1 : 0;
+				y = lowLayer
+					? THREE.MathUtils.randFloat(1.8, 18)
+					: THREE.MathUtils.randFloat(18, 68);
+				amplitudes[i] = lowLayer
+					? 0.18 + Math.random() * 0.52
+					: 0.06 + Math.random() * 0.34;
+			} else {
+				y = THREE.MathUtils.randFloat(3, 62);
+				amplitudes[i] = 0.18 + Math.random() * 0.55;
+			}
+
+			positions[offset] = base[offset] = x;
+			positions[offset + 1] = base[offset + 1] = y;
+			positions[offset + 2] = base[offset + 2] = z;
+			phases[i] = Math.random() * Math.PI * 2;
+		}
+
+		const geometry = new THREE.BufferGeometry();
+		geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+		const material = new THREE.PointsMaterial({
+			map: createSnowFlakeTexture(THREE),
+			alphaTest: config.alphaTest,
+			color: 0xffffff,
+			size: config.size,
+			sizeAttenuation: true,
+			transparent: true,
+			opacity: config.opacity,
+			depthWrite: false,
+			depthTest: false,
+			fog: false,
+			blending: THREE.NormalBlending
+		});
+
+		const points = new THREE.Points(geometry, material);
+		points.name = config.name;
+		points.frustumCulled = false;
+		points.renderOrder = config.renderOrder;
+
+		return {
+			points,
+			kind: config.kind,
+			count: config.count,
+			base,
+			phases,
+			amplitudes,
+			lowLayers,
+			speedScale: config.speedScale ?? 1,
+			wrapMinY: config.wrapMinY,
+			wrapMaxY: config.wrapMaxY
+		};
+	}
+
+	function updateAboutSnow(snow, t) {
+		const positions = snow.points.geometry.attributes.position.array;
+
+		for (let i = 0; i < snow.count; i++) {
+			const offset = i * 3;
+			const phase = snow.phases[i];
+			const amplitude = snow.amplitudes[i];
+
+			if (snow.kind === "background") {
+				const layerTime = t * snow.speedScale;
+				const fallSpeed = snow.lowLayers[i] ? 0.795 : 0.468;
+				const driftA = Math.sin(layerTime * 0.32 + phase) * amplitude * 1.15;
+				const driftB = Math.sin(layerTime * 0.17 + phase * 1.7) * amplitude * 0.75;
+				const swayZ = Math.cos(layerTime * 0.24 + phase * 1.3) * amplitude * 0.7;
+
+				positions[offset] = snow.base[offset] + driftA + driftB;
+				positions[offset + 1] = wrapAboutSnow(
+					snow.base[offset + 1] -
+						layerTime * fallSpeed -
+						Math.sin(layerTime * 0.2 + phase) * 0.45,
+					snow.wrapMinY,
+					snow.wrapMaxY
+				);
+				positions[offset + 2] = snow.base[offset + 2] + swayZ;
+			} else {
+				const swayX =
+					Math.sin(t * 0.22 + phase) * amplitude * 1.25 +
+					Math.cos(t * 0.11 + phase * 1.9) * amplitude * 0.8;
+				const swayZ =
+					Math.cos(t * 0.18 + phase) * amplitude * 0.7 +
+					Math.sin(t * 0.09 + phase * 1.4) * amplitude * 0.45;
+				const fall = 0.575 + Math.sin(phase) * 0.23;
+
+				positions[offset] = snow.base[offset] + swayX;
+				positions[offset + 1] = wrapAboutSnow(
+					snow.base[offset + 1] - t * fall,
+					snow.wrapMinY,
+					snow.wrapMaxY
+				);
+				positions[offset + 2] = snow.base[offset + 2] + swayZ;
+			}
+		}
+
+		snow.points.geometry.attributes.position.needsUpdate = true;
+	}
 
 	function createParticleTexture() {
 		const textureCanvas = document.createElement("canvas");
@@ -319,9 +515,9 @@
 		const ctx = textureCanvas.getContext("2d");
 		const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
 
-		gradient.addColorStop(0.0, "rgba(255,255,255,0.95)");
-		gradient.addColorStop(0.22, "rgba(255,255,255,0.48)");
-		gradient.addColorStop(0.55, "rgba(180,210,230,0.10)");
+		gradient.addColorStop(0.0, "rgba(255,255,255,0.92)");
+		gradient.addColorStop(0.18, "rgba(255,255,255,0.46)");
+		gradient.addColorStop(0.48, "rgba(180,210,230,0.08)");
 		gradient.addColorStop(1.0, "rgba(180,210,230,0)");
 
 		ctx.fillStyle = gradient;
@@ -429,18 +625,28 @@
 			return null;
 		}
 
-		const positions = [];
-		const colors = [];
+			const positions = [];
+			const colors = [];
 
-		let minY = Infinity;
-		let maxY = -Infinity;
+			let minX = Infinity;
+			let maxX = -Infinity;
+			let minY = Infinity;
+			let maxY = -Infinity;
+			let minZ = Infinity;
+			let maxZ = -Infinity;
 
-		triangles.forEach((tri) => {
-			minY = Math.min(minY, tri.a.y, tri.b.y, tri.c.y);
-			maxY = Math.max(maxY, tri.a.y, tri.b.y, tri.c.y);
-		});
+			triangles.forEach((tri) => {
+				minX = Math.min(minX, tri.a.x, tri.b.x, tri.c.x);
+				maxX = Math.max(maxX, tri.a.x, tri.b.x, tri.c.x);
+				minY = Math.min(minY, tri.a.y, tri.b.y, tri.c.y);
+				maxY = Math.max(maxY, tri.a.y, tri.b.y, tri.c.y);
+				minZ = Math.min(minZ, tri.a.z, tri.b.z, tri.c.z);
+				maxZ = Math.max(maxZ, tri.a.z, tri.b.z, tri.c.z);
+			});
 
-		const yRange = Math.max(maxY - minY, 0.0001);
+			const xRange = Math.max(maxX - minX, 0.0001);
+			const yRange = Math.max(maxY - minY, 0.0001);
+			const zRange = Math.max(maxZ - minZ, 0.0001);
 
 		for (let i = 0; i < PARTICLE_COUNT; i++) {
 			const p = sampleTriangle(triangles, totalArea);
@@ -459,19 +665,45 @@
                     Math.sin(p.x * 0.18 + p.y * 0.28) *
                     Math.cos(p.z * 0.16 - p.x * 0.08);
 
-            const sparkle = Math.random() < 0.08 ? 0.28 : 0;
+	            const middleTerrain = THREE.MathUtils.smoothstep(height, 0.20, 0.58);
+	            const highRidges = THREE.MathUtils.smoothstep(height, 0.56, 0.82);
+	            const ridgeDetail = ridge * (0.035 + highRidges * 0.20);
 
-            const brightness =
-                0.78 +
-                height * 0.32 +
-                ridge * 0.22 +
-                Math.random() * 0.16 +
-                sparkle;
+	            const xNormalized = THREE.MathUtils.clamp((p.x - minX) / xRange, 0, 1);
+	            const zNormalized = THREE.MathUtils.clamp((p.z - minZ) / zRange, 0, 1);
+	            const edgeDistance = Math.min(xNormalized, 1 - xNormalized) * 2;
+	            const depthMiddle = 1 - Math.abs(zNormalized - 0.5) * 2;
+
+	            const bottomFade = THREE.MathUtils.lerp(
+	                0.06,
+	                1,
+	                THREE.MathUtils.smoothstep(height, 0.12, 0.50)
+	            );
+	            const sideFade = THREE.MathUtils.lerp(
+	                0.35,
+	                1,
+	                THREE.MathUtils.smoothstep(edgeDistance, 0.04, 0.36)
+	            );
+	            const depthFade = THREE.MathUtils.lerp(
+	                0.75,
+	                1,
+	                THREE.MathUtils.smoothstep(depthMiddle, 0.05, 0.70)
+	            );
+
+	            const brightness =
+	                (0.72 +
+	                    middleTerrain * 0.12 +
+	                    highRidges * 0.36 +
+	                    ridgeDetail +
+	                    Math.random() * 0.004) *
+	                bottomFade *
+	                sideFade *
+	                depthFade;
 
             colors.push(
-                Math.min(1, 0.9 * brightness),
-                Math.min(1, 0.96 * brightness),
-                Math.min(1, 1.08 * brightness)
+                Math.min(1, 0.98 * brightness),
+                Math.min(1, 1.03 * brightness),
+                Math.min(1, 1.10 * brightness)
             );
 		}
 
@@ -489,12 +721,12 @@
 
 		const material = new THREE.PointsMaterial({
             map: createParticleTexture(),
-            alphaTest: 0.002,
+	            alphaTest: 0.004,
             size: PARTICLE_SIZE,
             sizeAttenuation: true,
             vertexColors: true,
             transparent: true,
-            opacity: 1,
+	            opacity: 1.5, //山透明度
             depthWrite: false,
             depthTest: false,
             blending: THREE.AdditiveBlending
@@ -530,7 +762,7 @@
 			scale
 		);
 
-		root.position.set(48, -5, 0); //山的位置
+		root.position.set(53, -5, 0); //山的位置
         root.rotation.set(
             THREE.MathUtils.degToRad(7),
             THREE.MathUtils.degToRad(-10),
@@ -584,6 +816,15 @@
 		backLight.position.set(-30, 18, -30);
 		scene.add(backLight);
 
+		const aboutFarSnow = createAboutSnow(ABOUT_SNOW_LAYERS.far);
+		const aboutMidSnow = createAboutSnow(ABOUT_SNOW_LAYERS.mid);
+		const aboutNearSnow = createAboutSnow(ABOUT_SNOW_LAYERS.near);
+		const aboutForegroundSnow = createAboutSnow(ABOUT_SNOW_LAYERS.foreground);
+		scene.add(aboutFarSnow.points);
+		scene.add(aboutMidSnow.points);
+		scene.add(aboutNearSnow.points);
+		scene.add(aboutForegroundSnow.points);
+
 		const loader = new GLTFLoader();
 		loader.setMeshoptDecoder(MeshoptDecoder);
 
@@ -632,6 +873,10 @@
 			if (disposed) return;
 
 			const t = performance.now() * 0.001;
+			updateAboutSnow(aboutFarSnow, t);
+			updateAboutSnow(aboutMidSnow, t);
+			updateAboutSnow(aboutNearSnow, t);
+			updateAboutSnow(aboutForegroundSnow, t);
 
 			if (mountainParticles) {
 				mountainParticles.rotation.y = Math.sin(t * 0.08) * 0.012;
@@ -701,14 +946,30 @@
 			ariaLabel={aboutContent.title}
 		/>
 
-		<div class="about-text">
-			{#each aboutContent.paragraphs as paragraph}
-				<p>
-					{#each paragraph as line, index}
-						{line}{#if index < paragraph.length - 1}<br />{/if}
-					{/each}
-				</p>
-			{/each}
+		<div class="about-text" class:is-default={!activeAbout}>
+			<p class="about-lead">
+				{#each aboutLead as line, index}
+					{line}{#if index < aboutLead.length - 1}<br />{/if}
+				{/each}
+			</p>
+
+			<div class="about-body">
+				{#each aboutBody as paragraph}
+					<p>
+						{#each paragraph as line, index}
+							{line}{#if index < paragraph.length - 1}<br />{/if}
+						{/each}
+					</p>
+				{/each}
+			</div>
+
+			{#if aboutContribution}
+				<div class="about-contribution">
+					<p class="about-contribution-text">
+						{aboutContribution.join(" ")}
+					</p>
+				</div>
+			{/if}
 		</div>
 	</div>
 
@@ -718,17 +979,15 @@
 		<div class="about-people">
 			{#each people as person}
 				<button
-					class="about-person-dot"
+					class="about-person-dot glow-orb"
 					type="button"
 					style={`left: ${person.x}%; top: ${person.y}%;`}
 					aria-label={person.name}
-					onmouseenter={() => (activeAbout = person)}
-					onmouseleave={() => (activeAbout = null)}
-					onfocus={() => (activeAbout = person)}
-					onblur={() => (activeAbout = null)}
+					onmouseenter={() => showPersonPreview(person)}
+					onmouseleave={clearPersonPreview}
+					onfocus={() => showPersonPreview(person)}
+					onblur={clearPersonPreview}
 				>
-					<span class="about-dot-core"></span>
-					<span class="about-dot-ring"></span>
 				</button>
 			{/each}
 		</div>
@@ -742,15 +1001,22 @@
 	}
 
 	.about-page {
+		--about-safe-padding: clamp(72px, 7vw, 96px);
+
 		position: relative;
 		width: 100vw;
 		height: 100vh;
 		overflow: hidden;
 		background:
 			radial-gradient(circle at 76% 28%, rgba(130, 158, 184, 0.12), transparent 24%),
-			radial-gradient(circle at 64% 82%, rgba(61, 113, 145, 0.16), transparent 28%),
+			linear-gradient(
+				to top,
+				rgba(7, 14, 23, 0.48) 0%,
+				rgba(7, 14, 23, 0.12) 22%,
+				transparent 46%
+			),
 			#070e17;
-		color: #f2f5f7;
+		color: rgba(242, 245, 247, 0.82);
 		font-family: var(--font-light);
 		font-weight: 200;
 	}
@@ -839,25 +1105,45 @@
 	}
 
 	.about-copy {
-		position: relative;
+		position: absolute;
+		left: var(--about-safe-padding);
+		top: var(--about-safe-padding);
 		z-index: 10;
-		width: min(34vw, 440px);
-		padding-left: 7vw;
-		padding-top: 13.5vh;
-		pointer-events: auto;
+		width: clamp(300px, 28vw, 356px);
+		max-width: calc(100vw - var(--about-safe-padding) - var(--about-safe-padding));
+		max-height: calc(100dvh - var(--about-safe-padding) - var(--about-safe-padding));
+		pointer-events: none;
+	}
+
+	.about-copy::before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		top: -4vh;
+		right: -9vw;
+		bottom: -5vh;
+		left: -5vw;
+		pointer-events: none;
+		background: linear-gradient(
+			90deg,
+			rgba(7, 14, 23, 0.38) 0%,
+			rgba(7, 14, 23, 0.16) 62%,
+			rgba(7, 14, 23, 0) 100%
+		);
+		filter: blur(16px);
 	}
 
 	.about-copy :global(.particle-title--about) {
-		margin: 0 0 7vh;
+		margin: 0 0 clamp(12px, 1.4vw, 18px);
 
-		width: 520px;
-		height: 150px;
+		width: 760px;
+		height: 132px;
 
 		font-family: var(--font-title);
-		font-size: 112px;
+		font-size: 58px; 
 		font-weight: 400;
 		line-height: 0.88;
-		letter-spacing: 0.08em;
+		letter-spacing: 0.05em;
 		text-transform: none;
 
 		--particle-title-align: left;
@@ -869,7 +1155,7 @@
 		--particle-title-push: 0.18;
 		--particle-title-return: 0.16;	
 		--particle-title-friction: 0.86;
-		--particle-title-dot-size: 1.18;
+		--particle-title-dot-size: 0.98;
 		--particle-title-opacity: 1;
 		--particle-title-cursor-radius: 58;
 		--particle-title-cursor-push: 0.72;
@@ -878,7 +1164,7 @@
 	}
 
 	.about-copy :global(.particle-title--about-name) {
-		margin: 0 0 7vh;
+		margin: 0 0 clamp(12px, 1.4vw, 18px);
 
 		width: 760px;
 		height: 132px;
@@ -908,20 +1194,71 @@
 	}
 
 	.about-text {
+		max-width: 356px;
 		font-family: var(--font-medium);
         font-weight: 400;
         font-style: italic;
-        font-size: clamp(18px, 1.45vw, 25px);
-        line-height: 0.87;
         letter-spacing: 0.01em;
-        color: rgba(242, 245, 247, 0.88);
         -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        font-synthesis: none;
+		-moz-osx-font-smoothing: grayscale;
+		font-synthesis: none;
+		word-break: normal;
+		overflow-wrap: normal;
+		hyphens: none;
 	}
 
-	.about-text p {
-		margin: 0 0 26px;
+	.about-text.is-default {
+		width: clamp(300px, 24vw, 340px);
+		max-width: calc(100vw - var(--about-safe-padding) - var(--about-safe-padding));
+	}
+
+	.about-text.is-default .about-lead,
+	.about-text.is-default .about-body {
+		line-height: 1.22;
+	}
+
+	.about-text.is-default .about-lead,
+	.about-text.is-default .about-body p {
+		margin-bottom: clamp(24px, 3vh, 34px);
+	}
+
+	.about-lead {
+		margin: 0 0 clamp(22px, 2.4vh, 30px);
+		font-family: "Omnes", sans-serif;
+		font-size: clamp(18px, 1.35vw, 20px);
+		font-style: normal;
+		font-weight: 400;
+		line-height: 1.12;
+		color: rgba(242, 245, 247, 0.94);
+	}
+
+	.about-body {
+		font-family: "Omnes", sans-serif;
+		font-size: clamp(18px, 1.35vw, 20px);
+		font-style: normal;
+		font-weight: 400;
+		line-height: 1.12;
+		color: rgba(242, 245, 247, 0.94);
+	}
+
+	.about-body p {
+		margin: 0 0 clamp(22px, 2.4vh, 30px);
+	}
+
+	.about-contribution {
+		max-width: clamp(300px, 30vw, 390px);
+		margin-top: clamp(22px, 2.6vh, 30px);
+		color: rgba(242, 245, 247, 0.72);
+	}
+
+	.about-contribution-text {
+		margin: 0;
+		font-family: "Omnes", sans-serif;
+		font-size: clamp(18px, 1.35vw, 20px);
+		font-style: normal;
+		font-weight: 400;
+		line-height: 1.12;
+		color: rgba(242, 245, 247, 0.72);
 	}
 
 	.about-mountain-layer {
@@ -989,15 +1326,15 @@
 		position: absolute;
 		left: 50%;
 		top: 50%;
-		width: 32px;
-		height: 32px;
+		width: 38px;
+		height: 38px;
 		border-radius: 999px;
 		transform: translate(-50%, -50%);
-		background: rgba(255, 255, 255, 0.9);
+		background: rgba(255, 255, 255, 0.96);
 		box-shadow:
-			0 0 12px rgba(255, 255, 255, 0.62),
-			0 0 30px rgba(220, 238, 255, 0.28),
-			0 0 56px rgba(180, 210, 236, 0.14);
+			0 0 18px rgba(255, 255, 255, 0.82),
+			0 0 44px rgba(220, 238, 255, 0.42),
+			0 0 88px rgba(180, 210, 236, 0.22);
 	}
 
 	.about-dot-ring {
@@ -1021,32 +1358,25 @@
 
 	.about-person-dot:hover,
 	.about-person-dot:focus-visible {
-		transform: none;
+		z-index: 2;
+		transform: none !important;
+		background: transparent !important;
+		border-color: transparent !important;
+		box-shadow: none !important;
+		animation: none !important;
 	}
 
-	.about-person-dot:hover .about-dot-ring,
-	.about-person-dot:focus-visible .about-dot-ring {
-		transform: translate(-50%, -50%) scale(1.14);
-		opacity: 0.96;
-		border-color: rgba(242, 245, 247, 0.58);
-	}
-
-	@keyframes about-dot-float {
-		0%,
-		100% {
-			translate: 0 0;
-		}
-
-		50% {
-			translate: 0 -8px;
-		}
+	.about-people:hover .about-person-dot:not(:hover):not(:focus-visible) {
+		opacity: 0.85;
 	}
 
 	@media (max-width: 900px) {
+		.about-page {
+			--about-safe-padding: clamp(32px, 7vw, 72px);
+		}
+
 		.about-copy {
-			width: min(72vw, 420px);
-			padding-left: 32px;
-			padding-top: 96px;
+			width: min(72vw, 356px);
 		}
 
 		.about-text {

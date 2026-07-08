@@ -106,7 +106,7 @@
 			Un viaggio tra frammenti e memorie. <br />Attraversa una mappa di voci e testimonianze per scoprire ciò che resta<br /> dell’esperienza olimpica.
 		</p>
 
-		<button id="enterBtn" class="enter-btn" aria-label="Esplora la mappa" onclick={enterOverview}>
+		<button id="enterBtn" class="enter-btn glow-orb" aria-label="Esplora la mappa" onclick={enterOverview}>
 			<span class="enter-glow"></span>
 		</button>
 
