@@ -1042,11 +1042,11 @@
 			linear-gradient(
 				90deg,
 				rgba(7, 14, 23, 0.98) 0%,
-				rgba(7, 14, 23, 0.88) 30%,
-				rgba(7, 14, 23, 0.38) 56%,
-				rgba(7, 14, 23, 0.12) 100%
+				rgba(7, 14, 23, 0.86) 28%,
+				rgba(7, 14, 23, 0.24) 55%,
+				rgba(7, 14, 23, 0.08) 100%
 			);
-		z-index: 6;
+		z-index: 2;
 	}
 
 	.about-back {
@@ -1150,15 +1150,15 @@
 		--particle-title-padding-x: 0;
 
 		--particle-title-rgb: 255,255,255;
-		--particle-title-density: 2;
-		--particle-title-radius: 44;
-		--particle-title-push: 0.18;
-		--particle-title-return: 0.16;	
+		--particle-title-density: 3;
+		--particle-title-radius: 82;
+		--particle-title-push: 0.42;
+		--particle-title-return: 0.09;
 		--particle-title-friction: 0.86;
 		--particle-title-dot-size: 0.98;
 		--particle-title-opacity: 1;
-		--particle-title-cursor-radius: 58;
-		--particle-title-cursor-push: 0.72;
+		--particle-title-cursor-radius: 96;
+		--particle-title-cursor-push: 1.35;
 		--particle-title-ring-opacity: 0.72;
 		--particle-title-ring-width: 1.4;
 	}
@@ -1265,7 +1265,6 @@
 		position: absolute;
 		inset: 0;
 		z-index: 3;
-		opacity: 0.82;
 	}
 
 	.about-canvas {
