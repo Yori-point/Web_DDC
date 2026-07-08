@@ -856,7 +856,7 @@ const RITUAL_CAMERA = {
     appState.view = 'transition';
     appState.transitionStart = clock.getElapsedTime();
     appState.transitionDuration = 2.2;
-    setDuomoRoadsActive(false);
+    clearDuomoHoverState();
     appState.hoverHookObject = null;
     window.hideCategoryHoverText?.();
     document.body.classList.remove("category-hover-active");
