@@ -9,16 +9,44 @@
 		| "opportunita"
 		| "trasformazione";
 
-	const TRACKS: Record<TrackKey, string> = {
-		overall: "/music/overall.mp3",
-		festa: "/music/festa.mp3",
-		relazioni: "/music/relazioni.mp3",
-		criticita: "/music/criticita.mp3",
-		opportunita: "/music/opportunita.mp3",
-		trasformazione: "/music/trasformazione.mp3"
+	type EffectKey = Exclude<TrackKey, "overall">;
+
+	const OVERALL_TRACK = "/music/overall.mp3";
+
+	const EFFECT_TRACKS: Record<EffectKey, string[]> = {
+		criticita: [
+			"/music/criticita/criticita-01.mp3",
+			"/music/criticita/criticita-02.mp3"
+		],
+		festa: [
+			"/music/festa/festa-01.mp3",
+			"/music/festa/festa-02.mp3"
+		],
+		opportunita: [
+			"/music/opportunita/opportunita-01.mp3",
+			"/music/opportunita/opportunita-02.mp3"
+		],
+		relazioni: [
+			"/music/relazioni/relazioni-01.mp3",
+			"/music/relazioni/relazioni-02.mp3"
+		],
+		trasformazione: [
+			"/music/trasformazione/trasformazione.mp3"
+		]
 	};
 
-	let audio = $state<HTMLAudioElement | null>(null);
+	const OVERALL_VOLUME = 0.45;
+	const EFFECT_VOLUMES: Record<EffectKey, number> = {
+		criticita: 0.4,
+		festa: 0.04,
+		opportunita: 0.3,
+		relazioni: 0.3,
+		trasformazione: 0.4
+	};
+
+	let overallAudio = $state<HTMLAudioElement | null>(null);
+	let effectAudios: HTMLAudioElement[] = [];
+
 	let currentKey = $state<TrackKey>("overall");
 	let isPlaying = $state(false);
 	let userPaused = $state(false);
@@ -27,43 +55,81 @@
 	let wasPlayingBeforeMedia = $state(false);
 
 	function normalizeTrackKey(key: unknown): TrackKey {
-		if (typeof key === "string" && key in TRACKS) {
-			return key as TrackKey;
+		if (key === "overall") return "overall";
+
+		if (typeof key === "string" && key in EFFECT_TRACKS) {
+			return key as EffectKey;
 		}
 
 		return "overall";
 	}
 
-	async function playCurrent() {
-		if (!audio) return;
+	function createLoopAudio(src: string, volume: number) {
+		const audioElement = new Audio(src);
+		audioElement.loop = true;
+		audioElement.volume = volume;
+		audioElement.preload = "auto";
+		return audioElement;
+	}
 
+	async function playAudio(audioElement: HTMLAudioElement) {
 		try {
-			await audio.play();
-			isPlaying = true;
+			await audioElement.play();
 		} catch (error) {
-			isPlaying = false;
-			console.warn("Music autoplay blocked or music file missing:", error);
+			console.warn("Audio autoplay blocked or file missing:", audioElement.src, error);
 		}
 	}
 
-	function pauseCurrent() {
-		if (!audio) return;
+	async function playCurrent() {
+		if (!overallAudio) return;
 
-		audio.pause();
+		await playAudio(overallAudio);
+
+		for (const effectAudio of effectAudios) {
+			await playAudio(effectAudio);
+		}
+
+		isPlaying = !overallAudio.paused || effectAudios.some((effectAudio) => !effectAudio.paused);
+	}
+
+	function pauseCurrent() {
+		if (overallAudio) {
+			overallAudio.pause();
+		}
+
+		for (const effectAudio of effectAudios) {
+			effectAudio.pause();
+		}
+
 		isPlaying = false;
 	}
 
-	async function setTrack(key: unknown, shouldPlay = true) {
-		if (!audio) return;
+	function stopEffects() {
+		for (const effectAudio of effectAudios) {
+			effectAudio.pause();
+			effectAudio.currentTime = 0;
+			effectAudio.src = "";
+		}
 
+		effectAudios = [];
+	}
+
+	function loadEffectsFor(key: TrackKey) {
+		stopEffects();
+
+		if (key === "overall") return;
+
+		effectAudios = EFFECT_TRACKS[key].map((src) => {
+			return createLoopAudio(src, EFFECT_VOLUMES[key]);
+		});
+	}
+
+	async function setTrack(key: unknown, shouldPlay = true) {
 		const nextKey = normalizeTrackKey(key);
-		const nextSrc = TRACKS[nextKey];
 
 		if (currentKey !== nextKey) {
 			currentKey = nextKey;
-			audio.pause();
-			audio.src = nextSrc;
-			audio.currentTime = 0;
+			loadEffectsFor(nextKey);
 		}
 
 		if (shouldPlay && !userPaused && !mediaPaused) {
@@ -72,7 +138,7 @@
 	}
 
 	function toggleMusic() {
-		if (!audio) return;
+		if (!overallAudio) return;
 
 		if (isPlaying) {
 			userPaused = true;
@@ -85,10 +151,7 @@
 	}
 
 	onMount(() => {
-		audio = new Audio(TRACKS.overall);
-		audio.loop = true;
-		audio.volume = 0.45;
-		audio.preload = "auto";
+		overallAudio = createLoopAudio(OVERALL_TRACK, OVERALL_VOLUME);
 
 		const handleStart = (event: Event) => {
 			const customEvent = event as CustomEvent<{ key?: TrackKey }>;
@@ -144,10 +207,12 @@
 			window.removeEventListener("tracce:music-pause-for-media", handleMediaPause);
 			window.removeEventListener("tracce:music-resume-after-media", handleMediaResume);
 
-			if (audio) {
-				audio.pause();
-				audio.src = "";
-				audio = null;
+			pauseCurrent();
+			stopEffects();
+
+			if (overallAudio) {
+				overallAudio.src = "";
+				overallAudio = null;
 			}
 		};
 	});
