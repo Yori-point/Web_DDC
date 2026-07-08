@@ -970,7 +970,7 @@
 				transparent 46%
 			),
 			#070e17;
-		color: #f2f5f7;
+		color: rgba(242, 245, 247, 0.82);
 		font-family: var(--font-light);
 		font-weight: 200;
 	}
@@ -1183,7 +1183,7 @@
 		font-style: normal;
 		font-weight: 400;
 		line-height: 1.12;
-		color: #f2f5f7;
+		color: rgba(242, 245, 247, 0.94);
 	}
 
 	.about-body {
@@ -1192,7 +1192,7 @@
 		font-style: normal;
 		font-weight: 400;
 		line-height: 1.12;
-		color: #f2f5f7;
+		color: rgba(242, 245, 247, 0.94);
 	}
 
 	.about-body p {
@@ -1202,7 +1202,7 @@
 	.about-contribution {
 		max-width: clamp(300px, 30vw, 390px);
 		margin-top: clamp(22px, 2.6vh, 30px);
-		color: #f2f5f7;
+		color: rgba(242, 245, 247, 0.72);
 	}
 
 	.about-contribution-text {
@@ -1212,7 +1212,7 @@
 		font-style: normal;
 		font-weight: 400;
 		line-height: 1.12;
-		color: #f2f5f7;
+		color: rgba(242, 245, 247, 0.72);
 	}
 
 	.about-mountain-layer {
