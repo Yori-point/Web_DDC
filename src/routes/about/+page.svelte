@@ -10,6 +10,24 @@
 
 	let activeAbout = $state(null);
 
+	onMount(() => {
+		document.body.classList.remove(
+			"intro-active",
+			"overview-active",
+			"chapter-active",
+			"chapter-nodes-active",
+			"chapter-nodes-preenter",
+			"summit-title-active",
+			"ritual-active",
+			"is-transitioning",
+			"category-menu-open",
+			"category-hover-active",
+			"media-detail-open",
+			"media-av-open",
+			"duomo-hover-active"
+		);
+	});
+
 	const defaultAbout = {
 		title: "Tracce",
 		paragraphs: [
@@ -269,8 +287,18 @@
     async function goBackToMap(event) {
 		event.preventDefault();
 
-		sessionStorage.setItem("tracce-open-map", "1");
-		document.documentElement.classList.add("tracce-returning-map");
+		const returnView = sessionStorage.getItem("tracce-about-return-view");
+		const chapterKey = sessionStorage.getItem("tracce-about-return-chapter");
+
+		if (returnView === "chapter" && chapterKey) {
+			sessionStorage.setItem("tracce-open-chapter", chapterKey);
+			sessionStorage.removeItem("tracce-open-map");
+			document.documentElement.classList.remove("tracce-returning-map");
+		} else {
+			sessionStorage.setItem("tracce-open-map", "1");
+			sessionStorage.removeItem("tracce-open-chapter");
+			document.documentElement.classList.add("tracce-returning-map");
+		}
 
 		await goto("/", {
 			noScroll: true
@@ -637,6 +665,24 @@
 			renderer.dispose();
 		};
 	});
+
+	onMount(() => {
+		document.body.classList.remove(
+			"intro-active",
+			"overview-active",
+			"chapter-active",
+			"chapter-nodes-active",
+			"chapter-nodes-preenter",
+			"summit-title-active",
+			"ritual-active",
+			"is-transitioning",
+			"category-menu-open",
+			"category-hover-active",
+			"media-detail-open",
+			"media-av-open",
+			"duomo-hover-active"
+		);
+	});
 </script>
 
 <svelte:head>
@@ -730,11 +776,11 @@
 			linear-gradient(
 				90deg,
 				rgba(7, 14, 23, 0.98) 0%,
-				rgba(7, 14, 23, 0.86) 28%,
-				rgba(7, 14, 23, 0.24) 55%,
-				rgba(7, 14, 23, 0.08) 100%
+				rgba(7, 14, 23, 0.88) 30%,
+				rgba(7, 14, 23, 0.38) 56%,
+				rgba(7, 14, 23, 0.12) 100%
 			);
-		z-index: 2;
+		z-index: 6;
 	}
 
 	.about-back {
@@ -818,15 +864,15 @@
 		--particle-title-padding-x: 0;
 
 		--particle-title-rgb: 255,255,255;
-		--particle-title-density: 3;
-		--particle-title-radius: 82;
-		--particle-title-push: 0.42;
-		--particle-title-return: 0.09;
+		--particle-title-density: 2;
+		--particle-title-radius: 44;
+		--particle-title-push: 0.18;
+		--particle-title-return: 0.16;	
 		--particle-title-friction: 0.86;
-		--particle-title-dot-size: 1.02;
+		--particle-title-dot-size: 1.18;
 		--particle-title-opacity: 1;
-		--particle-title-cursor-radius: 96;
-		--particle-title-cursor-push: 1.35;
+		--particle-title-cursor-radius: 58;
+		--particle-title-cursor-push: 0.72;
 		--particle-title-ring-opacity: 0.72;
 		--particle-title-ring-width: 1.4;
 	}
@@ -882,6 +928,7 @@
 		position: absolute;
 		inset: 0;
 		z-index: 3;
+		opacity: 0.82;
 	}
 
 	.about-canvas {
@@ -942,15 +989,15 @@
 		position: absolute;
 		left: 50%;
 		top: 50%;
-		width: 38px;
-		height: 38px;
+		width: 32px;
+		height: 32px;
 		border-radius: 999px;
 		transform: translate(-50%, -50%);
-		background: rgba(255, 255, 255, 0.96);
+		background: rgba(255, 255, 255, 0.9);
 		box-shadow:
-			0 0 18px rgba(255, 255, 255, 0.82),
-			0 0 44px rgba(220, 238, 255, 0.42),
-			0 0 88px rgba(180, 210, 236, 0.22);
+			0 0 12px rgba(255, 255, 255, 0.62),
+			0 0 30px rgba(220, 238, 255, 0.28),
+			0 0 56px rgba(180, 210, 236, 0.14);
 	}
 
 	.about-dot-ring {

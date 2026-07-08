@@ -83,6 +83,67 @@
 	outline-offset: 6px;
 }
 
+.chapter-about {
+	all: unset;
+	position: absolute;
+	right: var(--ui-padding-x);
+	top: 0;
+	height: var(--ui-header-height);
+	z-index: 30;
+
+	display: flex;
+	align-items: center;
+
+	cursor: pointer;
+	pointer-events: auto;
+
+	font-family: "Omnes Light", "Omnes", "Helvetica Neue", Arial, sans-serif;
+	font-size: 20px;
+	line-height: 1;
+	font-weight: 200;
+	letter-spacing: 0.035em;
+	text-transform: uppercase;
+
+	color: #f2f5f7;
+	opacity: 1;
+	text-decoration: none;
+	text-shadow: none;
+
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-synthesis: none;
+
+	background: transparent !important;
+	box-shadow: none !important;
+	border: none !important;
+	outline: none;
+
+	transition:
+		opacity 0.25s ease,
+		text-shadow 0.25s ease;
+}
+
+.chapter-about:hover {
+	opacity: 0.62;
+	transform: none;
+	text-shadow:
+		0 0 10px rgba(242, 245, 247, 0.18),
+		0 0 26px rgba(242, 245, 247, 0.08);
+}
+
+.chapter-about:focus,
+.chapter-about:active {
+	background: transparent !important;
+	box-shadow: none !important;
+	border: none !important;
+	outline: none;
+}
+
+.chapter-about:focus-visible {
+	outline: 1px solid rgba(242, 245, 247, 0.45);
+	outline-offset: 6px;
+}
+
 .chapter-hover-intro {
 	position: absolute;
 	left: 50%;
@@ -220,7 +281,8 @@ body.summit-title-active .summit-title-canvas {
 	image-rendering: auto;
 }
 
-body.media-detail-open .chapter-back {
+body.media-detail-open .chapter-back,
+body.media-detail-open .chapter-about {
 	opacity: 0 !important;
 	visibility: hidden !important;
 	pointer-events: none !important;

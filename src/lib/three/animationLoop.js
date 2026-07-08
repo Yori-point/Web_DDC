@@ -32,6 +32,7 @@ export function startAnimationLoop({
 	setInterviewPanCurrent,
 	getInterviewPanTarget
 }) {
+
 	function animate() {
 		const t = clock.getElapsedTime();
 
@@ -78,7 +79,6 @@ export function startAnimationLoop({
 			);
 
 			const eased = easeInOutCubic(progress);
-
 			const oneMinusT = 1 - eased;
 
 			// Quadratic Bézier for camera position
@@ -114,6 +114,7 @@ export function startAnimationLoop({
 			camera.lookAt(orbit.target);
 
 			if (progress >= 1 && appState.targetChapter) {
+				appState.summitMoveActive = false;
 				enterChapter(appState.targetChapter);
 			}
 		}

@@ -10,7 +10,8 @@ import {
 	updateChapterCopy,
 	showChapterContainer,
 	hideChapterContainer,
-	clearChapterState
+	clearChapterState,
+	prepareChapterSwitch
 } from "$lib/ui/chapter.js";
 
 import {
@@ -115,10 +116,15 @@ export function initScene() {
 
 	const BG_COLOR = 0x070e17;
 
-	const shouldOpenMapFromAbout =
-		sessionStorage.getItem("tracce-open-map") === "1";
+	const shouldOpenChapterFromAbout =
+    sessionStorage.getItem("tracce-open-chapter");
 
-	sessionStorage.removeItem("tracce-open-map");
+  const shouldOpenMapFromAbout =
+    sessionStorage.getItem("tracce-open-map") === "1" &&
+    !shouldOpenChapterFromAbout;
+
+  sessionStorage.removeItem("tracce-open-map");
+  sessionStorage.removeItem("tracce-open-chapter");
 
 	document.body.classList.remove(
 		"intro-active",
@@ -129,17 +135,33 @@ export function initScene() {
 		"category-menu-open"
 	);
 
-	if (shouldOpenMapFromAbout) {
-		document.body.classList.add("overview-active");
-	} else {
-		document.body.classList.add("intro-active");
-	}
+	if (shouldOpenChapterFromAbout) {
+    document.body.classList.add("chapter-active");
+  } else if (shouldOpenMapFromAbout) {
+    document.body.classList.add("overview-active");
+  } else {
+    document.body.classList.add("intro-active");
+  }
 
   const canvas = document.getElementById('scene');
 
   if (!canvas) {
-	console.error("Missing #scene canvas.");
-	return;
+    console.error("Missing #scene canvas.");
+    return;
+    }
+
+    if (shouldOpenChapterFromAbout) {
+    document.getElementById("intro")?.classList.add("hidden");
+
+    document.body.classList.remove(
+      "intro-active",
+      "overview-active",
+      "ritual-active",
+      "is-transitioning",
+      "category-menu-open"
+    );
+
+    document.body.classList.add("chapter-active");
   }
 
   const cleanupInfoPanel = bindInfoPanel();
@@ -193,10 +215,24 @@ export function initScene() {
   });
 
   const appState = {
-    view: 'intro',
+    view: shouldOpenChapterFromAbout
+      ? "chapter-pending"
+      : shouldOpenMapFromAbout
+        ? "overview"
+        : "intro",
     transitionStart: 0,
     transitionDuration: 2.1,
     targetChapter: null,
+
+    transitionKind: "map-to-chapter",
+    chapterSwitchPlacementDone: false,
+    chapterSwitchPendingPlacement: null,
+
+    summitMoveActive: false,
+    summitMoveStartPosition: new THREE.Vector3(),
+    summitMoveEndPosition: new THREE.Vector3(),
+    summitMoveStartRotationY: 0,
+    summitMoveEndRotationY: 0,
 
     summitImmerseStart: 0,
     summitImmerseDuration: 0.8,
@@ -849,24 +885,75 @@ const RITUAL_CAMERA = {
     relazioni: new Set()
   };
 
+  function restoreSummitModelOpacityToBase() {
+    const baseOpacity =
+      animatedObjects.summitModelParticles?.userData?.baseOpacity ?? 0.96;
+
+    animatedObjects.summitModelMaterials?.forEach((material) => {
+      material.transparent = true;
+      material.opacity = baseOpacity;
+      material.needsUpdate = true;
+    });
+  }
+
+  function setSummitModelOpacity(opacity) {
+    animatedObjects.summitModelMaterials?.forEach((material) => {
+      material.transparent = true;
+      material.opacity = opacity;
+      material.needsUpdate = true;
+    });
+  }
+
   function startChapterTransition(data) {
     const chapter = CHAPTERS[data.key];
     if (!chapter) return;
 
-    appState.view = 'transition';
+    if (appState.view === "transition") return;
+
+    const isAlreadyInThisChapter =
+      (appState.view === "chapter" || appState.view === "chapter-pending") &&
+      appState.targetChapter?.key === chapter.key;
+
+    if (isAlreadyInThisChapter) return;
+
+    const isChapterToChapter =
+      (
+        appState.view === "chapter" ||
+        appState.view === "chapter-pending" ||
+        document.body.classList.contains("chapter-active")
+      ) &&
+      appState.targetChapter?.key !== chapter.key;
+
+    if (isChapterToChapter) {
+      prepareChapterSwitch();
+    }
+
+    appState.view = "transition";
+    appState.transitionKind = isChapterToChapter
+      ? "chapter-to-chapter"
+      : "map-to-chapter";
+
+    appState.summitMoveActive = false;
+    appState.chapterSwitchPlacementDone = false;
+    appState.chapterSwitchPendingPlacement = null;
+
     appState.transitionStart = clock.getElapsedTime();
-    appState.transitionDuration = 2.2;
+    appState.transitionDuration = isChapterToChapter ? 1.95 : 2.2;
+
     clearDuomoHoverState();
     appState.hoverHookObject = null;
     window.hideCategoryHoverText?.();
+
     document.body.classList.remove("category-hover-active");
     document.body.classList.remove("category-menu-open");
 
     document.querySelectorAll(".category-item").forEach((item) => {
       item.classList.remove("is-hovered");
     });
+
     syncCategoryHoverUI();
     document.body.style.cursor = "";
+
     appState.targetChapter = chapter;
 
     window.dispatchEvent(
@@ -875,20 +962,26 @@ const RITUAL_CAMERA = {
       })
     );
 
-    document.getElementById('panel')?.classList.add('hidden');
+    document.getElementById("panel")?.classList.add("hidden");
+    document.body.classList.add("is-transitioning");
 
-    document.body.classList.add('is-transitioning');
-
-    mapSceneGroup.visible = true;
-    setMapSceneOpacity(1);
+    if (isChapterToChapter) {
+      mapSceneGroup.visible = false;
+      setMapSceneOpacity(0);
+    } else {
+      mapSceneGroup.visible = true;
+      setMapSceneOpacity(1);
+    }
 
     if (animatedObjects.summitScene) {
       animatedObjects.summitScene.visible = true;
     }
 
-    animatedObjects.summitModelMaterials?.forEach((material) => {
-      material.opacity = 0;
-    });
+    if (!isChapterToChapter) {
+      animatedObjects.summitModelMaterials?.forEach((material) => {
+        material.opacity = 0;
+      });
+    }
 
     if (animatedObjects.chapterCloud) {
       animatedObjects.chapterCloud.visible = false;
@@ -899,28 +992,8 @@ const RITUAL_CAMERA = {
     appState.cameraStart.copy(camera.position);
     appState.targetStart.copy(orbit.target);
 
-    // 被点击的山顶位置
     const focusPoint = data.pos.clone();
 
-    // 从当前相机直接朝被点击山靠近，不再用世界中心方向
-    const directToMountain = focusPoint.clone().sub(camera.position);
-    directToMountain.y = 0;
-
-    if (directToMountain.lengthSq() < 0.0001) {
-      directToMountain.set(0, 0, -1);
-    }
-
-    directToMountain.normalize();
-
-    appState.cameraMid.copy(focusPoint)
-      .add(directToMountain.clone().multiplyScalar(-18));
-
-    appState.cameraMid.y = focusPoint.y + 8.0;
-
-    appState.targetMid.copy(focusPoint);
-    appState.targetMid.y = focusPoint.y + 1.5;
-
-    // 从 overview / 当前相机位置指向被点击山
     const approachDir = focusPoint.clone().sub(camera.position);
     approachDir.y = 0;
 
@@ -930,7 +1003,6 @@ const RITUAL_CAMERA = {
 
     approachDir.normalize();
 
-    // 最终相机也落到这座山附近，而不是地图中心
     appState.cameraEnd.copy(focusPoint)
       .add(approachDir.clone().multiplyScalar(-18));
 
@@ -941,17 +1013,50 @@ const RITUAL_CAMERA = {
 
     appState.targetEnd.y = focusPoint.y + 0.6;
 
-    placeSummitParticlesAtMountain({
+    if (isChapterToChapter) {
+      appState.cameraMid.copy(appState.cameraStart)
+        .lerp(appState.cameraEnd, 0.5);
+
+      // 把中间点抬高一点，减少纯水平横移感
+      appState.cameraMid.y += 7.2;
+
+      appState.targetMid.copy(appState.targetStart)
+        .lerp(appState.targetEnd, 0.5);
+
+      appState.targetMid.y += 3.2;
+
+      // 切换时停止继续 pan，但不要立刻改当前画面位置
+      appState.summitPanTarget = 0;
+    } else {
+      appState.cameraMid.copy(focusPoint)
+        .add(approachDir.clone().multiplyScalar(-18));
+
+      appState.cameraMid.y = focusPoint.y + 8.0;
+
+      appState.targetMid.copy(focusPoint);
+      appState.targetMid.y = focusPoint.y + 1.5;
+    }
+
+    const summitPlacement = {
       THREE,
       animatedObjects,
-      mountainPos: focusPoint,
-      cameraDirection: approachDir,
-      cameraPosition: appState.cameraEnd,
-      targetPosition: appState.targetEnd,
+      mountainPos: focusPoint.clone(),
+      cameraDirection: approachDir.clone(),
+      cameraPosition: appState.cameraEnd.clone(),
+      targetPosition: appState.targetEnd.clone(),
       categoryKey: chapter.key
-    });
+    };
+
+    if (isChapterToChapter) {
+      appState.chapterSwitchPendingPlacement = summitPlacement;
+      restoreSummitModelOpacityToBase();
+    } else {
+      placeSummitParticlesAtMountain(summitPlacement);
+      appState.summitMoveActive = false;
+    }
 
     console.log("SUMMIT MODEL DEBUG", {
+      mode: appState.transitionKind,
       sceneVisible: animatedObjects.summitScene?.visible,
       modelReady: animatedObjects.summitModelReady,
       modelVisible: animatedObjects.summitModelRoot?.visible,
@@ -972,6 +1077,37 @@ const RITUAL_CAMERA = {
       0,
       1
     );
+
+    if (appState.transitionKind === "chapter-to-chapter") {
+      mapSceneGroup.visible = false;
+      setMapSceneOpacity(0);
+
+      const baseOpacity =
+        animatedObjects.summitModelParticles?.userData?.baseOpacity ?? 0.96;
+
+      if (
+        !appState.chapterSwitchPlacementDone &&
+        progress >= 0.46 &&
+        appState.chapterSwitchPendingPlacement
+      ) {
+        setSummitModelOpacity(0);
+
+        placeSummitParticlesAtMountain(appState.chapterSwitchPendingPlacement);
+
+        appState.chapterSwitchPlacementDone = true;
+      }
+
+      const fadeOut = 1 - smoothstep(0.04, 0.28, progress);
+      const fadeIn = smoothstep(0.55, 0.82, progress);
+
+      const opacity = appState.chapterSwitchPlacementDone
+        ? baseOpacity * fadeIn
+        : baseOpacity * fadeOut;
+
+      setSummitModelOpacity(opacity);
+
+      return;
+    }
 
     const mapFade = 1 - smoothstep(0.28, 0.52, progress);
     setMapSceneOpacity(mapFade);
@@ -1097,6 +1233,9 @@ const RITUAL_CAMERA = {
   }
 
   function enterChapter(chapter) {
+    sessionStorage.setItem("tracce-about-return-view", "chapter");
+    sessionStorage.setItem("tracce-about-return-chapter", chapter.key);
+
     appState.view = "chapter-pending";
 
     document.body.classList.add("chapter-active");
@@ -1269,6 +1408,9 @@ const RITUAL_CAMERA = {
   }
 
   function returnToOverview() {
+    sessionStorage.setItem("tracce-about-return-view", "map");
+    sessionStorage.removeItem("tracce-about-return-chapter");
+
     document.documentElement.classList.remove("tracce-returning-map");
 
     appState.view = 'overview';
@@ -1406,6 +1548,97 @@ const RITUAL_CAMERA = {
     return animatedObjects.hooks.find(hook => hook.userData.key === key) || null;
   }
 
+  function openChapterFromAbout(key, attempts = 0) {
+    const area = getLegacyArea(key);
+    const chapter = CHAPTERS[key];
+
+    if (!area || !chapter) return;
+
+    const hook = findHookByKey(key);
+
+    if (!hook && attempts < 40) {
+      requestAnimationFrame(() => {
+        openChapterFromAbout(key, attempts + 1);
+      });
+      return;
+    }
+
+    const focusPoint = hook?.userData?.pos
+      ? hook.userData.pos.clone()
+      : new THREE.Vector3(
+        area.x,
+        hookHeightByKey[key] || area.y || 9.5,
+        area.z
+      );
+
+    // 用当前 overview camera 计算进入该 chapter 的最终视角，
+    // 但不显示 map，也不播放 map -> chapter transition。
+    const approachDir = focusPoint.clone().sub(camera.position);
+    approachDir.y = 0;
+
+    if (approachDir.lengthSq() < 0.0001) {
+      approachDir.set(0, 0, -1);
+    }
+
+    approachDir.normalize();
+
+    const cameraEnd = focusPoint.clone()
+      .add(approachDir.clone().multiplyScalar(-18));
+
+    cameraEnd.y = focusPoint.y + 5.4;
+
+    const targetEnd = focusPoint.clone()
+      .add(approachDir.clone().multiplyScalar(14));
+
+    targetEnd.y = focusPoint.y + 0.6;
+
+    placeSummitParticlesAtMountain({
+      THREE,
+      animatedObjects,
+      mountainPos: focusPoint,
+      cameraDirection: approachDir,
+      cameraPosition: cameraEnd,
+      targetPosition: targetEnd,
+      categoryKey: chapter.key
+    });
+
+    camera.position.copy(cameraEnd);
+    orbit.target.copy(targetEnd);
+    camera.lookAt(orbit.target);
+
+    mapSceneGroup.visible = false;
+    setMapSceneOpacity(0);
+
+    if (animatedObjects.summitScene) {
+      animatedObjects.summitScene.visible = true;
+    }
+
+    animatedObjects.summitModelMaterials?.forEach((material) => {
+      const baseOpacity =
+        animatedObjects.summitModelParticles?.userData?.baseOpacity ?? 0.96;
+
+      material.transparent = true;
+      material.opacity = baseOpacity;
+      material.needsUpdate = true;
+    });
+
+    appState.targetChapter = chapter;
+    appState.transitionKind = "map-to-chapter";
+    appState.summitMoveActive = false;
+    appState.chapterSwitchPlacementDone = false;
+    appState.chapterSwitchPendingPlacement = null;
+
+    document.body.classList.remove(
+      "intro-active",
+      "overview-active",
+      "ritual-active",
+      "is-transitioning",
+      "category-menu-open"
+    );
+
+    enterChapter(chapter);
+  }
+
   let lastHoveredCategoryKey = null;
 
   function syncCategoryHoverUI() {
@@ -1514,6 +1747,33 @@ const RITUAL_CAMERA = {
 
   // Initialize bottom category progress labels on overview.
   updateCategoryProgress();
+
+  if (shouldOpenChapterFromAbout) {
+    document.getElementById("intro")?.classList.add("hidden");
+
+    document.body.classList.remove(
+      "intro-active",
+      "overview-active",
+      "ritual-active",
+      "is-transitioning",
+      "category-menu-open"
+    );
+
+    document.body.classList.add("chapter-active");
+
+    mapSceneGroup.visible = false;
+    setMapSceneOpacity(0);
+
+    orbit.yaw = OVERVIEW_CAMERA.yaw;
+    orbit.pitch = OVERVIEW_CAMERA.pitch;
+    orbit.radius = OVERVIEW_CAMERA.radius;
+    orbit.target.copy(OVERVIEW_CAMERA.target);
+    updateCamera();
+
+    requestAnimationFrame(() => {
+      openChapterFromAbout(shouldOpenChapterFromAbout);
+    });
+  }
 
   window.addEventListener('pointermove', e => {
 
@@ -1989,6 +2249,13 @@ const RITUAL_CAMERA = {
 
     if (!group || !group.visible) return;
 
+    if (
+      appState.view === "transition" &&
+      appState.transitionKind === "chapter-to-chapter"
+    ) {
+      return;
+    }
+
     if (!group.userData.summitBasePosition) {
       group.userData.summitBasePosition = group.position.clone();
       group.userData.summitBaseRotationY = group.rotation.y;
@@ -2112,6 +2379,24 @@ const RITUAL_CAMERA = {
 
     window.removeEventListener("tracce:return-intro", returnToIntro);
 
-		renderer.dispose();
-	};
+    document.body.classList.remove(
+      "intro-active",
+      "overview-active",
+      "chapter-active",
+      "chapter-nodes-active",
+      "chapter-nodes-preenter",
+      "summit-title-active",
+      "ritual-active",
+      "is-transitioning",
+      "category-menu-open",
+      "category-hover-active",
+      "media-detail-open",
+      "media-av-open",
+      "duomo-hover-active"
+    );
+
+    document.documentElement.classList.remove("tracce-returning-map");
+
+    renderer.dispose();
+  };
 }

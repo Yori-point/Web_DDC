@@ -7,6 +7,10 @@
 		Tracce
 	</button>
 
+	<a class="chapter-about" href="/about" aria-label="About">
+		ABOUT
+	</a>
+
 	<div id="chapterHoverIntro" class="chapter-hover-intro" aria-hidden="true">
 		<div id="chapterHoverTitle" class="chapter-hover-title"></div>
 		<p id="chapterHoverText" class="chapter-hover-text"></p>
