@@ -14,6 +14,7 @@
 
 	const defaultAbout = {
 		title: "Tracce",
+		meta: "PAESAGGIO DI MEMORIE · MILANO CORTINA 2026",
 		paragraphs: [
 			["Dopo un grande evento,", "qualcosa resta."],
 			[
@@ -50,6 +51,7 @@
 		{
 			id: "jiaying-hu",
 			name: "Jiaying Hu",
+			meta: "DIREZIONE VISIVA · INTERFACCIA · ESPERIENZA NARRATIVA",
 			x: 41,
 			y: 56,
 			title: "Jiaying Hu",
@@ -87,6 +89,7 @@
 		{
 			id: "yunwei-zhang",
 			name: "Yunwei Zhang",
+			meta: "DIREZIONE VISIVA · INTERFACCIA · ESPERIENZA NARRATIVA",
 			x: 54,
 			y: 42,
 			title: "Yunwei Zhang",
@@ -124,6 +127,7 @@
 		{
 			id: "isabella-lena",
 			name: "Isabella lena",
+			meta: "DIREZIONE VISIVA · INTERFACCIA · ESPERIENZA NARRATIVA",
 			x: 60,
 			y: 70,
 			title: "Isabella lena",
@@ -161,6 +165,7 @@
 		{
 			id: "laura-facchinetti",
 			name: "Laura Facchinetti",
+			meta: "ORGANIZZAZIONE DEL GRUPPO · GESTIONE DELLO STILE",
 			x: 75,
 			y: 30,
 			title: "Laura Facchinetti",
@@ -188,6 +193,7 @@
 		{
 			id: "matilde-pinarello",
 			name: "Matilde Pinarello",
+			meta: "DIREZIONE VISIVA · INTERFACCIA · ESPERIENZA NARRATIVA",
 			x: 90,
 			y: 46,
 			title: "Matilde Pinarello",
@@ -225,6 +231,7 @@
 		{
 			id: "giulia-croci",
 			name: "Giulia Croci",
+			meta: "DIREZIONE VISIVA · INTERFACCIA · ESPERIENZA NARRATIVA",
 			x: 81,
 			y: 70,
 			title: "Giulia Croci",
@@ -263,6 +270,17 @@
 
 	const aboutContent = $derived(activeAbout || defaultAbout);
 	const aboutTitleVariant = $derived(activeAbout ? "about-name" : "about");
+	const aboutLead = $derived(aboutContent.paragraphs[0] || []);
+	const aboutBody = $derived(
+		activeAbout
+			? aboutContent.paragraphs.slice(1, -1)
+			: aboutContent.paragraphs.slice(1)
+	);
+	const aboutContribution = $derived(
+		activeAbout
+			? aboutContent.paragraphs[aboutContent.paragraphs.length - 1]
+			: null
+	);
 
 	function showPersonPreview(person) {
 		activeAbout = person;
@@ -289,7 +307,7 @@
 
 	const MODEL_TARGET_WIDTH = 96;
     const PARTICLE_COUNT = 180000;
-    const PARTICLE_SIZE = 0.30;
+    const PARTICLE_SIZE = 0.38;
 	const ABOUT_SNOW_LAYERS = {
 		far: {
 			name: "about-far-snow",
@@ -484,9 +502,9 @@
 		const ctx = textureCanvas.getContext("2d");
 		const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
 
-		gradient.addColorStop(0.0, "rgba(255,255,255,0.82)");
-		gradient.addColorStop(0.22, "rgba(255,255,255,0.34)");
-		gradient.addColorStop(0.55, "rgba(180,210,230,0.06)");
+		gradient.addColorStop(0.0, "rgba(255,255,255,0.92)");
+		gradient.addColorStop(0.18, "rgba(255,255,255,0.46)");
+		gradient.addColorStop(0.48, "rgba(180,210,230,0.08)");
 		gradient.addColorStop(1.0, "rgba(180,210,230,0)");
 
 		ctx.fillStyle = gradient;
@@ -636,7 +654,7 @@
 
 	            const middleTerrain = THREE.MathUtils.smoothstep(height, 0.20, 0.58);
 	            const highRidges = THREE.MathUtils.smoothstep(height, 0.56, 0.82);
-	            const ridgeDetail = ridge * (0.02 + highRidges * 0.15);
+	            const ridgeDetail = ridge * (0.035 + highRidges * 0.20);
 
 	            const xNormalized = THREE.MathUtils.clamp((p.x - minX) / xRange, 0, 1);
 	            const zNormalized = THREE.MathUtils.clamp((p.z - minZ) / zRange, 0, 1);
@@ -644,9 +662,9 @@
 	            const depthMiddle = 1 - Math.abs(zNormalized - 0.5) * 2;
 
 	            const bottomFade = THREE.MathUtils.lerp(
-	                0.03,
+	                0.06,
 	                1,
-	                THREE.MathUtils.smoothstep(height, 0.10, 0.50)
+	                THREE.MathUtils.smoothstep(height, 0.12, 0.50)
 	            );
 	            const sideFade = THREE.MathUtils.lerp(
 	                0.35,
@@ -660,19 +678,19 @@
 	            );
 
 	            const brightness =
-	                (0.10 +
-	                    middleTerrain * 0.18 +
-	                    highRidges * 0.45 +
+	                (0.72 +
+	                    middleTerrain * 0.12 +
+	                    highRidges * 0.36 +
 	                    ridgeDetail +
-	                    Math.random() * 0.006) *
+	                    Math.random() * 0.004) *
 	                bottomFade *
 	                sideFade *
 	                depthFade;
 
             colors.push(
-                Math.min(1, 0.9 * brightness),
-                Math.min(1, 0.96 * brightness),
-                Math.min(1, 1.08 * brightness)
+                Math.min(1, 0.98 * brightness),
+                Math.min(1, 1.03 * brightness),
+                Math.min(1, 1.10 * brightness)
             );
 		}
 
@@ -690,12 +708,12 @@
 
 		const material = new THREE.PointsMaterial({
             map: createParticleTexture(),
-	            alphaTest: 0.008,
+	            alphaTest: 0.004,
             size: PARTICLE_SIZE,
             sizeAttenuation: true,
             vertexColors: true,
             transparent: true,
-	            opacity: 1.7, //山透明度
+	            opacity: 1.5, //山透明度
             depthWrite: false,
             depthTest: false,
             blending: THREE.AdditiveBlending
@@ -897,14 +915,34 @@
 			ariaLabel={aboutContent.title}
 		/>
 
+		<p class="about-meta">{aboutContent.meta}</p>
+
 		<div class="about-text">
-			{#each aboutContent.paragraphs as paragraph}
-				<p>
-					{#each paragraph as line, index}
-						{line}{#if index < paragraph.length - 1}<br />{/if}
-					{/each}
-				</p>
-			{/each}
+			<p class="about-lead">
+				{#each aboutLead as line, index}
+					{line}{#if index < aboutLead.length - 1}<br />{/if}
+				{/each}
+			</p>
+
+			<div class="about-body">
+				{#each aboutBody as paragraph}
+					<p>
+						{#each paragraph as line, index}
+							{line}{#if index < paragraph.length - 1}<br />{/if}
+						{/each}
+					</p>
+				{/each}
+			</div>
+
+			{#if aboutContribution}
+				<div class="about-contribution">
+					<p class="about-contribution-text">
+						{#each aboutContribution as line, index}
+							{line}{#if index < aboutContribution.length - 1}<br />{/if}
+						{/each}
+					</p>
+				</div>
+			{/if}
 		</div>
 	</div>
 
@@ -1066,7 +1104,7 @@
 	}
 
 	.about-copy :global(.particle-title--about) {
-		margin: 0 0 7vh;
+		margin: 0 0 1.4vh;
 
 		width: 520px;
 		height: 150px;
@@ -1096,7 +1134,7 @@
 	}
 
 	.about-copy :global(.particle-title--about-name) {
-		margin: 0 0 7vh;
+		margin: 0 0 1.4vh;
 
 		width: 760px;
 		height: 132px;
@@ -1125,14 +1163,24 @@
 		--particle-title-ring-width: 1.4;
 	}
 
+	.about-meta {
+		max-width: 420px;
+		margin: 0 0 1.8vh;
+		font-family: var(--font-medium);
+		font-size: clamp(8px, 0.58vw, 9px);
+		font-style: normal;
+		font-weight: 400;
+		line-height: 1.35;
+		letter-spacing: 0.1em;
+		color: rgba(242, 245, 247, 0.38);
+	}
+
 	.about-text {
+		max-width: 440px;
 		font-family: var(--font-medium);
         font-weight: 400;
         font-style: italic;
-        font-size: clamp(18px, 1.45vw, 25px);
-        line-height: 0.87;
         letter-spacing: 0.01em;
-        color: rgba(242, 245, 247, 0.88);
         -webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 		font-synthesis: none;
@@ -1141,8 +1189,33 @@
 		hyphens: none;
 	}
 
-	.about-text p {
-		margin: 0 0 26px;
+	.about-lead {
+		margin: 0 0 18px;
+		font-size: clamp(17px, 1.18vw, 20px);
+		line-height: 1.16;
+		color: rgba(242, 245, 247, 0.88);
+	}
+
+	.about-body {
+		font-size: clamp(14px, 0.96vw, 16px);
+		line-height: 1.22;
+		color: rgba(242, 245, 247, 0.64);
+	}
+
+	.about-body p {
+		margin: 0 0 14px;
+	}
+
+	.about-contribution {
+		max-width: 440px;
+		margin-top: 4px;
+	}
+
+	.about-contribution-text {
+		margin: 0;
+		font-size: clamp(14px, 0.96vw, 16px);
+		line-height: 1.22;
+		color: rgba(242, 245, 247, 0.6);
 	}
 
 	.about-mountain-layer {
