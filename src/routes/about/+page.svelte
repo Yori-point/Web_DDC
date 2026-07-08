@@ -15,33 +15,18 @@
 		title: "Tracce",
 		meta: "PAESAGGIO DI MEMORIE · MILANO CORTINA 2026",
 		paragraphs: [
-			["Dopo un grande evento,", "qualcosa resta."],
 			[
-				"Non solo strutture,",
-				"numeri o immagini ufficiali,",
-				"ma frammenti più piccoli:",
-				"una voce, uno sguardo,",
-				"un incontro, una sensazione."
+				"Milano Cortina 2026 lascia una legacy fatta non solo di infrastrutture, ma di storie che continuano a circolare dopo la fine dei Giochi."
 			],
 			[
-				"Milano Cortina 2026",
-				"diventa qui un paesaggio",
-				"da attraversare lentamente."
+				"Per raccogliere queste voci abbiamo lavorato sul campo: interviste dirette, sondaggi online, questionari, ogni strumento utile ad ampliare il coro di chi ha attraversato i Giochi da prospettive diverse."
 			],
 			[
-				"Ogni testimonianza",
-				"si deposita come una particella.",
-				"Ogni particella",
-				"lascia una traccia."
+				"Il sito che ne è nato vuole rendere giustizia a questa moltitudine, trasformando chi lo visita in parte attiva del racconto, non solo in spettatore."
 			],
 			[
-				"Il sito raccoglie ciò",
-				"che continua a muoversi",
-				"nella memoria quotidiana."
-			],
-			[
-				"Non una mappa da leggere,",
-				"ma uno spazio da attraversare."
+				"Ogni voce lascia una traccia,",
+				"ogni traccia racconta un punto di vista."
 			]
 		]
 	};
@@ -56,32 +41,33 @@
 			title: "Jiaying Hu",
 			paragraphs: [
 				[
-					"Dopo un grande evento sportivo,",
-					"quello che resta",
-					"non è solo il risultato."
+					"All’inizio vedevo le Olimpiadi",
+					"come qualcosa di grande,",
+					"quasi distante dalla vita quotidiana."
 				],
 				[
-					"Restano le voci,",
-					"i gesti,",
-					"le immagini che continuano",
-					"a muoversi nella memoria."
+					"Ascoltando le persone,",
+					"ho capito che un evento così",
+					"viene vissuto in modi molto diversi:",
+					"entusiasmo, orgoglio,",
+					"cambiamento o semplice curiosità."
 				],
 				[
-					"Tifare per il proprio paese",
-					"porta con sé un orgoglio forte."
+					"Questa varietà di sguardi",
+					"è stata la parte più interessante",
+					"del progetto per me."
 				],
 				[
-					"Ma le Olimpiadi",
-					"mi hanno fatto sentire altro:",
-					"emozionarsi per una fatica,",
-					"per un gesto,",
-					"per un traguardo condiviso."
+					"Mi ha fatto capire",
+					"che non esiste una sola memoria",
+					"di un evento collettivo."
 				],
 				[
-					"Nel progetto ho curato",
-					"la direzione visiva,",
-					"l’interfaccia",
-					"e l’esperienza narrativa."
+					"Ho curato la progettazione grafica",
+					"e visiva del sito,",
+					"lo sviluppo del prototipo su Figma",
+					"e l’implementazione dei contenuti",
+					"nel codice."
 				]
 			]
 		},
@@ -94,32 +80,31 @@
 			title: "Yunwei Zhang",
 			paragraphs: [
 				[
-					"Dopo un grande evento sportivo,",
-					"quello che resta",
-					"non è solo il risultato."
+					"Ho sempre visto le Olimpiadi",
+					"come qualcosa che va oltre",
+					"la competizione."
 				],
 				[
-					"Restano le voci,",
-					"i gesti,",
-					"le immagini che continuano",
-					"a muoversi nella memoria."
+					"Dopo un incidente,",
+					"il mio sguardo sullo sport",
+					"è cambiato:",
+					"tra entusiasmo, limite",
+					"e ostinazione."
 				],
 				[
-					"Tifare per il proprio paese",
-					"porta con sé un orgoglio forte."
+					"Per me raccontare lo sport",
+					"significa osservare",
+					"ciò che resta nei corpi,",
+					"nelle città e nella memoria."
 				],
 				[
-					"Ma le Olimpiadi",
-					"mi hanno fatto sentire altro:",
-					"emozionarsi per una fatica,",
-					"per un gesto,",
-					"per un traguardo condiviso."
-				],
-				[
-					"Nel progetto ho curato",
-					"la direzione visiva,",
-					"l’interfaccia",
-					"e l’esperienza narrativa."
+					"Ho curato lo sviluppo tecnico",
+					"del sito,",
+					"le funzionalità interattive,",
+					"parte della modellazione 3D,",
+					"la gestione della musica",
+					"e la realizzazione finale",
+					"del progetto."
 				]
 			]
 		},
@@ -132,32 +117,30 @@
 			title: "Isabella lena",
 			paragraphs: [
 				[
-					"Dopo un grande evento sportivo,",
-					"quello che resta",
-					"non è solo il risultato."
+					"Le Olimpiadi invernali",
+					"hanno creato una sorta di",
+					"mondo sospeso, separato",
+					"dalla routine quotidiana."
 				],
 				[
-					"Restano le voci,",
-					"i gesti,",
-					"le immagini che continuano",
-					"a muoversi nella memoria."
+					"Guardare una gara era",
+					"un momento di condivisione,",
+					"capace di offrire sempre",
+					"nuovi spunti di conversazione."
 				],
 				[
-					"Tifare per il proprio paese",
-					"porta con sé un orgoglio forte."
+					"Questo progetto mi ha dato",
+					"l’opportunità di esplorare",
+					"prospettive distanti dalla mia",
+					"e di capire come le persone",
+					"hanno percepito questo evento."
 				],
 				[
-					"Ma le Olimpiadi",
-					"mi hanno fatto sentire altro:",
-					"emozionarsi per una fatica,",
-					"per un gesto,",
-					"per un traguardo condiviso."
-				],
-				[
-					"Nel progetto ho curato",
-					"la direzione visiva,",
-					"l’interfaccia",
-					"e l’esperienza narrativa."
+					"Ho curato l’organizzazione generale",
+					"del gruppo di lavoro",
+					"e lo sviluppo del prototipo su Figma,",
+					"contribuendo anche",
+					"a implementare i contenuti nel codice."
 				]
 			]
 		},
@@ -168,24 +151,33 @@
 			x: 75,
 			y: 30,
 			title: "Laura Facchinetti",
-			paragraphs: [
+            paragraphs: [
                 [
                     "Scoprire quante prospettive diverse",
-                    "convivono attorno a uno stesso evento,",
+					"convivono attorno a uno stesso evento",
                     "è stata la parte più sorprendente",
                     "di questo percorso."
                 ],
                 [
                     "Ogni testimonianza raccontava",
                     "gli stessi Giochi",
-                    "in un modo",
-                    "completamente diverso."
+					"in un modo completamente diverso,",
+					"mostrando quanto un evento collettivo",
+					"possa essere vissuto",
+					"attraverso sensibilità lontane."
                 ],
+				[
+					"Lavorare su queste voci",
+					"mi ha fatto capire quanto sia importante",
+					"dare spazio non solo al grande racconto,",
+					"ma anche alle percezioni più personali."
+				],
                 [
-                    "Mi sono occupata",
-                    "dell'organizzazione del gruppo,",
-                    "e della gestione dello stile",
-                    "del progetto."
+					"Ho curato l’organizzazione",
+					"del gruppo di lavoro",
+					"e lo stile del progetto,",
+					"contribuendo anche",
+					"alla progettazione del modello su Figma."
                 ]
             ]
 		},
@@ -198,32 +190,29 @@
 			title: "Matilde Pinarello",
 			paragraphs: [
 				[
-					"Dopo un grande evento sportivo,",
-					"quello che resta",
-					"non è solo il risultato."
+					"Avendo praticato sport",
+					"per tutta la vita,",
+					"considero le Olimpiadi",
+					"come un traguardo desiderato",
+					"da ogni atleta",
+					"e uno dei più grandi onori."
 				],
 				[
-					"Restano le voci,",
-					"i gesti,",
-					"le immagini che continuano",
-					"a muoversi nella memoria."
+					"Tifare per la propria nazionale",
+					"e assistere alle performance",
+					"delle ragazze e dei ragazzi",
+					"è sempre una grande emozione."
 				],
 				[
-					"Tifare per il proprio paese",
-					"porta con sé un orgoglio forte."
+					"Questo progetto mi ha dato",
+					"la possibilità di osservare",
+					"lo sport da una prospettiva nuova."
 				],
 				[
-					"Ma le Olimpiadi",
-					"mi hanno fatto sentire altro:",
-					"emozionarsi per una fatica,",
-					"per un gesto,",
-					"per un traguardo condiviso."
-				],
-				[
-					"Nel progetto ho curato",
-					"la direzione visiva,",
-					"l’interfaccia",
-					"e l’esperienza narrativa."
+					"Ho curato lo stile generale",
+					"del sito e la colonna sonora,",
+					"oltre allo sviluppo",
+					"del prototipo su Figma."
 				]
 			]
 		},
@@ -236,32 +225,31 @@
 			title: "Giulia Croci",
 			paragraphs: [
 				[
-					"Dopo un grande evento sportivo,",
-					"quello che resta",
-					"non è solo il risultato."
+					"Le Olimpiadi sono",
+					"un momento immancabile",
+					"nella mia famiglia",
+					"ormai da anni."
 				],
 				[
-					"Restano le voci,",
-					"i gesti,",
-					"le immagini che continuano",
-					"a muoversi nella memoria."
+					"Assistere a tutte le gare",
+					"ha reso l’inverno",
+					"qualcosa di magico."
 				],
 				[
-					"Tifare per il proprio paese",
-					"porta con sé un orgoglio forte."
+					"Mi piacerebbe riuscire",
+					"a diventare come i migliori",
+					"snowboarder al mondo,",
+					"ma quando ci ho provato",
+					"mi sono rotta un braccio:",
+					"sarà per la prossima!"
 				],
 				[
-					"Ma le Olimpiadi",
-					"mi hanno fatto sentire altro:",
-					"emozionarsi per una fatica,",
-					"per un gesto,",
-					"per un traguardo condiviso."
-				],
-				[
-					"Nel progetto ho curato",
-					"la direzione visiva,",
-					"l’interfaccia",
-					"e l’esperienza narrativa."
+					"Ho curato la modellazione 3D",
+					"su Blender",
+					"e contribuito alla progettazione",
+					"del modello su Figma,",
+					"supportando l’organizzazione",
+					"dei contenuti."
 				]
 			]
 		}
@@ -746,7 +734,7 @@
 			scale
 		);
 
-		root.position.set(55, -5, 0); //山的位置
+		root.position.set(53, -5, 0); //山的位置
         root.rotation.set(
             THREE.MathUtils.degToRad(7),
             THREE.MathUtils.degToRad(-10),
@@ -912,11 +900,7 @@
 			ariaLabel={aboutContent.title}
 		/>
 
-		{#if !activeAbout}
-			<p class="about-meta">{aboutContent.meta}</p>
-		{/if}
-
-		<div class="about-text">
+		<div class="about-text" class:is-default={!activeAbout}>
 			<p class="about-lead">
 				{#each aboutLead as line, index}
 					{line}{#if index < aboutLead.length - 1}<br />{/if}
@@ -936,9 +920,7 @@
 			{#if aboutContribution}
 				<div class="about-contribution">
 					<p class="about-contribution-text">
-						{#each aboutContribution as line, index}
-							{line}{#if index < aboutContribution.length - 1}<br />{/if}
-						{/each}
+						{aboutContribution.join(" ")}
 					</p>
 				</div>
 			{/if}
@@ -1108,14 +1090,14 @@
 	.about-copy :global(.particle-title--about) {
 		margin: 0 0 clamp(12px, 1.4vw, 18px);
 
-		width: 520px;
-		height: 150px;
+		width: 760px;
+		height: 132px;
 
 		font-family: var(--font-title);
-		font-size: 112px;
+		font-size: 58px; 
 		font-weight: 400;
 		line-height: 0.88;
-		letter-spacing: 0.08em;
+		letter-spacing: 0.05em;
 		text-transform: none;
 
 		--particle-title-align: left;
@@ -1127,7 +1109,7 @@
 		--particle-title-push: 0.42;
 		--particle-title-return: 0.09;
 		--particle-title-friction: 0.86;
-		--particle-title-dot-size: 1.02;
+		--particle-title-dot-size: 0.98;
 		--particle-title-opacity: 1;
 		--particle-title-cursor-radius: 96;
 		--particle-title-cursor-push: 1.35;
@@ -1165,18 +1147,6 @@
 		--particle-title-ring-width: 1.4;
 	}
 
-	.about-meta {
-		max-width: 356px;
-		margin: 0 0 clamp(26px, 3vw, 38px);
-		font-family: var(--font-medium);
-		font-size: clamp(8px, 0.58vw, 9px);
-		font-style: normal;
-		font-weight: 400;
-		line-height: 1.35;
-		letter-spacing: 0.1em;
-		color: rgba(242, 245, 247, 0.38);
-	}
-
 	.about-text {
 		max-width: 356px;
 		font-family: var(--font-medium);
@@ -1191,14 +1161,29 @@
 		hyphens: none;
 	}
 
+	.about-text.is-default {
+		width: clamp(300px, 24vw, 340px);
+		max-width: calc(100vw - var(--about-safe-padding) - var(--about-safe-padding));
+	}
+
+	.about-text.is-default .about-lead,
+	.about-text.is-default .about-body {
+		line-height: 1.22;
+	}
+
+	.about-text.is-default .about-lead,
+	.about-text.is-default .about-body p {
+		margin-bottom: clamp(24px, 3vh, 34px);
+	}
+
 	.about-lead {
-		margin: 0 0 clamp(11px, 1.35vh, 15px);
+		margin: 0 0 clamp(22px, 2.4vh, 30px);
 		font-family: "Omnes", sans-serif;
 		font-size: clamp(18px, 1.35vw, 20px);
 		font-style: normal;
 		font-weight: 400;
 		line-height: 1.12;
-		color: rgba(242, 245, 247, 0.9);
+		color: #f2f5f7;
 	}
 
 	.about-body {
@@ -1207,26 +1192,27 @@
 		font-style: normal;
 		font-weight: 400;
 		line-height: 1.12;
-		color: rgba(242, 245, 247, 0.9);
+		color: #f2f5f7;
 	}
 
 	.about-body p {
-		margin: 0 0 clamp(11px, 1.35vh, 15px);
+		margin: 0 0 clamp(22px, 2.4vh, 30px);
 	}
 
 	.about-contribution {
-		max-width: 356px;
-		margin-top: clamp(26px, 3vh, 36px);
+		max-width: clamp(300px, 30vw, 390px);
+		margin-top: clamp(22px, 2.6vh, 30px);
+		color: #f2f5f7;
 	}
 
 	.about-contribution-text {
 		margin: 0;
-		font-family: var(--font-quote);
+		font-family: "Omnes", sans-serif;
 		font-size: clamp(18px, 1.35vw, 20px);
-		font-style: italic;
+		font-style: normal;
 		font-weight: 400;
-		line-height: 1.18;
-		color: rgba(242, 245, 247, 0.82);
+		line-height: 1.12;
+		color: #f2f5f7;
 	}
 
 	.about-mountain-layer {
