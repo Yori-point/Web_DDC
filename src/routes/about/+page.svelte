@@ -912,7 +912,9 @@
 			ariaLabel={aboutContent.title}
 		/>
 
-		<p class="about-meta">{aboutContent.meta}</p>
+		{#if !activeAbout}
+			<p class="about-meta">{aboutContent.meta}</p>
+		{/if}
 
 		<div class="about-text">
 			<p class="about-lead">
@@ -971,6 +973,8 @@
 	}
 
 	.about-page {
+		--about-safe-padding: clamp(72px, 7vw, 96px);
+
 		position: relative;
 		width: 100vw;
 		height: 100vh;
@@ -1073,11 +1077,13 @@
 	}
 
 	.about-copy {
-		position: relative;
+		position: absolute;
+		left: var(--about-safe-padding);
+		top: var(--about-safe-padding);
 		z-index: 10;
-		width: min(34vw, 440px);
-		padding-left: 7vw;
-		padding-top: 13.5vh;
+		width: clamp(300px, 28vw, 356px);
+		max-width: calc(100vw - var(--about-safe-padding) - var(--about-safe-padding));
+		max-height: calc(100dvh - var(--about-safe-padding) - var(--about-safe-padding));
 		pointer-events: none;
 	}
 
@@ -1100,7 +1106,7 @@
 	}
 
 	.about-copy :global(.particle-title--about) {
-		margin: 0 0 1.4vh;
+		margin: 0 0 clamp(12px, 1.4vw, 18px);
 
 		width: 520px;
 		height: 150px;
@@ -1130,7 +1136,7 @@
 	}
 
 	.about-copy :global(.particle-title--about-name) {
-		margin: 0 0 1.4vh;
+		margin: 0 0 clamp(12px, 1.4vw, 18px);
 
 		width: 760px;
 		height: 132px;
@@ -1160,8 +1166,8 @@
 	}
 
 	.about-meta {
-		max-width: 420px;
-		margin: 0 0 1.8vh;
+		max-width: 356px;
+		margin: 0 0 clamp(26px, 3vw, 38px);
 		font-family: var(--font-medium);
 		font-size: clamp(8px, 0.58vw, 9px);
 		font-style: normal;
@@ -1172,7 +1178,7 @@
 	}
 
 	.about-text {
-		max-width: 440px;
+		max-width: 356px;
 		font-family: var(--font-medium);
         font-weight: 400;
         font-style: italic;
@@ -1186,32 +1192,41 @@
 	}
 
 	.about-lead {
-		margin: 0 0 18px;
-		font-size: clamp(17px, 1.18vw, 20px);
-		line-height: 1.16;
-		color: rgba(242, 245, 247, 0.88);
+		margin: 0 0 clamp(11px, 1.35vh, 15px);
+		font-family: "Omnes", sans-serif;
+		font-size: clamp(18px, 1.35vw, 20px);
+		font-style: normal;
+		font-weight: 400;
+		line-height: 1.12;
+		color: rgba(242, 245, 247, 0.9);
 	}
 
 	.about-body {
-		font-size: clamp(14px, 0.96vw, 16px);
-		line-height: 1.22;
-		color: rgba(242, 245, 247, 0.64);
+		font-family: "Omnes", sans-serif;
+		font-size: clamp(18px, 1.35vw, 20px);
+		font-style: normal;
+		font-weight: 400;
+		line-height: 1.12;
+		color: rgba(242, 245, 247, 0.9);
 	}
 
 	.about-body p {
-		margin: 0 0 14px;
+		margin: 0 0 clamp(11px, 1.35vh, 15px);
 	}
 
 	.about-contribution {
-		max-width: 440px;
-		margin-top: 4px;
+		max-width: 356px;
+		margin-top: clamp(26px, 3vh, 36px);
 	}
 
 	.about-contribution-text {
 		margin: 0;
-		font-size: clamp(14px, 0.96vw, 16px);
-		line-height: 1.22;
-		color: rgba(242, 245, 247, 0.6);
+		font-family: var(--font-quote);
+		font-size: clamp(18px, 1.35vw, 20px);
+		font-style: italic;
+		font-weight: 400;
+		line-height: 1.18;
+		color: rgba(242, 245, 247, 0.82);
 	}
 
 	.about-mountain-layer {
@@ -1268,10 +1283,12 @@
 	}
 
 	@media (max-width: 900px) {
+		.about-page {
+			--about-safe-padding: clamp(32px, 7vw, 72px);
+		}
+
 		.about-copy {
-			width: min(72vw, 420px);
-			padding-left: 32px;
-			padding-top: 96px;
+			width: min(72vw, 356px);
 		}
 
 		.about-text {
