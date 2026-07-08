@@ -4,7 +4,6 @@
 	import Intro from "$lib/components/Intro.svelte";
 	import OverviewUI from "$lib/components/OverviewUI.svelte";
 	import CategoryBar from "$lib/components/CategoryBar.svelte";
-	import MusicControl from "$lib/components/MusicControl.svelte";
 	import InfoPanel from "$lib/components/InfoPanel.svelte";
 	import ChapterView from "$lib/components/ChapterView.svelte";
 	import RitualHint from "$lib/components/RitualHint.svelte";
@@ -28,7 +27,6 @@
 	<Intro />
 	<OverviewUI />
 	<CategoryBar />
-	<MusicControl />
 	<InfoPanel />
 	<ChapterView />
 </div>

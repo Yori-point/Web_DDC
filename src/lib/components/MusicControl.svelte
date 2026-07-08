@@ -89,7 +89,7 @@
 			await playAudio(effectAudio);
 		}
 
-		isPlaying = !overallAudio.paused || effectAudios.some((effectAudio) => !effectAudio.paused);
+		syncPlayingState();
 	}
 
 	function pauseCurrent() {
@@ -102,6 +102,17 @@
 		}
 
 		isPlaying = false;
+	}
+
+	function getRealPlayingState() {
+		return Boolean(
+			overallAudio &&
+			(!overallAudio.paused || effectAudios.some((effectAudio) => !effectAudio.paused))
+		);
+	}
+
+	function syncPlayingState() {
+		isPlaying = getRealPlayingState();
 	}
 
 	function stopEffects() {
@@ -137,10 +148,15 @@
 		}
 	}
 
-	function toggleMusic() {
+	function toggleMusic(event?: MouseEvent) {
+		event?.preventDefault();
+		event?.stopPropagation();
+
 		if (!overallAudio) return;
 
-		if (isPlaying) {
+		syncPlayingState();
+
+		if (getRealPlayingState()) {
 			userPaused = true;
 			pauseCurrent();
 			return;
@@ -227,6 +243,7 @@
 	type="button"
 	aria-label={isPlaying ? "Pause music" : "Play music"}
 	aria-pressed={isPlaying}
+	onpointerdown={(event) => event.stopPropagation()}
 	onclick={toggleMusic}
 >
 	<span style="--h: 4.5px; --delay: 0s"></span>
@@ -247,7 +264,7 @@
 		width: var(--icon-button-size);
 		height: var(--icon-button-size);
 
-		z-index: 96;
+		z-index: 9999;
 
 		display: flex;
 		align-items: center;
@@ -293,16 +310,17 @@
 	}
 
 	.music-control-btn.is-playing span {
-		opacity: 0.56;
-		background: rgba(242, 245, 247, 0.7);
+		opacity: 1;
+		background: rgba(255, 255, 255, 1);
+		box-shadow: 0 0 12px rgba(255, 255, 255, 0.12);
 		animation: music-pulse 1.15s ease-in-out infinite;
 		animation-delay: var(--delay);
 	}
 
 	.music-control-btn.is-paused span {
-		opacity: 1;
-		background: rgba(255, 255, 255, 1);
-		box-shadow: 0 0 12px rgba(255, 255, 255, 0.12);
+		opacity: 0.56;
+		background: rgba(242, 245, 247, 0.45);
+		box-shadow: none;
 		animation: none;
 	}
 
@@ -325,7 +343,8 @@
 	}
 
 	:global(body.overview-active:not(.intro-active):not(.ritual-active):not(.is-transitioning)) .music-control-btn,
-	:global(body.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning)) .music-control-btn {
+	:global(body.chapter-active.chapter-nodes-active:not(.intro-active):not(.ritual-active):not(.is-transitioning)) .music-control-btn,
+	:global(body.about-page-active:not(.is-transitioning)) .music-control-btn {
 		opacity: 1 !important;
 		visibility: visible !important;
 		pointer-events: auto !important;

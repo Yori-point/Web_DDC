@@ -1,5 +1,6 @@
 <script>
 	import favicon from "$lib/assets/favicon.svg";
+	import MusicControl from "$lib/components/MusicControl.svelte";
 
 	import "$lib/styles/reset.css";
 	import "$lib/styles/token.css";
@@ -15,3 +16,5 @@
 </svelte:head>
 
 {@render children()}
+
+<MusicControl />

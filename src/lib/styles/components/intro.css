@@ -245,13 +245,13 @@ body.model-loaded .intro-rings {
 	background: transparent !important;
 
 	--particle-title-rgb: 255,255,255;
-	--particle-title-density: 3;
+	--particle-title-density: 1.85;
 	--particle-title-radius: 82;
 	--particle-title-push: 0.42;
 	--particle-title-return: 0.09;
 	--particle-title-friction: 0.86;
-	--particle-title-dot-size: 1.02;
-	--particle-title-opacity: 0.99;
+	--particle-title-dot-size: 1.18;
+	--particle-title-opacity: 1;
 	--particle-title-cursor-radius: 96;
 	--particle-title-cursor-push: 1.35;
 	--particle-title-ring-opacity: 0.72;

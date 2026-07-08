@@ -214,9 +214,8 @@ export function initScene() {
     overviewPointerTargetX: 0,
     overviewPointerTargetY: 0,
 
-    // 进入 overview 后，先挡住第一次鼠标移动，避免一进地图就立刻触发 hover
     overviewHoverReady: false,
-    duomoRoadsActive: false,
+    duomoHoverActive: false,
 
     summitPanCurrent: 0,
     summitPanTarget: 0,
@@ -644,69 +643,32 @@ const RITUAL_CAMERA = {
     animatedObjects.duomoObject = object;
   }
 
-  const DUOMO_HOVER_TEXT = "Da qui, le memorie iniziano a muoversi.";
+  function setDuomoHoverActive(active) {
+    const shouldBeActive = appState.view === "overview" && active;
 
-  let duomoHoverHideTimer = null;
+    appState.duomoHoverActive = shouldBeActive;
+    document.body.classList.toggle("duomo-hover-active", shouldBeActive);
 
-  function cancelDuomoHoverHideTimer() {
-    if (duomoHoverHideTimer) {
-      window.clearTimeout(duomoHoverHideTimer);
-      duomoHoverHideTimer = null;
-    }
-  }
+    if (shouldBeActive) {
+      appState.hoverHookObject = null;
 
-  function showDuomoHoverText() {
-    if (appState.view !== "overview") return;
-
-    cancelDuomoHoverHideTimer();
-
-    appState.hoverHookObject = null;
-
-    const textEl = document.querySelector(".category-hover-text");
-
-    if (textEl) {
-      textEl.textContent = DUOMO_HOVER_TEXT;
-    }
-
-    document.body.classList.add("category-hover-active");
-    document.body.classList.add("duomo-hover-active");
-
-    syncCategoryHoverUI();
-
-    appState.overviewPointerTargetX = 0;
-    appState.overviewPointerTargetY = 0;
-  }
-
-  function hideDuomoHoverText() {
-    cancelDuomoHoverHideTimer();
-
-    duomoHoverHideTimer = window.setTimeout(() => {
-      document.body.classList.remove("duomo-hover-active");
+      // Duomo hover 不再显示中间文字
       window.hideCategoryHoverText?.();
       document.body.classList.remove("category-hover-active");
 
       syncCategoryHoverUI();
 
-      duomoHoverHideTimer = null;
-    }, 120);
+      appState.overviewPointerTargetX = 0;
+      appState.overviewPointerTargetY = 0;
+    }
   }
 
   function clearDuomoHoverState() {
-    cancelDuomoHoverHideTimer();
-    document.body.classList.remove("duomo-hover-active");
-  }
-
-  function setDuomoRoadsActive(active) {
-    appState.duomoRoadsActive = active;
-    document.body.classList.toggle("duomo-roads-active", active);
-  }
-
-  function toggleDuomoRoadsActive() {
-    setDuomoRoadsActive(!appState.duomoRoadsActive);
+    setDuomoHoverActive(false);
   }
 
   function animateDuomoRoadsHighlight(t) {
-    const active = appState.view === "overview" && appState.duomoRoadsActive;
+    const active = appState.view === "overview" && appState.duomoHoverActive;
 
     const pulse = active
       ? 0.5 + 0.5 * Math.sin(t * 1.35)
@@ -1518,15 +1480,13 @@ const RITUAL_CAMERA = {
       },
       onDuomoHover: () => {
         appState.overviewHoverReady = true;
-        showDuomoHoverText();
+        setDuomoHoverActive(true);
       },
       onDuomoLeave: () => {
-        hideDuomoHoverText();
+        setDuomoHoverActive(false);
       },
       onDuomoClick: () => {
-        appState.overviewHoverReady = true;
-        toggleDuomoRoadsActive();
-        showDuomoHoverText();
+        // 留空：Duomo click 效果之后再加
       }
     });
   }
@@ -1581,6 +1541,8 @@ const RITUAL_CAMERA = {
     const isOverDuomo = e.target.closest && e.target.closest('.duomo-hover-btn');
 
     if (isOverCategory) {
+      setDuomoHoverActive(false);
+
       appState.overviewPointerTargetX = 0;
       appState.overviewPointerTargetY = 0;
       return;
@@ -1588,7 +1550,24 @@ const RITUAL_CAMERA = {
 
     if (isOverDuomo) {
       appState.overviewHoverReady = true;
-      showDuomoHoverText();
+      setDuomoHoverActive(true);
+
+      appState.overviewPointerTargetX = 0;
+      appState.overviewPointerTargetY = 0;
+      return;
+    }
+
+    setDuomoHoverActive(false);
+
+    // 刚进入 overview 后，第一次鼠标移动只用来“激活 hover”，不显示效果。
+    // 第二次移动才真正显示 hover。
+    if (!appState.overviewHoverReady && !isOverCategory) {
+      appState.overviewHoverReady = true;
+
+      appState.hoverHookObject = null;
+      window.hideCategoryHoverText?.();
+      document.body.classList.remove("category-hover-active");
+      syncCategoryHoverUI();
 
       appState.overviewPointerTargetX = 0;
       appState.overviewPointerTargetY = 0;
@@ -1667,7 +1646,6 @@ const RITUAL_CAMERA = {
       appState.hoverHookObject = null;
       window.hideCategoryHoverText?.();
       document.body.classList.remove("category-hover-active");
-      document.body.classList.remove("duomo-hover-active");
       syncCategoryHoverUI();
     }
 
