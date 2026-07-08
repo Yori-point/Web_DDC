@@ -81,6 +81,14 @@ export function createHotspotButtons({
 		duomoButton.className = "duomo-hover-btn";
 		duomoButton.setAttribute("aria-label", "Duomo hover area");
 
+		duomoButton.addEventListener("mouseenter", () => {
+			onDuomoHover?.();
+		});
+
+		duomoButton.addEventListener("mouseleave", () => {
+			onDuomoLeave?.();
+		});
+
 		duomoButton.addEventListener("pointerdown", (event) => {
 			event.stopPropagation();
 		});

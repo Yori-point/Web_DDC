@@ -1719,7 +1719,13 @@ const RITUAL_CAMERA = {
         setDuomoHoverActive(false);
       },
       onDuomoClick: () => {
-        // 留空：Duomo click 效果之后再加
+        appState.overviewHoverReady = true;
+        setDuomoHoverActive(false);
+
+        window.hideCategoryHoverText?.();
+        document.body.classList.remove("category-hover-active");
+
+        window.dispatchEvent(new CustomEvent("tracce:open-duomo-info"));
       }
     });
   }
@@ -1812,6 +1818,11 @@ const RITUAL_CAMERA = {
       appState.overviewHoverReady = true;
       setDuomoHoverActive(true);
 
+      appState.hoverHookObject = null;
+      window.hideCategoryHoverText?.();
+      document.body.classList.remove("category-hover-active");
+      syncCategoryHoverUI();
+
       appState.overviewPointerTargetX = 0;
       appState.overviewPointerTargetY = 0;
       return;
@@ -1819,61 +1830,6 @@ const RITUAL_CAMERA = {
 
     setDuomoHoverActive(false);
 
-    // 刚进入 overview 后，第一次鼠标移动只用来“激活 hover”，不显示效果。
-    // 第二次移动才真正显示 hover。
-    if (!appState.overviewHoverReady && !isOverCategory) {
-      appState.overviewHoverReady = true;
-
-      appState.hoverHookObject = null;
-      window.hideCategoryHoverText?.();
-      document.body.classList.remove("category-hover-active");
-      syncCategoryHoverUI();
-
-      appState.overviewPointerTargetX = 0;
-      appState.overviewPointerTargetY = 0;
-      return;
-    }
-
-    // 刚进入 overview 后，第一次鼠标移动只用来“激活 hover”，不显示效果。
-    // 第二次移动才真正显示 hover。
-    if (!appState.overviewHoverReady && !isOverCategory) {
-      appState.overviewHoverReady = true;
-
-      appState.hoverHookObject = null;
-      window.hideCategoryHoverText?.();
-      document.body.classList.remove("category-hover-active");
-      syncCategoryHoverUI();
-
-      appState.overviewPointerTargetX = 0;
-      appState.overviewPointerTargetY = 0;
-      return;
-    }
-
-    if (isOverDuomo) {
-      appState.overviewHoverReady = true;
-      showDuomoHoverText();
-
-      appState.overviewPointerTargetX = 0;
-      appState.overviewPointerTargetY = 0;
-      return;
-    }
-
-    // 刚进入 overview 后，第一次鼠标移动只用来“激活 hover”，不显示效果。
-    // 第二次移动才真正显示 hover。
-    if (!appState.overviewHoverReady && !isOverCategory) {
-      appState.overviewHoverReady = true;
-
-      appState.hoverHookObject = null;
-      window.hideCategoryHoverText?.();
-      document.body.classList.remove("category-hover-active");
-      syncCategoryHoverUI();
-
-      appState.overviewPointerTargetX = 0;
-      appState.overviewPointerTargetY = 0;
-      return;
-    }
-
-    // hover 在 hotspot 上：显示和 category bar 一样的暗背景 + 中间文字
     if (isOverHotspot) {
       const key = isOverHotspot.dataset.key;
 
