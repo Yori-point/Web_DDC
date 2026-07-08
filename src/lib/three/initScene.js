@@ -123,6 +123,12 @@ export function initScene() {
     sessionStorage.getItem("tracce-open-map") === "1" &&
     !shouldOpenChapterFromAbout;
 
+  if (shouldOpenChapterFromAbout) {
+    document.documentElement.classList.add("tracce-returning-chapter");
+  } else {
+    document.documentElement.classList.remove("tracce-returning-chapter");
+  }
+
   sessionStorage.removeItem("tracce-open-map");
   sessionStorage.removeItem("tracce-open-chapter");
 
@@ -877,13 +883,50 @@ const RITUAL_CAMERA = {
 
   const INTERVIEWS_BY_CATEGORY = createInterviewsByCategory(CHAPTERS);
 
-  const exploredByCategory = {
-    festa: new Set(),
-    opportunita: new Set(),
-    trasformazione: new Set(),
-    criticita: new Set(),
-    relazioni: new Set()
-  };
+  const EXPLORED_STORAGE_KEY = "tracce-explored-by-category";
+
+function createEmptyExploredByCategory() {
+	return {
+		festa: new Set(),
+		opportunita: new Set(),
+		trasformazione: new Set(),
+		criticita: new Set(),
+		relazioni: new Set()
+	};
+}
+
+function loadExploredByCategory() {
+	const explored = createEmptyExploredByCategory();
+	const saved = sessionStorage.getItem(EXPLORED_STORAGE_KEY);
+
+	if (!saved) return explored;
+
+	try {
+		const parsed = JSON.parse(saved);
+
+		Object.keys(explored).forEach((key) => {
+			if (Array.isArray(parsed?.[key])) {
+				explored[key] = new Set(parsed[key]);
+			}
+		});
+	} catch (error) {
+		console.warn("Failed to restore explored nodes:", error);
+	}
+
+	return explored;
+}
+
+function saveExploredByCategory() {
+	const data = {};
+
+	Object.keys(exploredByCategory).forEach((key) => {
+		data[key] = Array.from(exploredByCategory[key] || []);
+	});
+
+	sessionStorage.setItem(EXPLORED_STORAGE_KEY, JSON.stringify(data));
+}
+
+const exploredByCategory = loadExploredByCategory();
 
   function restoreSummitModelOpacityToBase() {
     const baseOpacity =
@@ -1301,6 +1344,7 @@ const RITUAL_CAMERA = {
 
     requestAnimationFrame(() => {
       document.body.classList.add("chapter-nodes-active");
+      document.documentElement.classList.remove("tracce-returning-chapter");
     });
   }
 
@@ -1407,6 +1451,106 @@ const RITUAL_CAMERA = {
     updateCamera();
   }
 
+  function lockDuomoInfoBackground() {
+    if (!animatedObjects.summitScene) return;
+
+    // 清掉 chapter pan 记忆
+    delete animatedObjects.summitScene.userData.summitBasePosition;
+    delete animatedObjects.summitScene.userData.summitBaseRotationY;
+
+    appState.summitPanCurrent = 0;
+    appState.summitPanTarget = 0;
+
+    // Duomo info 背景山：放大成“山顶背景”，不是完整小山
+    animatedObjects.summitScene.position.set(0, -8.5, 0);
+    animatedObjects.summitScene.rotation.set(0, 0, 0);
+    animatedObjects.summitScene.scale.set(3.2, 3.2, 3.2);
+
+    // 子对象只归零位置/旋转，不在这里放大，避免叠加缩放失控
+    if (animatedObjects.summitModelRoot) {
+      animatedObjects.summitModelRoot.position.set(0, 0, 0);
+      animatedObjects.summitModelRoot.rotation.set(0, 0, 0);
+      animatedObjects.summitModelRoot.scale.set(1, 1, 1);
+    }
+
+    if (animatedObjects.summitModel) {
+      animatedObjects.summitModel.position.set(0, 0, 0);
+      animatedObjects.summitModel.rotation.set(0, 0, 0);
+      animatedObjects.summitModel.scale.set(1, 1, 1);
+    }
+
+    if (animatedObjects.summitModelParticles) {
+      animatedObjects.summitModelParticles.position.set(0, 0, 0);
+      animatedObjects.summitModelParticles.rotation.set(0, 0, 0);
+      animatedObjects.summitModelParticles.scale.set(1, 1, 1);
+    }
+  }
+
+  function enterDuomoInfoBackground() {
+    if (appState.view !== "overview") return;
+
+    appState.view = "duomo-info";
+    clearDuomoHoverState();
+
+    appState.hoverHookObject = null;
+    window.hideCategoryHoverText?.();
+    document.body.classList.remove("category-hover-active");
+    document.body.classList.remove("category-menu-open");
+
+    mapSceneGroup.visible = false;
+    setMapSceneOpacity(0);
+
+    if (animatedObjects.summitScene) {
+      animatedObjects.summitScene.visible = true;
+      lockDuomoInfoBackground();
+    }
+
+    if (animatedObjects.chapterCloud) {
+      animatedObjects.chapterCloud.visible = false;
+      animatedObjects.chapterCloud.material.opacity = 0;
+    }
+
+    camera.position.set(0, 6.8, 44);
+    camera.lookAt(new THREE.Vector3(0, 8.2, 0));
+
+    animatedObjects.summitModelMaterials?.forEach((material) => {
+      const baseOpacity =
+        animatedObjects.summitModelParticles?.userData?.baseOpacity ?? 0.96;
+
+      material.transparent = true;
+      material.opacity = baseOpacity;
+      material.needsUpdate = true;
+    });
+  }
+
+  function leaveDuomoInfoBackground() {
+    if (appState.view !== "duomo-info") return;
+
+    appState.view = "overview";
+
+    mapSceneGroup.visible = true;
+    setMapSceneOpacity(1);
+
+    if (animatedObjects.summitScene) {
+      lockDuomoInfoBackground();
+      animatedObjects.summitScene.visible = false;
+    }
+
+    document.body.classList.add("category-menu-open");
+
+    appState.overviewPointerX = 0;
+    appState.overviewPointerY = 0;
+    appState.overviewPointerTargetX = 0;
+    appState.overviewPointerTargetY = 0;
+    appState.overviewHoverReady = false;
+
+    orbit.yaw = OVERVIEW_CAMERA.yaw;
+    orbit.pitch = OVERVIEW_CAMERA.pitch;
+    orbit.radius = OVERVIEW_CAMERA.radius;
+    orbit.target.copy(OVERVIEW_CAMERA.target);
+    updateCamera();
+  }
+
   function returnToOverview() {
     sessionStorage.setItem("tracce-about-return-view", "map");
     sessionStorage.removeItem("tracce-about-return-chapter");
@@ -1505,6 +1649,7 @@ const RITUAL_CAMERA = {
       exploredSet: exploredByCategory[categoryKey],
       onSelect: (item) => {
         exploredByCategory[categoryKey].add(item.id);
+        saveExploredByCategory();
 
         openMediaPanel(item);
 
@@ -1522,6 +1667,8 @@ const RITUAL_CAMERA = {
   }
 
   window.addEventListener("tracce:return-intro", returnToIntro);
+  window.addEventListener("tracce:duomo-info-open", enterDuomoInfoBackground);
+  window.addEventListener("tracce:duomo-info-close", leaveDuomoInfoBackground);
 
   let interviewPanTarget = 0;
   let interviewPanCurrent = 0;
@@ -2212,6 +2359,10 @@ const RITUAL_CAMERA = {
       return;
     }
 
+    if (appState.view === "duomo-info") {
+      return;
+    }
+
     if (!group.userData.summitBasePosition) {
       group.userData.summitBasePosition = group.position.clone();
       group.userData.summitBaseRotationY = group.rotation.y;
@@ -2254,14 +2405,18 @@ const RITUAL_CAMERA = {
       animatedObjects
     });
 
-    animateSummitParticles({
-      THREE,
-      animatedObjects,
-      t,
-      appState
-    });
+    if (appState.view !== "duomo-info") {
+      animateSummitParticles({
+        THREE,
+        animatedObjects,
+        t,
+        appState
+      });
 
-    updateSummitScenePan();
+      updateSummitScenePan();
+    } else {
+      lockDuomoInfoBackground();
+    }
 
     updateSummitTransitionVisuals();
   }
@@ -2334,6 +2489,8 @@ const RITUAL_CAMERA = {
     cleanupCategoryBar?.();
 
     window.removeEventListener("tracce:return-intro", returnToIntro);
+    window.removeEventListener("tracce:duomo-info-open", enterDuomoInfoBackground);
+    window.removeEventListener("tracce:duomo-info-close", leaveDuomoInfoBackground);
 
     document.body.classList.remove(
       "intro-active",

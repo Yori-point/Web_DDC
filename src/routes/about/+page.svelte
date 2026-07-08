@@ -274,7 +274,6 @@
 	];
 
 	const aboutContent = $derived(activeAbout || defaultAbout);
-	const aboutTitleVariant = $derived(activeAbout ? "about-name" : "about");
 	const aboutLead = $derived(aboutContent.paragraphs[0] || []);
 	const aboutBody = $derived(
 		activeAbout
@@ -304,11 +303,15 @@
 		if (returnView === "chapter" && chapterKey) {
 			sessionStorage.setItem("tracce-open-chapter", chapterKey);
 			sessionStorage.removeItem("tracce-open-map");
+
+			document.documentElement.classList.add("tracce-returning-chapter");
 			document.documentElement.classList.remove("tracce-returning-map");
 		} else {
 			sessionStorage.setItem("tracce-open-map", "1");
 			sessionStorage.removeItem("tracce-open-chapter");
+
 			document.documentElement.classList.add("tracce-returning-map");
+			document.documentElement.classList.remove("tracce-returning-chapter");
 		}
 
 		await goto("/", {
@@ -940,11 +943,11 @@
 	</a>
 
 	<div class="about-copy">
-		<ParticleTitle
-			text={aboutContent.title}
-			variant={aboutTitleVariant}
-			ariaLabel={aboutContent.title}
-		/>
+		{#if activeAbout}
+			<h1 class="about-name-title">{aboutContent.title}</h1>
+		{:else}
+			<ParticleTitle text={aboutContent.title} variant="about" ariaLabel={aboutContent.title} />
+		{/if}
 
 		<div class="about-text" class:is-default={!activeAbout}>
 			<p class="about-lead">
@@ -1163,34 +1166,28 @@
 		--particle-title-ring-width: 1.4;
 	}
 
-	.about-copy :global(.particle-title--about-name) {
-		margin: 0 0 clamp(12px, 1.4vw, 18px);
+	.about-name-title {
+		margin: 0 0 7vh;
 
 		width: 760px;
 		height: 132px;
 
+		display: flex;
+		align-items: center;
+
 		font-family: var(--font-title);
 		font-size: 48px;
 		font-weight: 400;
-		line-height: 0.88;
-		letter-spacing: 0.05em;
+		line-height: 0.9;
+		letter-spacing: 0.045em;
 		text-transform: none;
 
-		--particle-title-align: left;
-		--particle-title-padding-x: 0;
+		color: rgba(255, 255, 255, 0.92);
+		text-shadow:
+			0 0 14px rgba(255, 255, 255, 0.18),
+			0 0 32px rgba(210, 226, 238, 0.12);
 
-		--particle-title-rgb: 255,255,255;
-		--particle-title-density: 3;
-		--particle-title-radius: 82;
-		--particle-title-push: 0.42;
-		--particle-title-return: 0.09;
-		--particle-title-friction: 0.86;
-		--particle-title-dot-size: 0.98;
-		--particle-title-opacity: 1;
-		--particle-title-cursor-radius: 96;
-		--particle-title-cursor-push: 1.35;
-		--particle-title-ring-opacity: 0.72;
-		--particle-title-ring-width: 1.4;
+		pointer-events: none;
 	}
 
 	.about-text {

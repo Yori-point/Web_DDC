@@ -221,3 +221,14 @@ body:not(.intro-active) .top-right .about-btn:hover {
 		0 0 26px rgba(242, 245, 247, 0.08);
 	transform: none;
 }
+
+html.tracce-returning-chapter #intro {
+	display: none !important;
+	opacity: 0 !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
+
+html.tracce-returning-chapter body {
+	background: #070e17;
+}

@@ -188,5 +188,87 @@ export const cambiamento = [
 
 		text: `Testo lungo completo...`,
 		visible: true
+	},
+
+	{
+		id: "2.10",
+		type: "testo",
+		fileType: "Testo",
+		title: "Chiara",
+		personName: "Chiara",
+
+		hoverLabel: "Testo",
+		hoverText: "Modernizzare tutti i trasporti.",
+		hoverCredit: "Chiara",
+
+		detailText: `La necessità di accogliere migliaia di tifosi ha costretto le amministrazioni locali a rinnovare l'intera rete dei trasporti in tempi record. 
+		Abbiamo ottenuto nuove linee della metropolitana leggera, treni moderni e una flotta di autobus ecologici che ridurranno drasticamente l'inquinamento nei prossimi anni. 
+		Questa imponente modernizzazione rappresenta l'eredità più utile e concreta che l'evento potesse lasciare a noi cittadini che viaggiamo ogni giorno per motivi di lavoro.`,
+
+		text: `Testo lungo completo...`,
+		visible: true
+	},
+
+	{
+		id: "2.11",
+		type: "testo",
+		fileType: "Testo",
+		title: "Elena",
+		personName: "Elena",
+
+		hoverLabel: "Testo",
+		hoverText: "Una grande occasione di riscatto per le periferie.",
+		hoverCredit: "Elena",
+
+		detailText: `Grazie ai Giochi Olimpici, molti quartieri considerati difficili hanno finalmente ricevuto l'attenzione e i finanziamenti che aspettavano da troppo tempo. 
+		Le vecchie aree industriali dismesse sono state completamente rimesse a nuovo, trasformandosi in parchi moderni e centri sportivi all'avanguardia aperti a tutta la cittadinanza. 
+		Questa profonda ristrutturazione urbana ha offerto ai ragazzi della zona la possibilità di praticare discipline diverse in strutture sicure e gratuite. 
+		Non si è trattato solo di una semplice manifestazione sportiva, ma di un vero e proprio motore di cambiamento sociale che ha migliorato la vita quotidiana di tantissimi residenti. 
+		Vedere la mia zona rinascere in questo modo mi ha riempito di speranza per il domani. 
+		Le Olimpiadi hanno dimostrato che lo sport può diventare uno strumento concreto per riqualificare il territorio e unire le persone.`,
+
+		text: `Testo lungo completo...`,
+		visible: true
+	},
+
+	{
+		id: "2.12",
+		type: "testo",
+		fileType: "Testo",
+		title: "Francesca",
+		personName: "Francesca",
+
+		hoverLabel: "Testo",
+		hoverText: "Il futuro dello Scalo Romana.",
+		hoverCredit: "Francesca",
+
+		detailText: `Le Olimpiadi hanno cambiato concretamente il volto di una parte storica di Milano, lo Scalo Romana. 
+		Vedere la trasformazione del Villaggio Olimpico in un futuro studentato pubblico è il segno tangibile di un cambiamento che serve davvero alla città. 
+		Ora, grazie ai Giochi, la zona ha cambiato totalmente volto, offrendo una risposta reale alla gravissima carenza di alloggi universitari che colpisce noi giovani. 
+		Questa importante rigenerazione urbana ha modificato l'equilibrio del quartiere, creando aree verdi e spazi pubblici fruibili. 
+		La competizione è finita, ma questo cambiamento strutturale rimarrà per sempre, dimostrando che le grandi manifestazioni possono lasciare eredità sociali durature, utili e concrete per sostenere il percorso formativo di tantissimi ragazzi che scelgono la nostra realtà metropolitana per costruire il loro domani sereno e sicuro.`,
+
+		text: `Testo lungo completo...`,
+		visible: true
+	},
+
+	{
+		id: "2.13",
+		type: "testo",
+		fileType: "Testo",
+		title: "Martina",
+		personName: "Martina",
+
+		hoverLabel: "Testo",
+		hoverText: "La rinascita del quartiere Santa Giulia.",
+		hoverCredit: "Martina",
+
+		detailText: `La costruzione della nuova Arena nel quartiere di Santa Giulia ha cambiato radicalmente la percezione della nostra periferia. 
+		Questo cambiamento ha modificato profondamente la nostra vita quotidiana. 
+		Ora il quartiere non è più un dormitorio desolato, ma un luogo vivo, capace di ospitare grandi eventi culturali e musicali. 
+		Questo profondo rinnovamento ha cancellato il vecchio isolamento, lasciandoci una zona dinamica, sicura e perfettamente integrata con il tessuto della nostra splendida metropoli, migliorando così il nostro vivere giornaliero.`,
+
+		text: `Testo lungo completo...`,
+		visible: true
 	}
 ];

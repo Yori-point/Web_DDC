@@ -50,6 +50,14 @@ export function createHotspotButtons({
 		button.addEventListener("click", (event) => {
 			event.stopPropagation();
 
+			onLeave?.();
+			button.blur();
+
+			document.body.classList.remove(
+				"category-hover-active",
+				"summit-title-active"
+			);
+
 			const hook = findHookByKey(area.key);
 			const y = hookHeightByKey[area.key] || 9.5;
 
@@ -99,6 +107,15 @@ export function createHotspotButtons({
 
 		duomoButton.addEventListener("click", (event) => {
 			event.stopPropagation();
+
+			onDuomoLeave?.();
+			duomoButton.blur();
+
+			document.body.classList.remove(
+				"category-hover-active",
+				"summit-title-active"
+			);
+
 			onDuomoClick?.();
 		});
 

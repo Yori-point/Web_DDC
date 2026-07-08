@@ -55,7 +55,8 @@ export function startAnimationLoop({
 			appState.view === "transition" ||
 			appState.view === "particle-ritual" ||
 			appState.view === "chapter-pending" ||
-			appState.view === "chapter";
+			appState.view === "chapter" ||
+			appState.view === "duomo-info";
 
 		if (shouldAnimateSnow) {
 			const delta = lastSnowFrameTime === null
