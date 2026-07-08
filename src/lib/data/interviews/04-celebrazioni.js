@@ -77,6 +77,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Audio",
 		hoverText: "Molta unità.",
+		previewText: "Molta unità è rimasta nell’immagine dei Giochi.",
 		hoverCredit: "Juan",
 
 		detailText: `Ho seguito l’evento sia per interesse sportivo sia per il valore internazionale dell’Olimpiade. La cerimonia mi ha trasmesso un’immagine dell’Italia molto artistica e colorata. Riassumerei l’eredità dell’evento con la parola “UNITÀ”.`,
@@ -214,6 +215,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Più che una comunità",
+		previewText: "Più che una comunità, un clima da ricordare.",
 		hoverCredit: "Michela",
 
 		detailText: ` Nelle venue olimpiche è facile parlare con chiunque, anche con sconosciuti. 
@@ -233,6 +235,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Atmosfera felice",
+		previewText: "Un’atmosfera felice è rimasta nello schermo.",
 		hoverCredit: "Matteo",
 
 		detailText: `Ho seguito le Olimpiadi attraverso la TV e internet. 
@@ -256,6 +259,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Serve poco per sentirsi coinvolti",
+		previewText: "Basta poco per sentirsi parte del momento.",
 		hoverCredit: "Angelica",
 
 		detailText: `Ho assistito a una gara di pattinaggio dal vivo e ho seguito altri momenti online. 
@@ -278,6 +282,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Gli occhi non mentono",
+		previewText: "Gli occhi degli atleti sono rimasti impressi.",
 		hoverCredit: "Angelica",
 
 		detailText: `Durante le Olimpiadi ho visto e percepito l'emozione, il sacrificio, la forza, la determinazione, la fatica, la grinta e la grande passione negli occhi di quei giovani ragazzi.
@@ -297,6 +302,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Condividere momenti con gli amici",
+		previewText: "Condividere momenti con gli amici ha lasciato calore.",
 		hoverCredit: "Tommaso",
 
 		detailText: `Non ho seguito le Olimpiadi, ma vedere i miei amici che si emozionavano per gli sport più disparati é stato divertente. 
@@ -316,6 +322,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Storie difficili di atleti unici",
+		previewText: "Le storie difficili degli atleti restano vive.",
 		hoverCredit: "Giuliano",
 
 		detailText: `Queste Olimpiadi sono state caratterizzate da tanta umanità. 
@@ -335,6 +342,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Nuove scoperte invernali",
+		previewText: "Nuove scoperte invernali hanno aperto lo sguardo.",
 		hoverCredit: "Giulia",
 
 		detailText: `La mia esperienza delle Olimpiadi 2026 è stata tranquilla, poco coinvolta ma sono rimasta colpita dal fascino rappresentativo dell'inverno. 
@@ -355,6 +363,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Tutti gli sport sono importanti",
+		previewText: "Ogni sport ha lasciato una piccola importanza.",
 		hoverCredit: "Damiano",
 
 		detailText: `I giochi olimpici invernali Milano-Cortina 2026 sono stati per Milano la piú grande occasione di visibilità, finanziamenti e divertimento. 
@@ -374,6 +383,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Orgoglio nazionale e globale",
+		previewText: "Un orgoglio nazionale e globale è rimasto acceso.",
 		hoverCredit: "Luca",
 
 		detailText: `Ho seguito le Olimpiadi invernali principalmente su TikTok e mi hanno trasmesso orgoglio nazionale, senso di appartenenza a qualcosa di globale e voglia di fare sport.
@@ -393,6 +403,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Gioia e momenti divertenti",
+		previewText: "Gioia e momenti divertenti sono rimasti addosso.",
 		hoverCredit: "Lucas",
 
 		detailText: `La parola che descrive al meglio le Olimpiadi invernali 2026 è CELEBRAZIONE. 
@@ -414,6 +425,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Momento di condivisione",
+		previewText: "Un momento di condivisione è diventato festa.",
 		hoverCredit: "Filippo",
 
 		detailText: `Le Olimpiadi rappresentano per me un momento di condivisione e spirito competitivo che non provavo da molto tempo.
@@ -435,6 +447,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Orgoglio nazionale",
+		previewText: "L’orgoglio nazionale è rimasto come emozione.",
 		hoverCredit: "Bisù",
 
 		detailText: `Se dovessi descrivere la mia esperienza delle Olimpiadi con una frase sarebbe orgoglio nazionale.
@@ -458,6 +471,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Un esempio di come vivere lo sport",
+		previewText: "Lo sport ha mostrato un modo diverso di stare insieme.",
 		hoverCredit: "Carlo",
 
 		detailText: `I giochi Olimpici sono sempre l’esempio di come dovrebbe essere vissuto lo sport, sia dagli atleti che dai tifosi.
@@ -482,6 +496,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Storie di atleti",
+		previewText: "Le storie degli atleti sono rimaste più delle gare.",
 		hoverCredit: "Melissa",
 
 		detailText: `Le Olimpiadi non mi interessano molto, ma mi sono rimaste storie di atleti, principalmente quelle che sui social sono state raccontate di più.
@@ -501,6 +516,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Le imprese di Federica Brignone",
+		previewText: "Le imprese di Federica Brignone restano nella memoria.",
 		hoverCredit: "Giada",
 
 		detailText: `Quello che più mi è rimasto delle Olimpiadi sono state le imprese di Federica Brignone.
@@ -524,6 +540,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Il curling è molto interessante",
+		previewText: "Il curling ha lasciato una curiosità inattesa.",
 		hoverCredit: "Leonardo",
 
 		detailText: `Prima di queste Olimpiadi non pensavo che il curling fosse così interessante.
@@ -548,6 +565,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Uno dei momenti più attesi",
+		previewText: "Uno dei momenti più attesi è diventato ricordo.",
 		hoverCredit: "Samuel",
 
 		detailText: `Le Olimpiadi sono uno dei momenti più attesi sia da parte degli atleti che dagli amanti dello sport. 
@@ -571,6 +589,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Tante emozioni",
+		previewText: "Tante emozioni sono rimaste dopo l’evento.",
 		hoverCredit: "Letizia",
 
 		detailText: `Le Olimpiadi mi hanno lasciato tante emozioni.
@@ -594,6 +613,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Grande festa dello sport",
+		previewText: "Una grande festa dello sport è rimasta nell’aria.",
 		hoverCredit: "Lea",
 
 		detailText: `Queste Olimpiadi sono state una grande festa dello sport.
@@ -618,6 +638,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Mi sono asciata coinvolgere",
+		previewText: "Mi sono lasciata coinvolgere dai racconti degli altri.",
 		hoverCredit: "Silvia",
 
 		detailText: `Le mie Olimpiadi sono state fatte di ascolto: mi sono lasciata coinvolgere dai racconti degli altri senza mai guardare una gara.
@@ -640,6 +661,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Forte senso di sportività.",
+		previewText: "Un forte senso di sportività è rimasto vivo.",
 		hoverCredit: "Samantha",
 
 		detailText: `Quello che più mi è rimasto di queste Olimpiadi è un senso di sportività molto forte.
@@ -683,6 +705,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Il pattinaggio di coppia.",
+		previewText: "Il pattinaggio di coppia è rimasto come emozione.",
 		hoverCredit: "Ludovica",
 
 		detailText: `In queste Olimpiadi mi sono emozionata per il pattinaggio di coppia. 
@@ -702,6 +725,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "La vittoria di Alysa Liu.",
+		previewText: "La vittoria di Alysa Liu è rimasta negli occhi.",
 		hoverCredit: "Berta",
 
 		detailText: `Ciò che è rimasto dopo le Olimpiadi è la vittoria di Alysa Liu.
@@ -771,6 +795,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Unione di popoli.",
+		previewText: "Unione di popoli, anche oltre le distanze.",
 		hoverCredit: "Sabrin",
 
 		detailText: `Le Olimpiadi hanno rappresentato un momento di unione di popoli ed etnie nonostante le guerre.
@@ -790,6 +815,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Mi hanno trasmesso potenza.",
+		previewText: "Mi hanno trasmesso potenza e una traccia di energia.",
 		hoverCredit: "Iginio",
 
 		detailText: `Queste Olimpiadi mi hanno trasmesso potenza.
@@ -813,6 +839,7 @@ export const celebrazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "L'icona .",
+		previewText: "Alysa Liu è rimasta come un’icona luminosa.",
 		hoverCredit: "Giulia",
 
 		detailText: `Ciò che più mi ricorderò di queste Olimpiadi è Alysa Liu icona mondiale.

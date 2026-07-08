@@ -8,6 +8,7 @@ export const relazioni = [
 
 		hoverLabel: "Audio",
 		hoverText: "Era come una grande festa.",
+		previewText: "Era come una festa nata da un piccolo scambio.",
 		hoverCredit: "Bar Locanda alla Mano",
 
 		detailText: `Le spille hanno funzionato come mezzo concreto di scambio, fino a trasformarsi in un incontro reale con un turista. 
@@ -47,6 +48,7 @@ export const relazioni = [
 
 		hoverLabel: "Foto",
 		hoverText: "It was really about being together.",
+		previewText: "It was a memory of being together in Milan.",
 		hoverCredit: "Tom",
 
 		detailText: `When the Netherlands won, people from different countries were happy together.
@@ -107,6 +109,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Chi cerca trova.",
+		previewText: "Ogni spilla poteva aprire una conversazione.",
 		hoverCredit: "Sebastiana",
 
 		detailText: `Lo scambio delle spille nasce spesso dall’osservazione reciproca: vedi una spilla sul collo di qualcuno e inizi a parlare. 
@@ -127,6 +130,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Non solo spille.",
+		previewText: "Non solo spille, ma piccoli gesti condivisi.",
 		hoverCredit: "Camilla",
 
 		detailText: `Le spille diventano un pretesto per iniziare una conversazione, anche tra persone che non si conoscono. 
@@ -147,6 +151,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Nuove spille, nuovi amici.",
+		previewText: "Nuove spille hanno aperto nuove amicizie.",
 		hoverCredit: "Valentino",
 
 		detailText: `Per me lo scambio di spille può essere una possibilità per conoscere persone diverse. 
@@ -169,6 +174,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Olimpiadi per unire.",
+		previewText: "Le Olimpiadi restano come un gesto di unione.",
 		hoverCredit: "Sara",
 
 		detailText: `Collego le Olimpiadi all’idea di pace, unione e incontro tra persone. 
@@ -192,6 +198,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Nuove persone.",
+		previewText: "Sono rimaste persone nuove dentro il ricordo.",
 		hoverCredit: "Andrea",
 
 		detailText: `Mi è capitato spesso di interagire con persone nuove grazie alle Olimpiadi, in particolare con gli altri volontari durante i turni. 
@@ -211,6 +218,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Impegno, sacrifici e soddisfazioni.",
+		previewText: "Restano impegno, sacrifici e soddisfazioni.",
 		hoverCredit: "Marco",
 
 		detailText: `Mi è capitato qualche volta di interagire con persone nuove grazie alle Olimpiadi parlando di atleti. 
@@ -231,6 +239,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Una tradizione da sempre.",
+		previewText: "Una tradizione che ritorna come memoria familiare.",
 		hoverCredit: "Giovanni",
 
 		detailText: `Le Olimpiadi sono state una bella esperienza, le seguo da sempre, per me è una tradizione, quest’anno poi ho anche avuto il piacere di vedere un mio collega partecipare. 
@@ -253,6 +262,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Evento unico e incredibile.",
+		previewText: "Un evento unico rimasto come luce nella città.",
 		hoverCredit: "Salvatore",
 
 		detailText: `Le Olimpiadi Milano-Cortina 2026 sono state un evento unico e incredibile, la città splendeva. 
@@ -274,6 +284,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Rircordo del pattinaggio artistico.",
+		previewText: "Resta il ricordo luminoso del pattinaggio artistico.",
 		hoverCredit: "David",
 
 		detailText: `Mi sono interessato da lontano alle Olimpiadi. 
@@ -312,6 +323,7 @@ export const relazioni = [
 
 		hoverLabel: "Foto",
 		hoverText: "Esperienza indimenticabile.",
+		previewText: "Un’esperienza indimenticabile, ancora accesa.",
 		hoverCredit: "Viola",
 
 		detailText: `Ho vissuto veramente attivamente questo evento globale, è stata un’esperienza indimenticabile. 
@@ -331,6 +343,7 @@ export const relazioni = [
 
 		hoverLabel: "Foto",
 		hoverText: "Le spille non sono solo un oggetto.",
+		previewText: "Le spille non sono solo oggetti, ma incontri.",
 		hoverCredit: "Lorenzo",
 
 		detailText: `Grazie a queste Olimpiadi ho scoperto l’esistenza delle spille olimpiche ed ho partecipato attivamente allo scambio, penso che abbiano aiutato molto a creare interazione tra le persone: le spille non sono solo un oggetto, ma un simbolo di società. 
@@ -373,6 +386,7 @@ export const relazioni = [
 
 		hoverLabel: "Foto",
 		hoverText: "Socializzare grazie alle spille.",
+		previewText: "Le spille hanno lasciato nuove occasioni sociali.",
 		hoverCredit: "Cecilia",
 
 		detailText: `Il motivo per cui ho seguito le Olimpiadi invernali 2026 è stato per prendere le pin, grazie alle Olimpiadi ho avuto più opportunità di socializzare con le persone; le spille hanno aiutato molto a creare interazione tra le persone, ed io ho partecipato attivamente.`,
@@ -390,6 +404,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Curiosità globale.",
+		previewText: "Una curiosità globale ha attraversato la città.",
 		hoverCredit: "Omar",
 
 		detailText: `Le Olimpiadi Milano-Cortina 2026 sono state una bella esperienza. 
@@ -412,6 +427,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Passione e unità.",
+		previewText: "Passione e unità restano come una traccia.",
 		hoverCredit: "Olga",
 
 		detailText: `Le Olimpiadi Milano-Cortina 2026 mi hanno trasmesso passione e senso di unità.
@@ -434,6 +450,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Lo sport crea unità.",
+		previewText: "Lo sport crea unità anche tra sconosciuti.",
 		hoverCredit: "Osvaldo",
 
 		detailText: `Le Olimpiadi invernali 2026 mi hanno fatto comprendere quanto lo sport crei unità.
@@ -454,6 +471,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Condiviso con amici e famiglia.",
+		previewText: "Un ricordo condiviso con amici e famiglia.",
 		hoverCredit: "Paolo",
 
 		detailText: `Ho guardato solo pochi momenti delle Olimpiadi insieme ad amici e famiglia.
@@ -475,6 +493,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Interazione sul pullman.",
+		previewText: "Un pullman è diventato spazio di incontro.",
 		hoverCredit: "Pamela",
 
 		detailText: `Mi è capitato qualche volta di interagire con persone nuove sul pullman grazie alle Olimpiadi.
@@ -497,6 +516,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Interazione sui social.",
+		previewText: "Anche sui social restano piccole interazioni.",
 		hoverCredit: "Marialaura",
 
 		detailText: `Mi è capitato di interagire con persone nuove grazie alle Olimpiadi attraverso contatti indiretti commentando sui social.
@@ -520,6 +540,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Momento condiviso.",
+		previewText: "Un momento condiviso è diventato memoria.",
 		hoverCredit: "Andrea",
 
 		detailText: `Ho seguito le Olimpiadi sulla TV e sui social media, con amici e famiglia, è diventato un momento condiviso.
@@ -542,6 +563,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Creare interazione tra le persone.",
+		previewText: "Ogni scambio poteva creare una nuova interazione.",
 		hoverCredit: "Erika",
 
 		detailText: `Ho sentito parlare dello scambio di spille e penso che abbia in parte aiutato a creare interazione tra le persone.
@@ -563,6 +585,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Hanno creato unità e curiosità.",
+		previewText: "Unità e curiosità sono rimaste tra le persone.",
 		hoverCredit: "Enrico",
 
 		detailText: `Le Olimpiadi invernali 2026 sono state un’esperienza bella da seguire, ha creato unità e curiosità in me e nelle persone intorno a me.
@@ -584,6 +607,7 @@ export const relazioni = [
 
 		hoverLabel: "Testo",
 		hoverText: "Partecipate e coinvolgenti.",
+		previewText: "Un evento partecipato, rimasto nel coinvolgimento.",
 		hoverCredit: "Massimo",
 
 		detailText: `Le Olimpiadi invernali 2026 sono state molto partecipate e coinvolgenti. 

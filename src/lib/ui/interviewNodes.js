@@ -75,6 +75,7 @@ function showInterviewHoverIntro(item, categoryKey) {
 	);
 
 	text.textContent = formatQuote(
+		item.previewText ||
 		item.hoverText ||
 		item.sintesi ||
 		item.text ||
