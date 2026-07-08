@@ -10,7 +10,6 @@
 	let canvas;
 
 	let activeAbout = $state(null);
-	let hoveredPersonId = $state(null);
 
 	const defaultAbout = {
 		title: "Tracce",
@@ -284,12 +283,10 @@
 
 	function showPersonPreview(person) {
 		activeAbout = person;
-		hoveredPersonId = person.id;
 	}
 
 	function clearPersonPreview() {
 		activeAbout = null;
-		hoveredPersonId = null;
 	}
 
     async function goBackToMap(event) {
@@ -953,7 +950,6 @@
 			{#each people as person}
 				<button
 					class="about-person-dot glow-orb"
-					class:is-preview-active={hoveredPersonId === person.id}
 					type="button"
 					style={`left: ${person.x}%; top: ${person.y}%;`}
 					aria-label={person.name}
@@ -1255,37 +1251,20 @@
 		-webkit-backdrop-filter: none;
 		pointer-events: auto;
 		cursor: pointer;
-		transition: opacity 0.3s ease;
 	}
 
 	.about-person-dot:hover,
-	.about-person-dot:focus-visible,
-	.about-person-dot.is-preview-active {
+	.about-person-dot:focus-visible {
 		z-index: 2;
 		transform: none !important;
 		background: transparent !important;
 		border-color: transparent !important;
 		box-shadow: none !important;
-		opacity: 1 !important;
 		animation: none !important;
 	}
 
-	.about-person-dot:hover::before,
-	.about-person-dot:focus-visible::before,
-	.about-person-dot.is-preview-active::before {
-		transform: translate(-50%, -50%) scale(1.15) !important;
-		filter: blur(0.4px) brightness(1.8) !important;
-		opacity: 1 !important;
-		animation: none !important;
-	}
-
-	.about-person-dot:hover::after,
-	.about-person-dot:focus-visible::after,
-	.about-person-dot.is-preview-active::after {
-		transform: translate(-50%, -50%) scale(1.25) !important;
-		filter: blur(20px) brightness(1.6) !important;
-		opacity: 0.95 !important;
-		animation: none !important;
+	.about-people:hover .about-person-dot:not(:hover):not(:focus-visible) {
+		opacity: 0.85;
 	}
 
 	@media (max-width: 900px) {
