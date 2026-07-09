@@ -148,116 +148,119 @@ function getIconMarkup(type) {
 function generateNodeLayout(interviews, categoryKey) {
 	const total = interviews.length;
 	const placed = [];
-
-	const isFew = total <= 15;
-	const isMany = total > 45;
-	const isMedium = total > 22 && total <= 45;
-
-	const minSize = isFew ? 65.25 : isMany ? 65.25 : isMedium ? 65.25 : 65.25;
-	const maxSize = isFew ? 99.6 : isMany ? 99.6 : isMedium ? 99.6 : 99.6;
-
-	const virtualWidthVw = isFew ? 100 : isMany ? 190 : isMedium ? 150 : 118;
+	const isCelebrazioni = categoryKey === "celebrazioni";
+	const minSize = 65.25;
+	const maxSize = 99.6;
+	const virtualWidthVw = total <= 15 ? 100 : total > 45 ? 190 : total > 22 ? 150 : 118;
 	const virtualHeightVh = 72;
-
 	const virtualWidthPx = window.innerWidth * (virtualWidthVw / 100);
 	const virtualHeightPx = window.innerHeight * (virtualHeightVh / 100);
+	const layoutLeft = 8;
+	const layoutRight = 92;
+	const layoutTop = isCelebrazioni ? 52 : 18;
+	const layoutBottom = isCelebrazioni ? 88 : 78;
+	const usableWidth = layoutRight - layoutLeft;
+	const usableHeight = layoutBottom - layoutTop;
+	const layoutCenterY = isCelebrazioni ? 76 : 48;
 
-	interviews.forEach((item, index) => {
-		const rand = createSeededRandom(`${categoryKey}-${item.id}-${index}`);
+	function halton(index, base) {
+		let result = 0;
+		let fraction = 1 / base;
+		let value = index;
 
-		const size = minSize + rand() * (maxSize - minSize);
-
-		const minX = 5;
-		const maxX = 95;
-		const minY = 18;
-		const maxY = 78;
-
-		const isInsideHoverTextZone = (x, y) => {
-			return x > 30 && x < 70 && y > 34 && y < 66;
-				};
-
-				const fewNodeZones = [
-			{ xMin: 12, xMax: 30, yMin: 18, yMax: 36 },
-			{ xMin: 70, xMax: 88, yMin: 18, yMax: 36 },
-			{ xMin: 10, xMax: 28, yMin: 62, yMax: 80 },
-			{ xMin: 72, xMax: 90, yMin: 62, yMax: 80 },
-			{ xMin: 12, xMax: 28, yMin: 42, yMax: 58 },
-			{ xMin: 72, xMax: 88, yMin: 42, yMax: 58 },
-			{ xMin: 34, xMax: 44, yMin: 18, yMax: 30 },
-			{ xMin: 56, xMax: 66, yMin: 18, yMax: 30 },
-			{ xMin: 34, xMax: 44, yMin: 70, yMax: 82 },
-			{ xMin: 56, xMax: 66, yMin: 70, yMax: 82 }
-		];
-
-		function getCandidatePosition(index, rand) {
-			if (isFew) {
-				const zone = fewNodeZones[index % fewNodeZones.length];
-
-				return {
-					x: zone.xMin + rand() * (zone.xMax - zone.xMin),
-					y: zone.yMin + rand() * (zone.yMax - zone.yMin)
-				};
-			}
-
-			return {
-				x: minX + rand() * (maxX - minX),
-				y: minY + rand() * (maxY - minY)
-			};
+		while (value > 0) {
+			result += fraction * (value % base);
+			value = Math.floor(value / base);
+			fraction /= base;
 		}
 
+		return result;
+	}
+
+	function isInsideHoverTextZone(x, y) {
+		return x > 30 && x < 70 && y > 34 && y < 66;
+	}
+
+	const nodes = interviews.map((item, index) => {
+		const rand = createSeededRandom(`${categoryKey}-${item.id}-${index}`);
+
+		return {
+			item,
+			index,
+			rand,
+			size: minSize + rand() * (maxSize - minSize)
+		};
+	});
+
+	const orderedNodes = [...nodes].sort((a, b) => b.size - a.size || a.index - b.index);
+	const sequenceOffset = Math.floor(createSeededRandom(`${categoryKey}-scatter-${total}`)() * 1000);
+
+	orderedNodes.forEach((node, placedIndex) => {
+		const { rand, size } = node;
 		let x = 50;
 		let y = 45;
 		let found = false;
+		const depthBand = isCelebrazioni ? placedIndex % 4 : placedIndex % 5;
 
-		for (let attempt = 0; attempt < 260; attempt++) {
-			const candidate = getCandidatePosition(index + attempt, rand);
-			const tryX = candidate.x;
-			const tryY = candidate.y;
+		for (let attempt = 0; attempt < Math.max(180, total * 8); attempt++) {
+			const sequenceIndex = sequenceOffset + placedIndex * 37 + attempt * 11 + 1;
+			const candidateX = layoutLeft + halton(sequenceIndex, 2) * usableWidth;
+			let candidateY = layoutTop + halton(sequenceIndex, 3) * usableHeight;
 
-			if (isInsideHoverTextZone(tryX, tryY)) {
+			if (isCelebrazioni) {
+				const groundPull = 0.45 + depthBand * 0.12;
+				candidateY = layoutCenterY + (candidateY - layoutCenterY) * groundPull;
+				candidateY += Math.sin(sequenceIndex * 1.08) * 3.4;
+				candidateY += (rand() - 0.5) * 5.5;
+			} else {
+				candidateY += (rand() - 0.5) * usableHeight * 0.06;
+			}
+
+			const jitterX = (rand() - 0.5) * usableWidth * (isCelebrazioni ? 0.085 : 0.06);
+			const finalX = Math.max(layoutLeft, Math.min(layoutRight, candidateX + jitterX));
+			const finalY = Math.max(layoutTop, Math.min(layoutBottom, candidateY));
+
+			if (isInsideHoverTextZone(finalX, finalY)) {
 				continue;
 			}
 
-			const tryXPx = (tryX / 100) * virtualWidthPx;
-			const tryYPx = (tryY / 100) * virtualHeightPx;
+			const tryXPx = (finalX / 100) * virtualWidthPx;
+			const tryYPx = (finalY / 100) * virtualHeightPx;
+			const minGap = isCelebrazioni ? 12 : total > 45 ? 10 : 14;
 
 			const isFarEnough = placed.every((p) => {
 				const dx = tryXPx - p.xPx;
 				const dy = tryYPx - p.yPx;
 				const dist = Math.sqrt(dx * dx + dy * dy);
 
-				const minDist = size / 2 + p.size / 2 + (isMany ? 10 : 16);
-
-				return dist > minDist;
+				return dist > size / 2 + p.size / 2 + minGap;
 			});
 
 			if (isFarEnough) {
-				x = tryX;
-				y = tryY;
+				x = finalX;
+				y = finalY;
 				found = true;
 				break;
 			}
 		}
 
 		if (!found) {
-			if (isFew) {
-				const fallback = getCandidatePosition(index, rand);
-				x = fallback.x;
-				y = fallback.y;
+			const fallbackIndex = sequenceOffset + placedIndex * 53 + 1;
+			x = layoutLeft + halton(fallbackIndex, 2) * usableWidth;
+			y = layoutTop + halton(fallbackIndex, 3) * usableHeight;
+
+			if (isCelebrazioni) {
+				y = layoutCenterY + (y - layoutCenterY) * 0.42;
+				y += Math.sin(fallbackIndex * 1.08) * 3.5;
+				y += (rand() - 0.5) * 4.5;
 			} else {
-				const cols = isMany ? 13 : isMedium ? 9 : 6;
-				const row = Math.floor(index / cols);
-				const col = index % cols;
-
-				x = 6 + (col / Math.max(cols - 1, 1)) * 88;
-				y = 20 + row * (isMany ? 12 : 15);
-
-				x += Math.sin(index * 1.7) * 2.8;
-				y += Math.cos(index * 1.3) * 2.4;
+				y += (rand() - 0.5) * 6;
 			}
 
+			x += (rand() - 0.5) * 8;
+
 			if (isInsideHoverTextZone(x, y)) {
-				y = y < 50 ? 24 + rand() * 8 : 70 + rand() * 8;
+				y = isCelebrazioni ? layoutBottom - 10 - rand() * 4 : y < 50 ? layoutTop + 8 + rand() * 4 : layoutBottom - 8 - rand() * 4;
 				x += x < 50 ? -8 : 8;
 			}
 		}
