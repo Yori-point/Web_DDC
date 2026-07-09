@@ -126,6 +126,10 @@ body:not(.intro-active) .top-left h1 {
 	font-synthesis: none;
 }
 
+body.chapter-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .top-left h1 {
+	font-size: 18px;
+}
+
 @media (max-width: 720px) {
 	.top-right {
 		top: auto;

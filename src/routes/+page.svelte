@@ -178,7 +178,7 @@
 	.duomo-info-close-hit .duomo-brand {
 		margin: 0;
 		font-family: 'Americana', var(--font-title);
-		font-size: 55px;
+		font-size: 32px;
 		font-weight: 400;
 		letter-spacing: 0.04em;
 		line-height: 0.9;
