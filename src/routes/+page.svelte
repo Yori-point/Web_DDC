@@ -96,36 +96,34 @@
 					<h1>Dopo un grande evento,<br />qualcosa resta</h1>
 
 					<p>
-						<em>“Tracce”</em> nasce per raccogliere ciò che le Olimpiadi
-						Milano-Cortina 2026 lasciano dietro di sé quando i riflettori si
-						spengono: non il bilancio ufficiale, ma la memoria di chi li ha
-						vissuti da vicino. Volontari, cittadini, lavoratori e spettatori
-						intrecciano voci diverse, fatte di celebrazione e critica, di
-						cambiamento e attesa.
+						Le Olimpiadi di Milano Cortina 2026 hanno racchiuso il territorio in
+						una grande bolla, un tempo sospeso in cui la grandiosità della festa ha
+						camminato fianco a fianco con la fragilità della quotidianità.
 					</p>
 
 					<p>
-						La raccolta delle testimonianze si è svolta a Milano e nelle zone
-						limitrofe, un territorio che, pur restando ai margini delle gare vere
-						e proprie, è stato punto nevralgico di tutte quelle attività
-						collaterali che hanno alimentato l’atmosfera olimpica: un tessuto
-						informale di vita quotidiana attorno all’evento, spesso invisibile
-						nei racconti ufficiali.
+						Le voci che abbiamo raccolto rivelano una realtà dalle anime
+						speculari, profondamente divisa tra la magia del palcoscenico mondiale
+						e il peso dei suoi riflessi sulla vita di tutti i giorni.
 					</p>
 
 					<p>
-						Ogni testimonianza si deposita come una particella. Ogni particella
-						lascia una traccia. Insieme, compongono una mappa che non si legge in
-						linea retta, ma si attraversa senza un ordine imposto. Dentro questo
-						spazio nascono cinque territori che raccolgono i sentimenti
-						principali emersi dalle testimonianze: Celebrazioni, Problemi,
-						Relazioni, Cambiamento e Opportunità.
+						C’è chi in quella sospensione ha subito il labirinto delle strade
+						bloccate, il silenzio dei trasporti interrotti e le porte sbarrate
+						dell’Università Bicocca, vivendo il passaggio della fiaccola olimpica
+						come un intralcio caotico che ha oscurato i bisogni dei residenti.
 					</p>
 
 					<p>
-						Il sito raccoglie ciò che continua a muoversi nella memoria
-						quotidiana, molto tempo dopo che i Giochi sono finiti.<br />
-						Non una mappa da leggere, ma uno spazio da attraversare.
+						Eppure, nello stesso identico istante, per molti quella bolla si è
+						fatta orizzonte e promessa: una vetrina preziosa per i propri sogni
+						commerciali, una palestra per mescolare lingue straniere e
+						prospettive, una scintilla che ha riacceso l’entusiasmo e il valore
+						dello sport nei più giovani.
+						Questo sito vuole essere il custode di un simile mosaico umano, un
+						racconto sincero dove il disagio e il riscatto convivono, restituendo
+						la verità profonda di un evento che ha cambiato per sempre il respiro
+						della nostra comunità.
 					</p>
 				</article>
 			</div>
@@ -234,14 +232,14 @@
 		z-index: 2;
 
 		width: min(720px, 68%);
-		margin-left: clamp(210px, 22vw, 280px);
+		margin-left: clamp(160px, 17vw, 230px);
 
 		-webkit-font-smoothing: antialiased;
 		font-synthesis: none;
 	}
 
 	.duomo-info-copy h1 {
-		margin: 0 0 32px;
+		margin: 0 0 44px;
 
 		font-family: var(--font-title);
 		font-size: clamp(50px, 4.7vw, 68px);
