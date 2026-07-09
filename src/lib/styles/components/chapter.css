@@ -146,20 +146,20 @@
 
 .chapter-hover-intro {
 	position: absolute;
-	left: 50%;
-	top: 50%;
-	z-index: 24;
+	left: clamp(430px, 31vw, 520px);
+	top: 44%;
+	z-index: 12;
 
-	width: 353px;
-	min-height: 129px;
+	width: clamp(500px, 34vw, 620px);
+	max-width: 620px;
 
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
+	justify-content: flex-start;
 	align-items: stretch;
-	gap: 10px;
+	gap: 0;
 
-	transform: translate(-50%, -50%);
+	transform: translateY(-50%);
 	text-align: left;
 
 	opacity: 0;
@@ -175,49 +175,60 @@
 .chapter-hover-intro.is-visible {
 	opacity: 1;
 	visibility: visible;
-	transform: translate(-50%, -50%);
+	transform: translateY(-50%);
 }
 
 .chapter-hover-title {
 	width: 100%;
 	margin: 0;
 
-	font-family: var(--font-primary);
+	font-family: "Omnes", sans-serif;
 	font-size: 16px;
 	font-weight: 400;
 	line-height: 18px;
+	font-style: normal;
 	letter-spacing: 0;
+	margin-bottom: 14px;
 
 	text-align: left;
 	color: rgba(242, 245, 247, 0.8);
 }
 
 .chapter-hover-text {
-	width: 100%;
+	width: clamp(500px, 34vw, 620px);
+	max-width: 620px;
 	margin: 0;
 
-	font-family: var(--font-quote);
-	font-size: 20px;
+	font-family: "Domaine Text", var(--font-title);
+	font-size: clamp(20px, 1.45vw, 24px);
 	font-style: italic;
 	font-weight: 400;
-	line-height: 23px;
-	letter-spacing: 0;
+	line-height: 1.22;
+	letter-spacing: 0.01em;
 
 	text-align: left;
 	color: rgba(242, 245, 247, 0.95);
-	text-shadow: 0 0 26px rgba(242, 245, 247, 0.16);
+	text-shadow: 0 0 18px rgba(242, 245, 247, 0.12);
 }
 
 .chapter-hover-credit {
-	align-self: flex-end;
-	width: auto;
-	margin: 0;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 6px;
+	align-self: stretch;
+	width: 100%;
+	max-width: 620px;
+	margin: 18px 0 0;
+	margin-left: 0;
 	padding: 0;
+	padding-left: 0;
 
-	font-family: var(--font-primary);
+	font-family: "Omnes", sans-serif;
 	font-size: 16px;
 	font-weight: 400;
 	line-height: 18px;
+	font-style: normal;
 	letter-spacing: 0;
 
 	text-align: right;

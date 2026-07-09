@@ -94,6 +94,7 @@ export const cambiamento = [
 
 		hoverLabel: "Testo",
 		hoverText: "Soldi mal spesi.",
+		previewText: "Sono rimasti più dubbi che cambiamenti reali.",
 		hoverCredit: "Francesco",
 
 		detailText: `Le Olimpiadi promettono sempre grandi rivoluzioni, ma il tanto atteso cambiamento spesso si rivela essere solo un'illusione ingegneristica.
@@ -115,6 +116,7 @@ export const cambiamento = [
 
 		hoverLabel: "Testo",
 		hoverText: "Il disagio del traffico cittadino.",
+		previewText: "Il traffico ha lasciato il ricordo più forte.",
 		hoverCredit: "Fabiola",
 
 		detailText: `I percorsi dei mezzi di superficie erano bloccati, c’erano molte più persone in giro per la città e ci sono stati disagi generali nel corso dell'evento. 
@@ -153,6 +155,7 @@ export const cambiamento = [
 
 		hoverLabel: "Testo",
 		hoverText: "Aumentati i treni",
+		previewText: "Più treni hanno cambiato il ritmo dei giorni.",
 		hoverCredit: "Stefano",
 
 		detailText: `Le Olimpiadi hanno cambiato molto la frequenza dei treni. 

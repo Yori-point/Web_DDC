@@ -4,7 +4,7 @@
 	<div class="media-detail-inner">
 		<aside class="media-detail-copy">
 			<h2 id="mediaPanelTitle" class="media-detail-title">Gianluca</h2>
-			<p id="mediaPanelText" class="media-detail-text"></p>
+			<div id="mediaPanelText" class="media-detail-text"></div>
 		</aside>
 
 		<section id="mediaStage" class="media-stage" aria-label="Interview media">

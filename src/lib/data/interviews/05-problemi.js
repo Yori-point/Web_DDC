@@ -115,6 +115,7 @@ export const problemi = [
 
 		hoverLabel: "Testo",
 		hoverText: "Questione di carattere.",
+		previewText: "Una questione di carattere ha segnato gli scambi.",
 		hoverCredit: "Ginevra",
 
 		detailText: `Le spille possono aiutare le persone a parlare tra loro, ma non sempre creano un vero senso di comunità. 
@@ -135,6 +136,7 @@ export const problemi = [
 
 		hoverLabel: "Testo",
 		hoverText: "Turisti poco socievoli.",
+		previewText: "Turisti poco socievoli hanno lasciato distanza.",
 		hoverCredit: "Giorgio",
 
 		detailText: `L’atmosfera mi è sembrata molto caotica. 
@@ -158,6 +160,7 @@ export const problemi = [
 
 		hoverLabel: "Testo",
 		hoverText: "Spille come semplici oggetti.",
+		previewText: "Le spille sono rimaste semplici oggetti.",
 		hoverCredit: "Rania",
 
 		detailText: `Non ho scambiato nessuna spilla e per me le spille restano soprattutto oggetti da collezione. 
@@ -177,6 +180,7 @@ export const problemi = [
 
 		hoverLabel: "Testo",
 		hoverText: "Olimpiadi utopiche.",
+		previewText: "Olimpiadi utopiche, lontane dalla vita reale.",
 		hoverCredit: "Giorgia",
 
 		detailText: `Non ho seguito molto le Olimpiadi e non ho partecipato ad attività legate all’evento. 
@@ -201,6 +205,7 @@ export const problemi = [
 
 		hoverLabel: "Testo",
 		hoverText: "Università chiuse, stadi aperti.",
+		previewText: "Università chiuse e stadi aperti restano il segno.",
 		hoverCredit: "Gioele",
 
 		detailText: `Le Olimpiadi hanno cambiato un po’ il modo in cui ho vissuto la città di Milano perché hanno chiuso le università e ho perso delle lezioni. 
@@ -222,6 +227,7 @@ export const problemi = [
 
 		hoverLabel: "Testo",
 		hoverText: "Un intralcio per chi studia.",
+		previewText: "Un intralcio per chi studia è rimasto addosso.",
 		hoverCredit: "Helena",
 
 		detailText: `La viabilità veniva bloccata, e i trasporti rallentati o chiusi per alcune ore. 
@@ -264,6 +270,7 @@ export const problemi = [
 
 		hoverLabel: "Testo",
 		hoverText: "Olimpiadi rapide e passeggere.",
+		previewText: "Olimpiadi rapide, passate senza lasciare molto.",
 		hoverCredit: "Alberto",
 
 		detailText: `Non ho mai avuto particolare interesse per gli sport invernali, le olimpiadi sono state un’occasione interessante per scoprirli meglio ma mi sono sembrate troppo rapide e passeggere per lasciare effettivamente qualcosa.
@@ -303,6 +310,7 @@ export const problemi = [
 
 		hoverLabel: "Testo",
 		hoverText: "Non mi hanno appassionato.",
+		previewText: "Non mi hanno appassionato, solo sfiorato.",
 		hoverCredit: "Tiziana",
 
 		detailText: `Le Olimpiadi non mi hanno appassionato particolarmente.
@@ -322,6 +330,7 @@ export const problemi = [
 
 		hoverLabel: "Testo",
 		hoverText: "Finalmente sono finite.",
+		previewText: "Finalmente finite, con un ricordo di vuoto.",
 		hoverCredit: "Tiberio",
 
 		detailText: `Finalmente sono finite le Olimpiadi. Le ho trovate vuote.
@@ -341,6 +350,7 @@ export const problemi = [
 
 		hoverLabel: "Testo",
 		hoverText: "Non mi sono sentita coinvolta.",
+		previewText: "Non mi sono sentita coinvolta dalla città in festa.",
 		hoverCredit: "Cinzia",
 
 		detailText: `Non mi sono sentita coinvolta. 
