@@ -128,11 +128,11 @@
 		},
 		{
 			id: "isabella-lena",
-			name: "Isabella lena",
+			name: "Isabella Lena",
 			meta: "DIREZIONE VISIVA · INTERFACCIA · ESPERIENZA NARRATIVA",
 			x: 60,
 			y: 70,
-			title: "Isabella lena",
+			title: "Isabella Lena",
 			paragraphs: [
 				[
 					"Le Olimpiadi invernali",
