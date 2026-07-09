@@ -11,9 +11,7 @@ export const relazioni = [
 		previewText: "Era come una festa nata da un piccolo scambio.",
 		hoverCredit: "Bar Locanda alla Mano",
 
-		detailText: `Le spille hanno funzionato come mezzo concreto di scambio, fino a trasformarsi in un incontro reale con un turista. 
-        Le Olimpidi sono state un’opportunità positiva per i bar e le attività locali.
-        Un turista mi ha dato una spilletta e poi siamo andati a bere qualcosa.`,
+		detailText: `Le spille hanno funzionato come mezzo concreto di scambio, trasformandosi anche in un incontro reale con un turista. Le Olimpidi sono state un’opportunità positiva per i bar e le attività locali. Spesso queste conversazioni si prolungavano al bancone o ai tavoli, creando piccoli momenti di scambio.`,
 
 		text: `Testo lungo completo...`,
 		visible: true
@@ -62,12 +60,12 @@ export const relazioni = [
 		id: "3.4",
 		type: "video",
 		fileType: "Video",
-		title: "Gabriele e Federico",
-		personName: "Gabriele e Federico",
+		title: "Gabriele, Federico",
+		personName: "Gabriele, Federico",
 
 		hoverLabel: "Video",
 		hoverText: "Ho parlato con degli atleti canadesi di snowboard.",
-		hoverCredit: "Gabriele e Federico",
+		hoverCredit: "Gabriele, Federico",
 
 		detailText: `Le Olimpiadi hanno dato la possibilità di incontro e scambio. 
         Hanno creato un clima di unione e permesso piccole interazioni spontanee nello spazio urbano.
@@ -92,9 +90,7 @@ export const relazioni = [
 		hoverText: "Abbiamo cercato di far sentire tutti i turisti a casa.",
 		hoverCredit: "bar MAG",
 
-		detailText: `Si sono create situazioni di contatto e scambio grazie all’atmosfera olimpica costruita nel locale. 
-        Qui le Olimpiadi non restano sullo sfondo come semplice immagine o festa, ma diventano un dispositivo reale di incontro: i drink dedicati alle nazioni, le spillette, le divise e il tema del menù hanno funzionato come pretesti per far parlare le persone, farle riconoscere tra loro e sentirsi rappresentate. 
-        L’elemento più significativo è che clienti inizialmente separati finivano per unirsi in un unico tavolo.`,
+		detailText: `Si sono create situazioni di contatto e scambio grazie all’atmosfera olimpica costruita nel locale. Qui le Olimpiadi non restano sullo sfondo ma diventano un dispositivo reale di incontro: le spillette e gli elementi a tema favorivano conversazioni e connessioni tra le persone. Il personale e i clienti spesso avviavano scambi spontanei, e tavoli separati finivano per unirsi durante l’evento.`,
 
 		text: `Testo lungo completo...`,
 		visible: true

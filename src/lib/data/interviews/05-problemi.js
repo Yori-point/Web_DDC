@@ -63,24 +63,14 @@ export const problemi = [
 		id: "5.4",
 		type: "audio",
 		fileType: "Audio",
-		title: "Nati per Vivere a Milano - Paul Pablo",
-		personName: "Nati per Vivere a Milano - Paul Pablo",
+		title: "Nati per Vivere a Milano",
+		personName: "Nati per Vivere a Milano",
 
 		hoverLabel: "Audio",
 		hoverText: "La parola chiave per me è esclusione.",
-		hoverCredit: "Nati per Vivere a Milano - Paul Pablo",
+		hoverCredit: "Nati per Vivere a Milano",
 
-		detailText: `Il tema dominante è l’esclusione. 
-		Le Olimpiadi sono state troppo costose, poco accessibili, poco autentiche e lontane dalla vita reale della città. 
-		Le spille sono un semplice oggetto da possedere. È stato più un fenomeno social.
-		Non era importante lo scambio tra persone, ma possederle.
-		Anche i creator locali, che avrebbero potuto aiutare a coinvolgere davvero i cittadini, sono stati lasciati fuori. 
-		Le Paralimpiadi sono state separate dalle Olimpiadi, questo è un segnale di disparità.
-		Le Paralimpiadi così non le ha viste praticamente nessuno.
-		La parola chiave è distanza: è stato un evento grande, visibile, ma poco condiviso da chi la città la vive ogni giorno.
-		Non è stato rispettato il fatto che esistono cittadini che vivono questa città.
-		Tutto questo ha reso l’evento lontano da chi vive a Milano.
-		La cerimonia è stata una noia mortale.`,
+		detailText: `Il tema dominante è l’esclusione. Le Olimpiadi sono state costose e poco accessibili, distanti dalla vita quotidiana della città. Le spillette sono rimaste un fenomeno da possedere più che un vero strumento di scambio, e molti creator locali sono stati esclusi. Le Paralimpiadi sono risultate separate e poco visibili, accentuando la distanza tra l’evento e chi vive Milano.`,
 
 		text: `Testo lungo completo...`,
 		visible: true

@@ -48,7 +48,8 @@
 	color: #fff;
 
 	/* 关键：不要用深色整屏盖住 GLB 山 */
-	background: rgba(7, 14, 23, 0.18);
+	/* reduce overlay darkness slightly */
+	background: rgba(7, 14, 23, 0.12);
 	backdrop-filter: none;
 	-webkit-backdrop-filter: none;
 
@@ -200,20 +201,13 @@
 }
 
 .media-panel.is-image .media-detail-inner,
-.media-panel.is-video .media-detail-inner {
+.media-panel.is-video .media-detail-inner,
+.media-panel.is-audio .media-detail-inner {
 	width: min(1500px, calc(100vw - clamp(96px, 9vw, 180px)));
 	height: min(780px, calc(100vh - clamp(130px, 15vh, 190px)));
 	padding: 0;
 	grid-template-columns: clamp(260px, 18vw, 340px) minmax(0, 1fr);
 	column-gap: clamp(52px, 5.4vw, 92px);
-}
-
-.media-panel.is-audio .media-detail-inner {
-	width: min(1280px, calc(100vw - clamp(120px, 12vw, 220px)));
-	height: min(680px, calc(100vh - clamp(150px, 18vh, 230px)));
-	padding: 0;
-	grid-template-columns: clamp(260px, 18vw, 340px) minmax(0, 1fr);
-	column-gap: clamp(72px, 7vw, 120px);
 }
 
 .media-panel.is-image .media-detail-copy,
@@ -224,24 +218,38 @@
 }
 
 .media-panel.is-image .media-stage,
-.media-panel.is-video .media-stage {
+.media-panel.is-video .media-stage,
+.media-panel.is-audio .media-stage {
 	width: 100%;
 	height: min(70vh, 700px);
 	min-height: clamp(460px, 52vh, 560px);
 }
 
-.media-panel.is-audio .media-stage {
-	width: 100%;
-	height: min(56vh, 520px);
-	min-height: clamp(360px, 44vh, 460px);
-}
-
 .media-panel.is-image .media-stage,
 .media-panel.is-video .media-stage {
 	background: transparent;
-	box-shadow:
-		0 26px 90px rgba(0, 0, 0, 0.34),
-		inset 0 0 44px rgba(0, 0, 0, 0.28);
+	/* border-radius and overflow remain; box-shadow handled per-type to avoid flash */
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+/* video: start without box-shadow to avoid showing a dark rounded rectangle
+   before the first frame is available; the ready class will restore it */
+.media-panel.is-video .media-stage {
+	box-shadow: none;
+	transition: box-shadow 220ms ease, background 220ms ease;
+}
+
+.media-panel.media-video-ready .media-stage {
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
+}
+
+.media-panel.is-audio .media-stage {
+	background: transparent;
+	/* audio: softer, diffused appearance without a hard frame */
+	box-shadow: 0 8px 26px rgba(0, 0, 0, 0.08);
+	border-radius: 8px;
+	overflow: hidden;
 }
 
 .media-panel.is-image .media-stage::after,
@@ -253,17 +261,44 @@
 
 	pointer-events: none;
 
-	background:
-		radial-gradient(
-			ellipse at center,
-			transparent 56%,
-			rgba(2, 7, 12, 0.16) 72%,
-			rgba(2, 7, 12, 0.72) 100%
-		);
+	/* cinematic vignette for image/video - soft and wide */
+	background: radial-gradient(ellipse at center, transparent 60%, rgba(2, 7, 12, 0.14) 76%, rgba(2, 7, 12, 0.36) 100%);
+	filter: blur(22px);
 
-	box-shadow:
-		inset 0 0 26px 16px rgba(0, 0, 0, 0.45),
-		inset 0 0 80px 30px rgba(0, 0, 0, 0.34);
+	/* keep only a gentle inner depth */
+	box-shadow: inset 0 0 20px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* videos: start with vignette hidden, fade in once first frame is ready */
+.media-panel.is-video .media-stage::after {
+	opacity: 0;
+	transition: opacity 220ms ease;
+}
+
+.media-panel.media-video-ready .media-stage::after {
+	opacity: 1;
+}
+
+/* slightly stronger vignette specifically for images (darker than default) */
+.media-panel.is-image .media-stage::after {
+	background: radial-gradient(ellipse at center, transparent 58%, rgba(2, 7, 12, 0.18) 74%, rgba(2, 7, 12, 0.44) 100%);
+	filter: blur(22px);
+	box-shadow: inset 0 0 24px 10px rgba(0, 0, 0, 0.16);
+}
+
+.media-panel.is-audio .media-stage::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 5;
+
+	pointer-events: none;
+
+	/* very diffused, low-contrast vignette for audio */
+	background: radial-gradient(ellipse at center, transparent 70%, rgba(2, 7, 12, 0.06) 84%, rgba(2, 7, 12, 0.14) 100%);
+	filter: blur(28px);
+
+	box-shadow: inset 0 0 14px 8px rgba(0, 0, 0, 0.06);
 }
 
 .media-stage.is-hidden {

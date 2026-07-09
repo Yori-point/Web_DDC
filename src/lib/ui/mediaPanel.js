@@ -1,4 +1,9 @@
 // @ts-nocheck
+import { opportunita } from "../data/interviews/01-opportunita.js";
+import { cambiamento } from "../data/interviews/02-cambiamento.js";
+import { relazioni } from "../data/interviews/03-relazioni.js";
+import { celebrazioni } from "../data/interviews/04-celebrazioni.js";
+import { problemi } from "../data/interviews/05-problemi.js";
 
 function normalizeText(text) {
 	return String(text ?? "").trim();
@@ -81,6 +86,197 @@ function renderDetailText(container, text, type) {
 		paragraph.textContent = paragraphText;
 		container.appendChild(paragraph);
 	});
+}
+
+function findInterviewSource(item) {
+	const lists = [opportunita, cambiamento, relazioni, celebrazioni, problemi];
+
+	// Try to find by id first
+	if (item && item.id) {
+		const id = String(item.id);
+		for (const list of lists) {
+			const found = list.find((it) => String(it.id) === id);
+			if (found) return found;
+		}
+	}
+
+	// Try to find by title or personName
+	const title = (item && (item.title || item.personName || item.person || "")).toLowerCase();
+	if (title) {
+		for (const list of lists) {
+			const found = list.find((it) => String(it.title || it.personName || "").toLowerCase() === title);
+			if (found) return found;
+		}
+	}
+
+	return null;
+}
+
+function getContainerHeight(container) {
+	// use scrollHeight for accurate content height
+	return Math.ceil(container.scrollHeight || container.getBoundingClientRect().height);
+}
+
+function trimElementTextToFit(container, el, targetHeight) {
+	const original = String(el.textContent || "").trim();
+	if (!original) return false;
+
+	let lo = 0;
+	let hi = original.length;
+	let best = "";
+
+	// If container already fits, nothing to do
+	if (getContainerHeight(container) <= targetHeight) return true;
+
+	// Binary search for max substring length that fits
+	while (lo <= hi) {
+		const mid = Math.floor((lo + hi) / 2);
+		el.textContent = original.slice(0, mid).trim() + (mid < original.length ? "…" : "");
+
+		const h = getContainerHeight(container);
+		if (h <= targetHeight) {
+			best = el.textContent;
+			lo = mid + 1;
+		} else {
+			hi = mid - 1;
+		}
+	}
+
+	if (best) {
+		el.textContent = best;
+		return true;
+	}
+
+	// If nothing fits, remove element
+	el.remove();
+	return false;
+}
+
+function appendParagraphsToFill(container, paragraphs, targetHeight, maxAppend = 6) {
+	if (!paragraphs || !paragraphs.length) return 0;
+
+	let appended = 0;
+
+	// If container already exceeds target, aggressively trim/remove last paragraph(s)
+	function shrinkToFit() {
+		let attempts = 0;
+		while (getContainerHeight(container) > targetHeight && attempts < 20) {
+			const ps = Array.from(container.querySelectorAll("p"));
+			if (!ps.length) break;
+
+			const last = ps[ps.length - 1];
+			const trimmed = trimElementTextToFit(container, last, targetHeight);
+			if (!trimmed) {
+				// couldn't trim (was removed), continue loop
+			}
+			attempts++;
+		}
+	}
+
+	if (getContainerHeight(container) > targetHeight) {
+		shrinkToFit();
+		if (getContainerHeight(container) > targetHeight) return appended;
+	}
+
+	for (const para of paragraphs) {
+		if (appended >= maxAppend) break;
+
+		const p = document.createElement("p");
+		p.textContent = para;
+		container.appendChild(p);
+		appended++;
+
+		const h = getContainerHeight(container);
+		if (h >= targetHeight) {
+			// If we've exceeded or reached, attempt to trim this paragraph to fit exactly
+			if (h > targetHeight) {
+				trimElementTextToFit(container, p, targetHeight);
+			}
+			// After trimming, ensure we don't stay larger
+			if (getContainerHeight(container) > targetHeight) {
+				shrinkToFit();
+			}
+			break;
+		}
+	}
+
+	return appended;
+}
+
+function fillDetailTextUsingData(item, type) {
+	const container = document.getElementById("mediaPanelText");
+	const stage = document.getElementById("mediaStage");
+
+	if (!container || !stage) return;
+
+	const mediaHeight = stage.clientHeight;
+	const textHeight = container.clientHeight;
+
+	if (textHeight >= mediaHeight - 8) return; // already tall enough
+
+	// Find source interview (same item) or similar in same category
+	const source = findInterviewSource(item) || item;
+
+	const fullText = String(source.detailText || source.text || source.sintesi || "");
+	let paras = getTextParagraphs(fullText);
+
+	// If we already rendered some paragraphs, avoid duplicating them
+	const existing = Array.from(container.querySelectorAll("p")).map((p) => p.textContent || "");
+	paras = paras.filter((p) => !existing.includes(p));
+
+	// If still not enough and item has a category, try other interviews in same category
+	if ((!paras || paras.length === 0) && item && item.category) {
+		const lists = {
+			opportunita,
+			trasformazione: cambiamento,
+			relazioni,
+			festa: celebrazioni,
+			criticita: problemi
+		};
+
+		const list = lists[item.category] || [];
+		for (const it of list) {
+			const more = getTextParagraphs(it.detailText || it.text || it.sintesi || "");
+			paras = paras.concat(more.filter((p) => !existing.includes(p)));
+			if (paras.length) break;
+		}
+	}
+
+	// Fallback: gather from all lists
+	if (!paras || paras.length === 0) {
+		const all = [].concat(opportunita, cambiamento, relazioni, celebrazioni, problemi);
+		for (const it of all) {
+			const more = getTextParagraphs(it.detailText || it.text || it.sintesi || "");
+			paras = paras.concat(more.filter((p) => !existing.includes(p)));
+			if (paras.length >= 6) break;
+		}
+	}
+
+	// Append until we reach target height or run out
+	appendParagraphsToFill(container, paras, mediaHeight, 8);
+
+	// Remove any previous spacer
+	Array.from(container.querySelectorAll(".media-text-spacer")).forEach((el) => el.remove());
+
+	// If still shorter, insert an invisible spacer to make heights match exactly
+	const finalH = getContainerHeight(container);
+	const remaining = Math.max(0, Math.round(mediaHeight - finalH));
+	// If we somehow still exceed target, remove last paragraphs until fit
+	if (finalH > mediaHeight) {
+		shrinkToFit();
+	}
+
+	const finalH2 = getContainerHeight(container);
+	const remaining2 = Math.max(0, Math.round(mediaHeight - finalH2));
+	if (remaining2 > 0) {
+		const spacer = document.createElement("div");
+		spacer.className = "media-text-spacer";
+		spacer.style.height = `${remaining2}px`;
+		spacer.style.width = "100%";
+		spacer.style.pointerEvents = "none";
+		spacer.style.opacity = "0";
+		container.appendChild(spacer);
+	}
 }
 
 function pickMediaSrc(value, type) {
@@ -231,6 +427,9 @@ function resetMediaElements() {
 		video.removeAttribute("src");
 		video.load?.();
 		video.hidden = true;
+		// remove any ready flag
+		const mediaPanel = document.getElementById("mediaPanel");
+		mediaPanel?.classList.remove("media-video-ready");
 	}
 
 	if (image) {
@@ -307,21 +506,63 @@ export function openMediaPanel(item) {
 		);
 	}
 
+	// After rendering text, try to fill left column to match media height using interview data
+	function scheduleFill() {
+		// run on next frames to ensure layout settled
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				fillDetailTextUsingData(item, type);
+			});
+		});
+	}
+
 	if (type === "video" && video && src) {
 		video.src = src;
-		video.hidden = false;
+		// keep video hidden until first frame is available to avoid showing
+		// browser black frame or stage box-shadow before content
+		video.hidden = true;
+
+		// ensure ready flag removed until we have first frame
+		mediaPanel.classList.remove("media-video-ready");
+
+		// when first frame/data is available, reveal video, show vignette and fill text
+		const onVideoFrame = () => {
+			video.hidden = false;
+			mediaPanel.classList.add("media-video-ready");
+			fillDetailTextUsingData(item, type);
+			video.removeEventListener("loadeddata", onVideoFrame);
+			video.removeEventListener("canplay", onVideoFrame);
+		};
+
+		video.addEventListener("loadeddata", onVideoFrame);
+		video.addEventListener("canplay", onVideoFrame);
+
+		// also schedule a fallback
+		scheduleFill();
 	}
 
 	if (type === "image" && image && src) {
 		image.src = src;
 		image.alt = item.title || item.personName || "Interview image";
 		image.hidden = false;
+
+		const onImageLoad = () => {
+			fillDetailTextUsingData(item, type);
+			image.removeEventListener("load", onImageLoad);
+		};
+
+		image.addEventListener("load", onImageLoad);
+		// also schedule a fallback
+		scheduleFill();
 	}
 
 	if (type === "audio" && audioShell && audio && src) {
 		audio.src = src;
 		audioShell.hidden = false;
 		updateAudioUI();
+
+		// audio doesn't change stage size much, schedule fill
+		scheduleFill();
 	}
 
 	if (type === "text") {
@@ -347,6 +588,8 @@ export function closeMediaPanel() {
 	document.body.classList.remove("media-av-open");
 
 	if (mediaPanel) {
+		// remove media-type classes immediately so stage overlays disappear
+		mediaPanel.classList.remove("is-text", "is-image", "is-audio", "is-video");
 		mediaPanel.classList.add("hidden");
 		mediaPanel.setAttribute("aria-hidden", "true");
 	}
