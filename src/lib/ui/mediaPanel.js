@@ -212,7 +212,11 @@ function fillDetailTextUsingData(item, type) {
 	const mediaHeight = stage.clientHeight;
 	const textHeight = container.clientHeight;
 
-	if (textHeight >= mediaHeight - 8) return; // already tall enough
+	// keep a small safety offset so the left text won't slightly exceed media height
+	const SAFETY_OFFSET_PX = 8;
+	const targetHeight = Math.max(0, mediaHeight - SAFETY_OFFSET_PX);
+
+	if (textHeight >= targetHeight) return; // already tall enough
 
 	// Find source interview (same item) or similar in same category
 	const source = findInterviewSource(item) || item;
@@ -253,7 +257,7 @@ function fillDetailTextUsingData(item, type) {
 	}
 
 	// Append until we reach target height or run out
-	appendParagraphsToFill(container, paras, mediaHeight, 8);
+	appendParagraphsToFill(container, paras, targetHeight, 8);
 
 	// Remove any previous spacer
 	Array.from(container.querySelectorAll(".media-text-spacer")).forEach((el) => el.remove());

@@ -11,8 +11,8 @@ export const problemi = [
 		hoverCredit: "Fernando",
 
 		detailText: `Pur non avendo seguito l’evento, ho percepito alcuni disagi concreti, come traffico e chiusure stradali. 
-		Le Olimpiadi sarebbero state un’opportunità, ma non è stata sfruttata al massimo.
-		Avevo garndi aspettative, ma alla fine, come molti grandi eventi che ospita Milano, una volta finiti, torna tutto come prima.`,
+		Le Olimpiadi sarebbero state un’opportunità, ma non è stata sfruttata al massimo.`,
+		 
 
 		text: `Testo lungo completo...`,
 		visible: true
