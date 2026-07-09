@@ -74,7 +74,7 @@ body.category-hover-active .category-hover-overlay {
 
 	font-family: var(--font-medium);
 	font-size: 20px;
-	font-weight: 500;
+	font-weight: 400;
 	line-height: 24px;
 	letter-spacing: 0.01em;
 	text-transform: none;
@@ -115,7 +115,7 @@ body.category-hover-active .category-hover-overlay {
 
 	font-family: var(--font-medium);
 	font-size: 20px;
-	font-weight: 500;
+	font-weight: 400;
 	line-height: 24px;
 	color: rgba(255, 255, 255, 0.56);
 

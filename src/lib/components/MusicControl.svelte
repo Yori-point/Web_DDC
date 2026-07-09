@@ -294,7 +294,8 @@
 
 	.music-control-btn span {
 		display: block;
-		width: 2.12px;
+		/* make the music bars slightly thinner */
+		width: 1.2px;
 		height: var(--h);
 		border-radius: 999px;
 
