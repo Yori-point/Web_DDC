@@ -41,183 +41,137 @@
 	animation: interview-float var(--float-duration, 7s) ease-in-out infinite;
 	animation-delay: var(--float-delay, 0s);
 
-	transition:
-		opacity 0.35s ease,
-		transform 0.35s ease,
-		filter 0.35s ease;
+	opacity: 0.76;
+	filter: none;
+
+	transition: opacity 0.28s ease, transform 0.28s ease, box-shadow 0.28s ease, filter 0.28s ease;
 }
 
-/* 默认状态：有各自颜色，但不发光 */
 .interview-node.media-node::before {
 	content: "";
 	position: absolute;
 	left: 50%;
 	top: 50%;
-	width: calc(var(--node-size, 70px) * 0.76);
-	height: calc(var(--node-size, 70px) * 0.76);
+	width: 70px;
+	height: 70px;
 	border-radius: 50%;
 	transform: translate(-50%, -50%);
 
 	background:
 		radial-gradient(
 			circle,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.95) 0%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.72) 32%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.28) 58%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.08) 74%,
+			rgba(var(--node-color-rgb, 147, 171, 219), 0.92) 0%,
+			rgba(var(--node-color-rgb, 147, 171, 219), 0.78) 13%,
+			rgba(var(--node-color-rgb, 147, 171, 219), 0.32) 24%,
+			rgba(var(--node-color-rgb, 147, 171, 219), 0.06) 34%,
+			transparent 42%,
+			transparent 58%,
+			rgba(var(--node-color-rgb, 147, 171, 219), 0.42) 60%,
+			rgba(var(--node-color-rgb, 147, 171, 219), 0.16) 62%,
+			transparent 66%,
+			rgba(var(--node-color-rgb, 147, 171, 219), 0.06) 76%,
 			transparent 100%
 		);
 
-	filter: blur(0.2px);
-	opacity: 0.72;
+	filter: blur(0.4px);
+	opacity: 0.9;
 	pointer-events: none;
 	z-index: 1;
 }
 
-/* 默认状态不显示外部光晕 */
 .interview-node.media-node::after {
 	content: "";
 	position: absolute;
 	left: 50%;
 	top: 50%;
-	width: calc(var(--node-size, 70px) * 2.05);
-	height: calc(var(--node-size, 70px) * 2.05);
+	width: 160px;
+	height: 160px;
 	border-radius: 50%;
 	transform: translate(-50%, -50%);
 
 	background:
 		radial-gradient(
 			circle,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.28) 0%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.16) 28%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.06) 52%,
-			transparent 76%
-		);
-
-	filter: blur(6px);
-	opacity: 0;
-	pointer-events: none;
-	z-index: 0;
-}
-
-/* hover：轻微亮起，但不要变成点击后的强发光 */
-.interview-node.media-node:hover {
-	--node-scale: 1.06;
-	filter: brightness(1.12);
-}
-
-.interview-node.media-node:hover::before {
-	opacity: 0.95;
-}
-
-.interview-node.media-node:hover::after {
-	opacity: 0.28;
-}
-
-/* 点击后 / 看过后：各自分类颜色发光，不要白色 */
-.interview-node.media-node.is-viewed {
-	opacity: 1;
-	background: transparent;
-	box-shadow: none;
-	filter: brightness(1.12);
-}
-
-.interview-node.media-node.is-viewed::before {
-	width: calc(var(--node-size, 70px) * 0.92);
-	height: calc(var(--node-size, 70px) * 0.92);
-
-	background:
-		radial-gradient(
-			circle,
-			rgba(var(--node-color-rgb, 147, 171, 219), 1) 0%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.92) 13%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.36) 24%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.07) 34%,
-			transparent 42%,
-			transparent 58%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.46) 60%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.16) 62%,
-			transparent 66%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.08) 76%,
-			transparent 100%
-		);
-
-	filter: blur(0.4px);
-	opacity: 1;
-}
-
-.interview-node.media-node.is-viewed::after {
-	width: calc(var(--node-size, 70px) * 2.85);
-	height: calc(var(--node-size, 70px) * 2.85);
-
-	background:
-		radial-gradient(
-			circle,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.26) 0%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.14) 26%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.05) 48%,
+			rgba(var(--node-color-rgb, 147, 171, 219), 0.22) 0%,
+			rgba(var(--node-color-rgb, 147, 171, 219), 0.12) 26%,
+			rgba(var(--node-color-rgb, 147, 171, 219), 0.045) 48%,
 			transparent 72%
 		);
 
 	filter: blur(18px);
-	opacity: 0.88;
+	opacity: 0.82;
+	pointer-events: none;
+	z-index: 0;
 }
 
-/* 打开详情页后，其它 node 后退 */
+.interview-node.media-node:hover {
+	opacity: 0.9;
+	--node-scale: 1.08;
+}
+
+.interview-node.media-node:hover::before {
+	transform: translate(-50%, -50%) scale(1.08);
+	filter: blur(0.4px) brightness(1.18);
+	opacity: 1;
+}
+
+.interview-node.media-node:hover::after {
+	transform: translate(-50%, -50%) scale(1.125);
+	opacity: 1;
+	filter: blur(20px) brightness(1.18);
+}
+
+.interview-node.media-node.is-viewed {
+	opacity: 1;
+	--node-scale: 1;
+	box-shadow: none;
+	filter: brightness(1.24);
+}
+
+.interview-node.media-node.is-viewed:hover {
+	--node-scale: 1.04;
+}
+
+.interview-node.media-node.is-viewed::before {
+	transform: translate(-50%, -50%);
+	filter: blur(0.4px) brightness(1.24);
+	opacity: 0.84;
+}
+
+.interview-node.media-node.is-viewed::after {
+	transform: translate(-50%, -50%);
+	filter: blur(18px) brightness(1.04);
+	opacity: 0.76;
+}
+
 .chapter-media-map.has-open .interview-node.media-node {
-	/* de-emphasize all nodes when a media panel is open */
 	opacity: 0.08;
 	--node-scale: 0.9;
-	filter: saturate(0.7) brightness(0.9);
+	filter: brightness(0.9);
 }
 
-/* 当前点击的 active node：保持各自分类颜色强发光 */
 .chapter-media-map.has-open .interview-node.media-node.is-active {
-	/* keep the active node prominent */
 	opacity: 1;
-	--node-scale: 1.12;
-	background: transparent;
+	--node-scale: 1;
 	box-shadow: none;
-	filter: brightness(1.18) saturate(1.05);
+	filter: brightness(1.24);
 	z-index: 30;
 }
 
-.chapter-media-map.has-open .interview-node.media-node.is-active::before {
-	width: calc(var(--node-size, 70px) * 0.98);
-	height: calc(var(--node-size, 70px) * 0.98);
-	opacity: 1;
+.chapter-media-map.has-open .interview-node.media-node.is-active:hover {
+	--node-scale: 1.04;
+}
 
-	background:
-		radial-gradient(
-			circle,
-			rgba(var(--node-color-rgb, 147, 171, 219), 1) 0%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.92) 13%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.36) 24%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.07) 34%,
-			transparent 42%,
-			transparent 58%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.5) 60%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.18) 62%,
-			transparent 66%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.1) 76%,
-			transparent 100%
-		);
+.chapter-media-map.has-open .interview-node.media-node.is-active::before {
+	transform: translate(-50%, -50%);
+	filter: blur(0.4px) brightness(1.24);
+	opacity: 0.84;
 }
 
 .chapter-media-map.has-open .interview-node.media-node.is-active::after {
-	width: calc(var(--node-size, 70px) * 3.05);
-	height: calc(var(--node-size, 70px) * 3.05);
-	opacity: 1;
-	filter: blur(20px);
-
-	background:
-		radial-gradient(
-			circle,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.32) 0%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.18) 28%,
-			rgba(var(--node-color-rgb, 147, 171, 219), 0.07) 52%,
-			transparent 76%
-		);
+	transform: translate(-50%, -50%);
+	filter: blur(18px) brightness(1.04);
+	opacity: 0.76;
 }
 
 @keyframes interview-float {
