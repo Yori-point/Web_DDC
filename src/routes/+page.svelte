@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from "svelte";
+	import { goto } from "$app/navigation";
 
 	import Intro from "$lib/components/Intro.svelte";
 	import OverviewUI from "$lib/components/OverviewUI.svelte";
@@ -24,6 +25,15 @@
 		document.body.classList.remove("duomo-info-active");
 
 		window.dispatchEvent(new CustomEvent("tracce:duomo-info-close"));
+
+		// also simulate clicking the global back-to-map control so the app returns to overview
+		// this will trigger the existing handler attached to #backToMap in the scene init
+		document.getElementById('backToMap')?.click();
+
+		// fallback: ensure we navigate to the root map if the click handler is not present
+		setTimeout(() => {
+			try { goto('/'); } catch (e) { /* ignore */ }
+		}, 60);
 	}
 
 	function goToAboutFromDuomo() {
@@ -66,7 +76,7 @@
 				type="button"
 				aria-label="Torna alla mappa"
 				onclick={closeDuomoInfo}
-			></button>
+			><h1 class="duomo-brand">Tracce</h1></button>
 
 			<a
 				class="duomo-info-about-hit"
@@ -151,15 +161,33 @@
 			top: 28px;
 			z-index: 260;
 
-			width: 180px;
-			height: 56px;
-
-			padding: 0;
-			border: none;
-			background: transparent;
+			/* override global button styles so we can show a large brand-like title */
+			min-width: 0;
+			width: auto;
+			height: auto;
+			padding: 0 6px;
+			border: none !important;
+			background: transparent !important;
+			box-shadow: none !important;
+			backdrop-filter: none !important;
+			pointer-events: auto;
 
 			cursor: pointer;
 		}
+
+	.duomo-info-close-hit .duomo-brand {
+		margin: 0;
+		font-family: var(--font-title);
+		font-size: 32px;
+		font-weight: 300;
+		letter-spacing: 0.08em;
+		line-height: 0.9;
+		color: #f2f5f7;
+		opacity: 1;
+		text-shadow: 0 0 22px rgba(242, 245, 247, 0.06);
+		-webkit-font-smoothing: antialiased;
+		font-synthesis: none;
+	}
 
 	.duomo-info-about-hit {
 		position: fixed;
@@ -276,6 +304,13 @@
 	:global(body.duomo-info-active .category-bar),
 	:global(body.duomo-info-active .category-item),
 	:global(body.duomo-info-active .category-hover-overlay) {
+		opacity: 0 !important;
+		visibility: hidden !important;
+		pointer-events: none !important;
+	}
+
+	/* hide the top-left brand/logo while duomo info is active to avoid duplicate 'Tracce' text */
+	:global(body.duomo-info-active .ui.top-left) {
 		opacity: 0 !important;
 		visibility: hidden !important;
 		pointer-events: none !important;
