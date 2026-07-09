@@ -298,3 +298,13 @@ body.media-detail-open .chapter-about {
 	visibility: hidden !important;
 	pointer-events: none !important;
 }
+
+/* When a media panel or AV (audio/video) panel is open, blur and darken the 3D scene
+   to better separate the UI layers and match the chapter node hover effect. */
+body.media-detail-open #scene,
+body.media-av-open #scene {
+	filter: blur(18px) brightness(0.56) contrast(0.95);
+	-webkit-filter: blur(18px) brightness(0.56) contrast(0.95);
+	transition: filter 260ms ease, -webkit-filter 260ms ease;
+	pointer-events: none;
+}

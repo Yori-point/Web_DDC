@@ -165,17 +165,21 @@
 
 /* 打开详情页后，其它 node 后退 */
 .chapter-media-map.has-open .interview-node.media-node {
-	opacity: 0.16;
+	/* de-emphasize all nodes when a media panel is open */
+	opacity: 0.08;
 	--node-scale: 0.9;
+	filter: saturate(0.7) brightness(0.9);
 }
 
 /* 当前点击的 active node：保持各自分类颜色强发光 */
 .chapter-media-map.has-open .interview-node.media-node.is-active {
+	/* keep the active node prominent */
 	opacity: 1;
 	--node-scale: 1.12;
 	background: transparent;
 	box-shadow: none;
-	filter: brightness(1.18);
+	filter: brightness(1.18) saturate(1.05);
+	z-index: 30;
 }
 
 .chapter-media-map.has-open .interview-node.media-node.is-active::before {
