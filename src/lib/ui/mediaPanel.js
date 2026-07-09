@@ -12,8 +12,67 @@ function getTextParagraphs(text) {
 		.filter(Boolean);
 }
 
-function renderDetailText(container, text) {
-	const paragraphs = getTextParagraphs(text);
+const DETAIL_TEXT_LIMITS = {
+	text: {
+		maxParagraphs: 5,
+		maxCharacters: 760
+	},
+	default: {
+		maxParagraphs: 4,
+		maxCharacters: 540
+	}
+};
+
+function trimParagraphToLength(text, maxCharacters) {
+	if (text.length <= maxCharacters) return text;
+
+	const slice = text.slice(0, maxCharacters);
+	const sentenceEnd = Math.max(
+		slice.lastIndexOf("."),
+		slice.lastIndexOf("!"),
+		slice.lastIndexOf("?")
+	);
+
+	if (sentenceEnd > maxCharacters * 0.45) {
+		return slice.slice(0, sentenceEnd + 1).trim();
+	}
+
+	const commaEnd = Math.max(slice.lastIndexOf(","), slice.lastIndexOf(";"));
+
+	if (commaEnd > maxCharacters * 0.45) {
+		return `${slice.slice(0, commaEnd).trim()}…`;
+	}
+
+	const wordEnd = slice.lastIndexOf(" ");
+	return `${slice.slice(0, wordEnd > 0 ? wordEnd : maxCharacters).trim()}…`;
+}
+
+function getLimitedTextParagraphs(paragraphs, type) {
+	const limit = type === "text" ? DETAIL_TEXT_LIMITS.text : DETAIL_TEXT_LIMITS.default;
+	const limited = [];
+	let characterCount = 0;
+
+	for (const paragraph of paragraphs) {
+		if (limited.length >= limit.maxParagraphs) break;
+
+		const nextCharacterCount = characterCount + paragraph.length;
+
+		if (limited.length > 0 && nextCharacterCount > limit.maxCharacters) break;
+
+		if (limited.length === 0 && nextCharacterCount > limit.maxCharacters) {
+			limited.push(trimParagraphToLength(paragraph, limit.maxCharacters));
+			break;
+		}
+
+		limited.push(paragraph);
+		characterCount = nextCharacterCount;
+	}
+
+	return limited;
+}
+
+function renderDetailText(container, text, type) {
+	const paragraphs = getLimitedTextParagraphs(getTextParagraphs(text), type);
 
 	container.replaceChildren();
 
@@ -243,7 +302,8 @@ export function openMediaPanel(item) {
 			item.detailText ||
 			item.text ||
 			item.sintesi ||
-			""
+			"",
+			type
 		);
 	}
 
