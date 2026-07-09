@@ -238,8 +238,7 @@ body.chapter-active:not(.intro-active):not(.ritual-active):not(.is-transitioning
 	pointer-events: auto !important;
 }
 
-body.category-hover-active.overview-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-hover-overlay,
-body.category-hover-active.chapter-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-hover-overlay {
+body.category-hover-active.overview-active:not(.intro-active):not(.ritual-active):not(.is-transitioning) .category-hover-overlay {
 	opacity: 1 !important;
 	visibility: visible !important;
 }
@@ -374,4 +373,19 @@ body.category-hover-active.chapter-active.media-detail-open:not(.intro-active):n
 	opacity: 0 !important;
 	visibility: hidden !important;
 	pointer-events: none !important;
+}
+
+/* Never show map/category hover text inside chapter */
+body.chapter-active .category-hover-overlay,
+body.chapter-active.category-hover-active .category-hover-overlay,
+body.chapter-active #categoryHoverOverlay {
+	opacity: 0 !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
+
+body.chapter-active .category-hover-text,
+body.chapter-active #categoryHoverText {
+	opacity: 0 !important;
+	visibility: hidden !important;
 }
