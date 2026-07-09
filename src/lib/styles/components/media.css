@@ -145,13 +145,13 @@
 .media-detail-title {
 	margin: 0 0 48px;
 
-	font-family: var(--font-primary);
-	font-size: 48px;
+	font-family: var(--font-title);
+	font-size: clamp(42px, 3.5vw, 48px);
 	font-weight: 400;
 	line-height: 1;
 	letter-spacing: 0;
 
-	color: #fff;
+	color: rgba(242, 245, 247, 0.9);
 }
 
 .media-detail-text {
@@ -159,17 +159,29 @@
 
 	width: 100%;
 
-	font-family: var(--font-quote);
+	display: flex;
+	flex-direction: column;
+	row-gap: clamp(18px, 2.2vh, 28px);
+
+	font-family: "Omnes", sans-serif;
 	font-size: 18px;
-	font-style: italic;
-	font-weight: 400;
+	font-style: normal;
+	font-weight: 200;
 	line-height: 1.14;
 	letter-spacing: 0;
 
-	white-space: pre-line;
+	white-space: normal;
 
-	color: rgba(255, 255, 255, 0.94);
-	text-shadow: 0 0 24px rgba(255, 255, 255, 0.12);
+	color: rgba(242, 245, 247, 0.86);
+	text-shadow: none;
+}
+
+.media-detail-text p {
+	margin: 0;
+}
+
+.media-detail-text p:last-child {
+	margin-bottom: 0;
 }
 
 .media-stage {
@@ -470,12 +482,15 @@
 }
 
 .media-panel.is-text .media-detail-title {
-	margin-bottom: 24px;
+	margin-bottom: clamp(38px, 4.2vh, 56px);
 }
 
 .media-panel.is-text .media-detail-text {
 	font-size: 18px;
 	line-height: 1.18;
+	max-height: clamp(330px, 48vh, 430px);
+	box-sizing: border-box;
+	overflow: hidden;
 }
 
 .media-panel.is-text .media-stage {

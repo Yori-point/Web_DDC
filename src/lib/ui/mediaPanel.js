@@ -4,6 +4,26 @@ function normalizeText(text) {
 	return String(text ?? "").trim();
 }
 
+function getTextParagraphs(text) {
+	return String(text ?? "")
+		.replace(/\r\n/g, "\n")
+		.split(/\n+/)
+		.map((line) => line.trim())
+		.filter(Boolean);
+}
+
+function renderDetailText(container, text) {
+	const paragraphs = getTextParagraphs(text);
+
+	container.replaceChildren();
+
+	paragraphs.forEach((paragraphText) => {
+		const paragraph = document.createElement("p");
+		paragraph.textContent = paragraphText;
+		container.appendChild(paragraph);
+	});
+}
+
 function pickMediaSrc(value, type) {
 	if (!Array.isArray(value)) return value || "";
 
@@ -218,7 +238,8 @@ export function openMediaPanel(item) {
 	}
 
 	if (mediaPanelText) {
-		mediaPanelText.textContent = normalizeText(
+		renderDetailText(
+			mediaPanelText,
 			item.detailText ||
 			item.text ||
 			item.sintesi ||
