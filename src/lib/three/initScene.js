@@ -691,6 +691,9 @@ const RITUAL_CAMERA = {
     appState.duomoHoverActive = shouldBeActive;
     document.body.classList.toggle("duomo-hover-active", shouldBeActive);
 
+    // Duomo hover 区域包含真实按钮外的扩展范围，所以 cursor 必须由 JS 统一控制
+    document.body.style.cursor = shouldBeActive ? "pointer" : "";
+
     if (shouldBeActive) {
       appState.hoverHookObject = null;
 
@@ -1787,6 +1790,7 @@ const exploredByCategory = loadExploredByCategory();
   }
 
   let lastHoveredCategoryKey = null;
+  let duomoHoverHoldUntil = 0;
 
   function syncCategoryHoverUI() {
     const hoveredKey =
@@ -1801,6 +1805,64 @@ const exploredByCategory = loadExploredByCategory();
     document.querySelectorAll(".category-item").forEach((item) => {
       item.classList.toggle("is-hovered", item.dataset.key === hoveredKey);
     });
+  }
+
+  function isPointerOverDuomoArea(event) {
+    if (appState.view !== "overview") return false;
+
+    const duomo = animatedObjects.duomoObject;
+    if (!duomo) return false;
+
+    const box = new THREE.Box3().setFromObject(duomo);
+    if (box.isEmpty()) return false;
+
+    const min = box.min;
+    const max = box.max;
+
+    const corners = [
+      new THREE.Vector3(min.x, min.y, min.z),
+      new THREE.Vector3(min.x, min.y, max.z),
+      new THREE.Vector3(min.x, max.y, min.z),
+      new THREE.Vector3(min.x, max.y, max.z),
+      new THREE.Vector3(max.x, min.y, min.z),
+      new THREE.Vector3(max.x, min.y, max.z),
+      new THREE.Vector3(max.x, max.y, min.z),
+      new THREE.Vector3(max.x, max.y, max.z)
+    ];
+
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+
+    corners.forEach((corner) => {
+      corner.project(camera);
+
+      const x = (corner.x * 0.5 + 0.5) * window.innerWidth;
+      const y = (-corner.y * 0.5 + 0.5) * window.innerHeight;
+
+      minX = Math.min(minX, x);
+      maxX = Math.max(maxX, x);
+      minY = Math.min(minY, y);
+      maxY = Math.max(maxY, y);
+    });
+
+    // hover 区域整体往左上移动一点
+    const offsetX = -45;
+    const offsetY = -38;
+
+    // 四个方向分别控制：左上更大，右下更小
+    const paddingLeft = 26;
+    const paddingRight = 36;
+    const paddingTop = 26;
+    const paddingBottom = 28;
+
+    return (
+      event.clientX >= minX + offsetX - paddingLeft &&
+      event.clientX <= maxX + offsetX + paddingRight &&
+      event.clientY >= minY + offsetY - paddingTop &&
+      event.clientY <= maxY + offsetY + paddingBottom
+    );
   }
 
   function pickMountainByPointer(event) {
@@ -1840,7 +1902,9 @@ const exploredByCategory = loadExploredByCategory();
       onLeave: () => {
         appState.hoverHookObject = null;
         window.hideCategoryHoverText?.();
-        document.body.classList.remove("duomo-hover-active");
+
+        // 不要在普通 hotspot leave 时直接移除 duomo-hover-active
+        // Duomo hover 只交给 setDuomoHoverActive 控制
         syncCategoryHoverUI();
       },
       onSelect: (area) => {
@@ -1860,14 +1924,15 @@ const exploredByCategory = loadExploredByCategory();
       },
       onDuomoHover: () => {
         appState.overviewHoverReady = true;
-        setDuomoHoverActive(true);
+        // 不在这里直接打开，交给 pointermove + isPointerOverDuomoArea 统一判断
       },
       onDuomoLeave: () => {
-        setDuomoHoverActive(false);
+        // 不在这里直接关闭，否则边缘会和 isPointerOverDuomoArea 打架导致闪烁
       },
       onDuomoClick: () => {
         appState.overviewHoverReady = true;
         setDuomoHoverActive(false);
+        document.body.style.cursor = "";
 
         window.hideCategoryHoverText?.();
         document.body.classList.remove("category-hover-active");
@@ -1951,7 +2016,8 @@ const exploredByCategory = loadExploredByCategory();
 
     const isOverHotspot = e.target.closest && e.target.closest('.hotspot-btn');
     const isOverCategory = e.target.closest && e.target.closest('.category-item');
-    const isOverDuomo = e.target.closest && e.target.closest('.duomo-hover-btn');
+    const isOverDuomoButton = e.target.closest && e.target.closest('.duomo-hover-btn');
+    const isOverDuomo = isOverDuomoButton || isPointerOverDuomoArea(e);
 
     if (isOverCategory) {
       setDuomoHoverActive(false);
@@ -1961,9 +2027,27 @@ const exploredByCategory = loadExploredByCategory();
       return;
     }
 
+    const now = performance.now();
+
     if (isOverDuomo) {
+      duomoHoverHoldUntil = now + 140;
+
       appState.overviewHoverReady = true;
       setDuomoHoverActive(true);
+
+      appState.hoverHookObject = null;
+      window.hideCategoryHoverText?.();
+      document.body.classList.remove("category-hover-active");
+      syncCategoryHoverUI();
+
+      appState.overviewPointerTargetX = 0;
+      appState.overviewPointerTargetY = 0;
+      return;
+    }
+
+    // 鼠标刚离开判定边缘时，不要立刻关闭，给 140ms 缓冲
+    if (appState.duomoHoverActive && now <= duomoHoverHoldUntil) {
+      document.body.style.cursor = "pointer";
 
       appState.hoverHookObject = null;
       window.hideCategoryHoverText?.();
@@ -2050,9 +2134,21 @@ const exploredByCategory = loadExploredByCategory();
     if (appState.view !== 'overview') return;
 
     const isOverHotspot = event.target.closest && event.target.closest('.hotspot-btn');
-    const isOverDuomo = event.target.closest && event.target.closest('.duomo-hover-btn');
+    const isOverDuomoButton = event.target.closest && event.target.closest('.duomo-hover-btn');
+    const isOverDuomo = isOverDuomoButton || isPointerOverDuomoArea(event);
 
-    if (isOverHotspot || isOverDuomo) return;
+    if (isOverDuomo) {
+      appState.overviewHoverReady = true;
+      setDuomoHoverActive(false);
+
+      window.hideCategoryHoverText?.();
+      document.body.classList.remove("category-hover-active");
+
+      window.dispatchEvent(new CustomEvent("tracce:open-duomo-info"));
+      return;
+    }
+
+    if (isOverHotspot) return;
 
     const pickedHook = pickMountainByPointer(event);
     if (!pickedHook) return;

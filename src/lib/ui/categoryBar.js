@@ -25,6 +25,11 @@ export function bindCategoryBar({
 	}
 
 	function showCategoryHoverByKey(key) {
+		if (document.body.classList.contains("chapter-active")) {
+			hideCategoryHoverText();
+			return;
+		}
+
 		const area = getAreaByKey(key);
 		if (!area) return;
 
@@ -97,6 +102,9 @@ window.clearActiveCategory = clearActiveCategory;
 		const area = getAreaByKey(key);
 
 		if (!area) return;
+
+		hideCategoryHoverText();
+		onLeaveCategory?.();
 
 		if (document.body.classList.contains("chapter-active")) {
 			prepareChapterSwitch();
