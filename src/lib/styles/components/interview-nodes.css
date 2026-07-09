@@ -105,20 +105,21 @@
 }
 
 .interview-node.media-node:hover {
-	opacity: 0.9;
-	--node-scale: 1.08;
+	opacity: 1;
+	--node-scale: 1.18;
+	filter: brightness(1.42) saturate(1.12);
 }
 
 .interview-node.media-node:hover::before {
-	transform: translate(-50%, -50%) scale(1.08);
-	filter: blur(0.4px) brightness(1.18);
+	transform: translate(-50%, -50%) scale(1.22);
+	filter: blur(0px) brightness(1.62);
 	opacity: 1;
 }
 
 .interview-node.media-node:hover::after {
-	transform: translate(-50%, -50%) scale(1.125);
+	transform: translate(-50%, -50%) scale(1.28);
 	opacity: 1;
-	filter: blur(20px) brightness(1.18);
+	filter: blur(26px) brightness(1.5);
 }
 
 .interview-node.media-node.is-viewed {

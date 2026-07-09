@@ -121,12 +121,12 @@ export function applyMarkerHoverVisual({
 				const bb = baseColors[i + 2];
 
 				if (isTargetMountain) {
-					const mix = 0.58;
-					const glow = 1.18;
+					const mix = 0.82;
+					const glow = 1.42;
 
-					colors[i] = THREE.MathUtils.lerp(br * 0.88, targetColor.r * glow, mix);
-					colors[i + 1] = THREE.MathUtils.lerp(bg * 0.88, targetColor.g * glow, mix);
-					colors[i + 2] = THREE.MathUtils.lerp(bb * 0.88, targetColor.b * glow, mix);
+					colors[i] = THREE.MathUtils.lerp(br * 0.82, targetColor.r * glow, mix);
+					colors[i + 1] = THREE.MathUtils.lerp(bg * 0.82, targetColor.g * glow, mix);
+					colors[i + 2] = THREE.MathUtils.lerp(bb * 0.82, targetColor.b * glow, mix);
 				} else {
 					colors[i] = br;
 					colors[i + 1] = bg;
@@ -139,7 +139,7 @@ export function applyMarkerHoverVisual({
 
 		if (isTargetMountain) {
 			mat.opacity = 1.0;
-			mat.size = (points.userData.baseSize || 0.44) * 1.08;
+			mat.size = (points.userData.baseSize || 0.44) * 1.22;
 			points.renderOrder = 42;
 		} else {
 			mat.opacity = points.userData.baseOpacity || 0.96;
@@ -169,8 +169,8 @@ export function applyMarkerHoverVisual({
 
 		if (isTarget) {
 			hook.material.opacity = 1.0;
-			hook.scale.set(5.2, 5.2, 1);
-			hook.renderOrder = 70;
+			hook.scale.set(6.2, 6.2, 1);
+			hook.renderOrder = 82;
 		} else {
 			hook.material.opacity = 0.86;
 			hook.scale.set(4.7, 4.7, 1);
