@@ -38,10 +38,14 @@
 	const OVERALL_VOLUME = 0.45;
 	const EFFECT_VOLUMES: Record<EffectKey, number> = {
 		criticita: 0.4,
-		festa: 0.04,
+		festa: 0.02,
 		opportunita: 0.3,
 		relazioni: 0.3,
 		trasformazione: 0.4
+	};
+	// Per-track volume overrides for individual files that need to be quieter/louder
+	const EFFECT_TRACK_VOLUME_OVERRIDES: Record<string, number> = {
+		"/music/opportunita/opportunita-02.mp3": 0.15
 	};
 
 	let overallAudio = $state<HTMLAudioElement | null>(null);
@@ -72,6 +76,35 @@
 		return audioElement;
 	}
 
+	// Fade controller map for cancelling in-flight fades
+	const _fadeControllers = new WeakMap<HTMLAudioElement, { cancelled: boolean }>();
+
+	function fadeTo(audio: HTMLAudioElement, target: number, duration = 600) {
+		return new Promise<void>((resolve) => {
+			const start = performance.now();
+			const from = Number(audio.volume) || 0;
+			const delta = target - from;
+			const ctrl = { cancelled: false };
+			_fadeControllers.set(audio, ctrl);
+
+			function step(now: number) {
+				if (ctrl.cancelled) return resolve();
+				const t = Math.min(1, (now - start) / duration);
+				audio.volume = Math.max(0, Math.min(1, from + delta * t));
+				if (t < 1) requestAnimationFrame(step);
+				else resolve();
+			}
+
+			requestAnimationFrame(step);
+		});
+	}
+
+	function cancelFade(audio: HTMLAudioElement) {
+		const c = _fadeControllers.get(audio);
+		if (c) c.cancelled = true;
+		_fadeControllers.delete(audio);
+	}
+
 	async function playAudio(audioElement: HTMLAudioElement) {
 		try {
 			await audioElement.play();
@@ -83,10 +116,18 @@
 	async function playCurrent() {
 		if (!overallAudio) return;
 
+		// ensure overall plays and fade to target
 		await playAudio(overallAudio);
+		cancelFade(overallAudio);
+		fadeTo(overallAudio, OVERALL_VOLUME, 600).catch(() => {});
 
 		for (const effectAudio of effectAudios) {
 			await playAudio(effectAudio);
+			const target = (effectAudio as any)._targetVolume ?? Object.keys(EFFECT_TRACKS).reduce((acc, k) => {
+				if (EFFECT_TRACKS[k].includes(effectAudio.src)) return EFFECT_VOLUMES[k as EffectKey];
+				return acc;
+			}, 0.3 as number);
+			fadeTo(effectAudio, target, 800).catch(() => {});
 		}
 
 		syncPlayingState();
@@ -94,11 +135,14 @@
 
 	function pauseCurrent() {
 		if (overallAudio) {
-			overallAudio.pause();
+			// fade overall down then pause
+			cancelFade(overallAudio);
+			fadeTo(overallAudio, 0, 500).then(() => overallAudio.pause()).catch(() => overallAudio.pause());
 		}
 
 		for (const effectAudio of effectAudios) {
-			effectAudio.pause();
+			cancelFade(effectAudio);
+			fadeTo(effectAudio, 0, 500).then(() => effectAudio.pause()).catch(() => effectAudio.pause());
 		}
 
 		isPlaying = false;
@@ -116,23 +160,49 @@
 	}
 
 	function stopEffects() {
+		// fade out and stop existing effect audios
 		for (const effectAudio of effectAudios) {
-			effectAudio.pause();
-			effectAudio.currentTime = 0;
-			effectAudio.src = "";
+			cancelFade(effectAudio);
+			fadeTo(effectAudio, 0, 600).then(() => {
+				effectAudio.pause();
+				effectAudio.currentTime = 0;
+				effectAudio.src = "";
+			}).catch(() => {});
 		}
 
 		effectAudios = [];
 	}
 
 	function loadEffectsFor(key: TrackKey) {
-		stopEffects();
+		// Crossfade: fade out old effects, create new ones at 0 volume and fade them in.
+		const old = effectAudios.slice();
 
-		if (key === "overall") return;
+		if (key === "overall") {
+			// fade out old and clear
+			stopEffects();
+			return;
+		}
 
 		effectAudios = EFFECT_TRACKS[key].map((src) => {
-			return createLoopAudio(src, EFFECT_VOLUMES[key]);
+			const a = createLoopAudio(src, 0);
+			a.preload = "auto";
+			return a;
 		});
+
+		// start new effects muted, then fade in
+		for (const ea of effectAudios) {
+			playAudio(ea).then(() => fadeTo(ea, EFFECT_VOLUMES[key], 800)).catch(() => {});
+		}
+
+		// fade out old effects and clean them after
+		for (const oldA of old) {
+			cancelFade(oldA);
+			fadeTo(oldA, 0, 600).then(() => {
+				oldA.pause();
+				oldA.currentTime = 0;
+				oldA.src = "";
+			}).catch(() => {});
+		}
 	}
 
 	async function setTrack(key: unknown, shouldPlay = true) {
@@ -295,7 +365,8 @@
 	.music-control-btn span {
 		display: block;
 		/* make the music bars slightly thinner */
-		width: 1.2px;
+		/* slightly thicker so default state is visible */
+		width: 2px;
 		height: var(--h);
 		border-radius: 999px;
 
