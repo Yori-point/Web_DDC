@@ -943,11 +943,8 @@
 	</a>
 
 	<div class="about-copy">
-		{#if activeAbout}
-			<h1 class="about-name-title">{aboutContent.title}</h1>
-		{:else}
-			<ParticleTitle text={aboutContent.title} variant="about" ariaLabel={aboutContent.title} />
-		{/if}
+		<!-- Always show static title (no particle effect) -->
+		<h1 class="about-name-title">{aboutContent.title}</h1>
 
 		<div class="about-text" class:is-default={!activeAbout}>
 			<p class="about-lead">
@@ -1175,17 +1172,15 @@
 		display: flex;
 		align-items: center;
 
-		font-family: var(--font-title);
-		font-size: 48px;
+		font-family: 'Americana', var(--font-title);
+		font-size: 55px;
 		font-weight: 400;
 		line-height: 0.9;
-		letter-spacing: 0.045em;
+		letter-spacing: 0.04em;
 		text-transform: none;
 
-		color: rgba(255, 255, 255, 0.92);
-		text-shadow:
-			0 0 14px rgba(255, 255, 255, 0.18),
-			0 0 32px rgba(210, 226, 238, 0.12);
+		color: #f2f5f7;
+		text-shadow: 0 0 22px rgba(242, 245, 247, 0.06);
 
 		pointer-events: none;
 	}
